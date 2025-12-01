@@ -1,6 +1,6 @@
 package fxprof
 
-class MediaSampleMarkerPayload private (args: MediaSampleMarkerPayloadArgs) {
+class MediaSampleMarkerPayload private (private[fxprof] val args: MediaSampleMarkerPayloadArgs) {
   def `type`: MediaSampleMarkerPayload_Type.type = args.`type`
   def sampleStartTimeUs: Microseconds = args.sampleStartTimeUs
   def sampleEndTimeUs: Microseconds = args.sampleEndTimeUs
@@ -20,6 +20,9 @@ class MediaSampleMarkerPayload private (args: MediaSampleMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object MediaSampleMarkerPayload {
   def apply(
     `type`: MediaSampleMarkerPayload_Type.type,
@@ -31,9 +34,23 @@ object MediaSampleMarkerPayload {
       sampleStartTimeUs = sampleStartTimeUs,
       sampleEndTimeUs = sampleEndTimeUs,
     ))
+  given JsonValueCodec[MediaSampleMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: MediaSampleMarkerPayload) = 
+        new MediaSampleMarkerPayload(summon[JsonValueCodec[MediaSampleMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: MediaSampleMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[MediaSampleMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: MediaSampleMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class MediaSampleMarkerPayloadArgs(
   `type`: MediaSampleMarkerPayload_Type.type,
   sampleStartTimeUs: Microseconds,
   sampleEndTimeUs: Microseconds,
 )
+private[fxprof] object MediaSampleMarkerPayloadArgs {
+  given JsonValueCodec[MediaSampleMarkerPayloadArgs] = JsonCodecMaker.make
+}

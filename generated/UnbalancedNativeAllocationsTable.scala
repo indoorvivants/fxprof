@@ -1,22 +1,22 @@
 package fxprof
 
-class UnbalancedNativeAllocationsTable private (args: UnbalancedNativeAllocationsTableArgs) {
-  def time: Array[Milliseconds] = args.time
-  def weight: Array[Bytes] = args.weight
+class UnbalancedNativeAllocationsTable private (private[fxprof] val args: UnbalancedNativeAllocationsTableArgs) {
+  def time: Vector[Milliseconds] = args.time
+  def weight: Vector[Bytes] = args.weight
   def weightType: UnbalancedNativeAllocationsTable_WeightType.type = args.weightType
-  def stack: Array[Option[IndexIntoStackTable]] = args.stack
+  def stack: Vector[Option[IndexIntoStackTable]] = args.stack
   def length: Double = args.length
 
-  def withTime(value: Array[Milliseconds]): UnbalancedNativeAllocationsTable =
+  def withTime(value: Vector[Milliseconds]): UnbalancedNativeAllocationsTable =
     copy(_.copy(time = value))
   
-  def withWeight(value: Array[Bytes]): UnbalancedNativeAllocationsTable =
+  def withWeight(value: Vector[Bytes]): UnbalancedNativeAllocationsTable =
     copy(_.copy(weight = value))
   
   def withWeightType(value: UnbalancedNativeAllocationsTable_WeightType.type): UnbalancedNativeAllocationsTable =
     copy(_.copy(weightType = value))
   
-  def withStack(value: Array[Option[IndexIntoStackTable]]): UnbalancedNativeAllocationsTable =
+  def withStack(value: Vector[Option[IndexIntoStackTable]]): UnbalancedNativeAllocationsTable =
     copy(_.copy(stack = value))
   
   def withLength(value: Double): UnbalancedNativeAllocationsTable =
@@ -28,6 +28,9 @@ class UnbalancedNativeAllocationsTable private (args: UnbalancedNativeAllocation
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object UnbalancedNativeAllocationsTable {
   def apply(
     weightType: UnbalancedNativeAllocationsTable_WeightType.type,
@@ -37,11 +40,25 @@ object UnbalancedNativeAllocationsTable {
       weightType = weightType,
       length = length,
     ))
+  given JsonValueCodec[UnbalancedNativeAllocationsTable] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: UnbalancedNativeAllocationsTable) = 
+        new UnbalancedNativeAllocationsTable(summon[JsonValueCodec[UnbalancedNativeAllocationsTableArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: UnbalancedNativeAllocationsTable, out: JsonWriter) = 
+        summon[JsonValueCodec[UnbalancedNativeAllocationsTableArgs]].encodeValue(x.args, out)
+      
+      def nullValue: UnbalancedNativeAllocationsTable = null
+    }
+  
 }
 private[fxprof] case class UnbalancedNativeAllocationsTableArgs(
-  time: Array[Milliseconds] = Array.empty,
-  weight: Array[Bytes] = Array.empty,
+  time: Vector[Milliseconds] = Vector.empty,
+  weight: Vector[Bytes] = Vector.empty,
   weightType: UnbalancedNativeAllocationsTable_WeightType.type,
-  stack: Array[Option[IndexIntoStackTable]] = Array.empty,
+  stack: Vector[Option[IndexIntoStackTable]] = Vector.empty,
   length: Double,
 )
+private[fxprof] object UnbalancedNativeAllocationsTableArgs {
+  given JsonValueCodec[UnbalancedNativeAllocationsTableArgs] = JsonCodecMaker.make
+}

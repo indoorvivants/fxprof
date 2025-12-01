@@ -1,16 +1,16 @@
 package fxprof
 
-class ProfilerConfiguration private (args: ProfilerConfigurationArgs) {
-  def threads: Array[String] = args.threads
-  def features: Array[String] = args.features
+class ProfilerConfiguration private (private[fxprof] val args: ProfilerConfigurationArgs) {
+  def threads: Vector[String] = args.threads
+  def features: Vector[String] = args.features
   def capacity: Bytes = args.capacity
   def duration: Option[Double] = args.duration
   def activeTabID: Option[TabID] = args.activeTabID
 
-  def withThreads(value: Array[String]): ProfilerConfiguration =
+  def withThreads(value: Vector[String]): ProfilerConfiguration =
     copy(_.copy(threads = value))
   
-  def withFeatures(value: Array[String]): ProfilerConfiguration =
+  def withFeatures(value: Vector[String]): ProfilerConfiguration =
     copy(_.copy(features = value))
   
   def withCapacity(value: Bytes): ProfilerConfiguration =
@@ -28,6 +28,9 @@ class ProfilerConfiguration private (args: ProfilerConfigurationArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object ProfilerConfiguration {
   def apply(
     capacity: Bytes,
@@ -35,11 +38,25 @@ object ProfilerConfiguration {
     new ProfilerConfiguration(ProfilerConfigurationArgs(
       capacity = capacity,
     ))
+  given JsonValueCodec[ProfilerConfiguration] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: ProfilerConfiguration) = 
+        new ProfilerConfiguration(summon[JsonValueCodec[ProfilerConfigurationArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: ProfilerConfiguration, out: JsonWriter) = 
+        summon[JsonValueCodec[ProfilerConfigurationArgs]].encodeValue(x.args, out)
+      
+      def nullValue: ProfilerConfiguration = null
+    }
+  
 }
 private[fxprof] case class ProfilerConfigurationArgs(
-  threads: Array[String] = Array.empty,
-  features: Array[String] = Array.empty,
+  threads: Vector[String] = Vector.empty,
+  features: Vector[String] = Vector.empty,
   capacity: Bytes,
   duration: Option[Double] = None,
   activeTabID: Option[TabID] = None,
 )
+private[fxprof] object ProfilerConfigurationArgs {
+  given JsonValueCodec[ProfilerConfigurationArgs] = JsonCodecMaker.make
+}

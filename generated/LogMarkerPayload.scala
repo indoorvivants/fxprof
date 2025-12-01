@@ -1,6 +1,6 @@
 package fxprof
 
-class LogMarkerPayload private (args: LogMarkerPayloadArgs) {
+class LogMarkerPayload private (private[fxprof] val args: LogMarkerPayloadArgs) {
   def `type`: LogMarkerPayload_Type.type = args.`type`
   def name: String = args.name
   def module: String = args.module
@@ -20,6 +20,9 @@ class LogMarkerPayload private (args: LogMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object LogMarkerPayload {
   def apply(
     `type`: LogMarkerPayload_Type.type,
@@ -31,9 +34,23 @@ object LogMarkerPayload {
       name = name,
       module = module,
     ))
+  given JsonValueCodec[LogMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: LogMarkerPayload) = 
+        new LogMarkerPayload(summon[JsonValueCodec[LogMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: LogMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[LogMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: LogMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class LogMarkerPayloadArgs(
   `type`: LogMarkerPayload_Type.type,
   name: String,
   module: String,
 )
+private[fxprof] object LogMarkerPayloadArgs {
+  given JsonValueCodec[LogMarkerPayloadArgs] = JsonCodecMaker.make
+}

@@ -1,6 +1,6 @@
 package fxprof
 
-class RawCounter private (args: RawCounterArgs) {
+class RawCounter private (private[fxprof] val args: RawCounterArgs) {
   def name: String = args.name
   def category: String = args.category
   def description: String = args.description
@@ -36,6 +36,9 @@ class RawCounter private (args: RawCounterArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object RawCounter {
   def apply(
     name: String,
@@ -53,6 +56,17 @@ object RawCounter {
       mainThreadIndex = mainThreadIndex,
       samples = samples,
     ))
+  given JsonValueCodec[RawCounter] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: RawCounter) = 
+        new RawCounter(summon[JsonValueCodec[RawCounterArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: RawCounter, out: JsonWriter) = 
+        summon[JsonValueCodec[RawCounterArgs]].encodeValue(x.args, out)
+      
+      def nullValue: RawCounter = null
+    }
+  
 }
 private[fxprof] case class RawCounterArgs(
   name: String,
@@ -63,3 +77,6 @@ private[fxprof] case class RawCounterArgs(
   mainThreadIndex: ThreadIndex,
   samples: RawCounterSamplesTable,
 )
+private[fxprof] object RawCounterArgs {
+  given JsonValueCodec[RawCounterArgs] = JsonCodecMaker.make
+}

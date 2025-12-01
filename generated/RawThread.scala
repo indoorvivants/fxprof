@@ -1,12 +1,12 @@
 package fxprof
 
-class RawThread private (args: RawThreadArgs) {
+class RawThread private (private[fxprof] val args: RawThreadArgs) {
   def processType: ProcessType = args.processType
   def processStartupTime: Milliseconds = args.processStartupTime
   def processShutdownTime: Option[Milliseconds] = args.processShutdownTime
   def registerTime: Milliseconds = args.registerTime
   def unregisterTime: Option[Milliseconds] = args.unregisterTime
-  def pausedRanges: Array[PausedRange] = args.pausedRanges
+  def pausedRanges: Vector[PausedRange] = args.pausedRanges
   def showMarkersInTimeline: Option[Boolean] = args.showMarkersInTimeline
   def name: String = args.name
   def isMainThread: Boolean = args.isMainThread
@@ -42,7 +42,7 @@ class RawThread private (args: RawThreadArgs) {
   def withUnregisterTime(value: Option[Milliseconds]): RawThread =
     copy(_.copy(unregisterTime = value))
   
-  def withPausedRanges(value: Array[PausedRange]): RawThread =
+  def withPausedRanges(value: Vector[PausedRange]): RawThread =
     copy(_.copy(pausedRanges = value))
   
   def withShowMarkersInTimeline(value: Option[Boolean]): RawThread =
@@ -108,6 +108,9 @@ class RawThread private (args: RawThreadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object RawThread {
   def apply(
     processType: ProcessType,
@@ -141,6 +144,17 @@ object RawThread {
       resourceTable = resourceTable,
       nativeSymbols = nativeSymbols,
     ))
+  given JsonValueCodec[RawThread] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: RawThread) = 
+        new RawThread(summon[JsonValueCodec[RawThreadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: RawThread, out: JsonWriter) = 
+        summon[JsonValueCodec[RawThreadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: RawThread = null
+    }
+  
 }
 private[fxprof] case class RawThreadArgs(
   processType: ProcessType,
@@ -148,7 +162,7 @@ private[fxprof] case class RawThreadArgs(
   processShutdownTime: Option[Milliseconds] = None,
   registerTime: Milliseconds,
   unregisterTime: Option[Milliseconds] = None,
-  pausedRanges: Array[PausedRange] = Array.empty,
+  pausedRanges: Vector[PausedRange] = Vector.empty,
   showMarkersInTimeline: Option[Boolean] = None,
   name: String,
   isMainThread: Boolean,
@@ -169,3 +183,6 @@ private[fxprof] case class RawThreadArgs(
   isPrivateBrowsing: Option[Boolean] = None,
   userContextId: Option[Double] = None,
 )
+private[fxprof] object RawThreadArgs {
+  given JsonValueCodec[RawThreadArgs] = JsonCodecMaker.make
+}

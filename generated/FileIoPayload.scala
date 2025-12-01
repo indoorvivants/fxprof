@@ -1,6 +1,6 @@
 package fxprof
 
-class FileIoPayload private (args: FileIoPayloadArgs) {
+class FileIoPayload private (private[fxprof] val args: FileIoPayloadArgs) {
   def `type`: FileIoPayload_Type.type = args.`type`
   def cause: Option[CauseBacktrace] = args.cause
   def source: String = args.source
@@ -32,6 +32,9 @@ class FileIoPayload private (args: FileIoPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object FileIoPayload {
   def apply(
     `type`: FileIoPayload_Type.type,
@@ -43,6 +46,17 @@ object FileIoPayload {
       source = source,
       operation = operation,
     ))
+  given JsonValueCodec[FileIoPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: FileIoPayload) = 
+        new FileIoPayload(summon[JsonValueCodec[FileIoPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: FileIoPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[FileIoPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: FileIoPayload = null
+    }
+  
 }
 private[fxprof] case class FileIoPayloadArgs(
   `type`: FileIoPayload_Type.type,
@@ -52,3 +66,6 @@ private[fxprof] case class FileIoPayloadArgs(
   filename: Option[String] = None,
   threadId: Option[Double] = None,
 )
+private[fxprof] object FileIoPayloadArgs {
+  given JsonValueCodec[FileIoPayloadArgs] = JsonCodecMaker.make
+}

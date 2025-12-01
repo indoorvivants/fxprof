@@ -1,6 +1,6 @@
 package fxprof
 
-class DOMEventMarkerPayload private (args: DOMEventMarkerPayloadArgs) {
+class DOMEventMarkerPayload private (private[fxprof] val args: DOMEventMarkerPayloadArgs) {
   def `type`: DOMEventMarkerPayload_Type.type = args.`type`
   def latency: Option[Milliseconds] = args.latency
   def eventType: String = args.eventType
@@ -24,6 +24,9 @@ class DOMEventMarkerPayload private (args: DOMEventMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object DOMEventMarkerPayload {
   def apply(
     `type`: DOMEventMarkerPayload_Type.type,
@@ -33,6 +36,17 @@ object DOMEventMarkerPayload {
       `type` = `type`,
       eventType = eventType,
     ))
+  given JsonValueCodec[DOMEventMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: DOMEventMarkerPayload) = 
+        new DOMEventMarkerPayload(summon[JsonValueCodec[DOMEventMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: DOMEventMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[DOMEventMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: DOMEventMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class DOMEventMarkerPayloadArgs(
   `type`: DOMEventMarkerPayload_Type.type,
@@ -40,3 +54,6 @@ private[fxprof] case class DOMEventMarkerPayloadArgs(
   eventType: String,
   innerWindowID: Option[Double] = None,
 )
+private[fxprof] object DOMEventMarkerPayloadArgs {
+  given JsonValueCodec[DOMEventMarkerPayloadArgs] = JsonCodecMaker.make
+}

@@ -1,6 +1,6 @@
 package fxprof
 
-class GPUMarkerPayload private (args: GPUMarkerPayloadArgs) {
+class GPUMarkerPayload private (private[fxprof] val args: GPUMarkerPayloadArgs) {
   def `type`: GPUMarkerPayload_Type.type = args.`type`
   def cpustart: Milliseconds = args.cpustart
   def cpuend: Milliseconds = args.cpuend
@@ -28,6 +28,9 @@ class GPUMarkerPayload private (args: GPUMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object GPUMarkerPayload {
   def apply(
     `type`: GPUMarkerPayload_Type.type,
@@ -43,6 +46,17 @@ object GPUMarkerPayload {
       gpustart = gpustart,
       gpuend = gpuend,
     ))
+  given JsonValueCodec[GPUMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: GPUMarkerPayload) = 
+        new GPUMarkerPayload(summon[JsonValueCodec[GPUMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: GPUMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[GPUMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: GPUMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class GPUMarkerPayloadArgs(
   `type`: GPUMarkerPayload_Type.type,
@@ -51,3 +65,6 @@ private[fxprof] case class GPUMarkerPayloadArgs(
   gpustart: Milliseconds,
   gpuend: Milliseconds,
 )
+private[fxprof] object GPUMarkerPayloadArgs {
+  given JsonValueCodec[GPUMarkerPayloadArgs] = JsonCodecMaker.make
+}

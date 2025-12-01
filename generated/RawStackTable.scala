@@ -1,14 +1,14 @@
 package fxprof
 
-class RawStackTable private (args: RawStackTableArgs) {
-  def frame: Array[IndexIntoFrameTable] = args.frame
-  def prefix: Array[Option[IndexIntoStackTable]] = args.prefix
+class RawStackTable private (private[fxprof] val args: RawStackTableArgs) {
+  def frame: Vector[IndexIntoFrameTable] = args.frame
+  def prefix: Vector[Option[IndexIntoStackTable]] = args.prefix
   def length: Double = args.length
 
-  def withFrame(value: Array[IndexIntoFrameTable]): RawStackTable =
+  def withFrame(value: Vector[IndexIntoFrameTable]): RawStackTable =
     copy(_.copy(frame = value))
   
-  def withPrefix(value: Array[Option[IndexIntoStackTable]]): RawStackTable =
+  def withPrefix(value: Vector[Option[IndexIntoStackTable]]): RawStackTable =
     copy(_.copy(prefix = value))
   
   def withLength(value: Double): RawStackTable =
@@ -20,6 +20,9 @@ class RawStackTable private (args: RawStackTableArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object RawStackTable {
   def apply(
     length: Double,
@@ -27,9 +30,23 @@ object RawStackTable {
     new RawStackTable(RawStackTableArgs(
       length = length,
     ))
+  given JsonValueCodec[RawStackTable] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: RawStackTable) = 
+        new RawStackTable(summon[JsonValueCodec[RawStackTableArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: RawStackTable, out: JsonWriter) = 
+        summon[JsonValueCodec[RawStackTableArgs]].encodeValue(x.args, out)
+      
+      def nullValue: RawStackTable = null
+    }
+  
 }
 private[fxprof] case class RawStackTableArgs(
-  frame: Array[IndexIntoFrameTable] = Array.empty,
-  prefix: Array[Option[IndexIntoStackTable]] = Array.empty,
+  frame: Vector[IndexIntoFrameTable] = Vector.empty,
+  prefix: Vector[Option[IndexIntoStackTable]] = Vector.empty,
   length: Double,
 )
+private[fxprof] object RawStackTableArgs {
+  given JsonValueCodec[RawStackTableArgs] = JsonCodecMaker.make
+}

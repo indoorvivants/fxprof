@@ -1,6 +1,6 @@
 package fxprof
 
-class NavigationMarkerPayload private (args: NavigationMarkerPayloadArgs) {
+class NavigationMarkerPayload private (private[fxprof] val args: NavigationMarkerPayloadArgs) {
   def `type`: NavigationMarkerPayload_Type.type = args.`type`
   def category: NavigationMarkerPayload_Category.type = args.category
   def eventType: Option[String] = args.eventType
@@ -24,6 +24,9 @@ class NavigationMarkerPayload private (args: NavigationMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object NavigationMarkerPayload {
   def apply(
     `type`: NavigationMarkerPayload_Type.type,
@@ -33,6 +36,17 @@ object NavigationMarkerPayload {
       `type` = `type`,
       category = category,
     ))
+  given JsonValueCodec[NavigationMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: NavigationMarkerPayload) = 
+        new NavigationMarkerPayload(summon[JsonValueCodec[NavigationMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: NavigationMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[NavigationMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: NavigationMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class NavigationMarkerPayloadArgs(
   `type`: NavigationMarkerPayload_Type.type,
@@ -40,3 +54,6 @@ private[fxprof] case class NavigationMarkerPayloadArgs(
   eventType: Option[String] = None,
   innerWindowID: Option[Double] = None,
 )
+private[fxprof] object NavigationMarkerPayloadArgs {
+  given JsonValueCodec[NavigationMarkerPayloadArgs] = JsonCodecMaker.make
+}

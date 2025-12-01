@@ -1,35 +1,35 @@
 package fxprof
 
-class Profile private (args: ProfileArgs) {
+class Profile private (private[fxprof] val args: ProfileArgs) {
   def meta: ProfileMeta = args.meta
-  def libs: Array[Lib] = args.libs
+  def libs: Vector[Lib] = args.libs
   def pages: Option[PageList] = args.pages
-  def counters: Option[Array[RawCounter]] = args.counters
-  def profilerOverhead: Option[Array[ProfilerOverhead]] = args.profilerOverhead
+  def counters: Option[Vector[RawCounter]] = args.counters
+  def profilerOverhead: Option[Vector[ProfilerOverhead]] = args.profilerOverhead
   def shared: RawProfileSharedData = args.shared
-  def threads: Array[RawThread] = args.threads
+  def threads: Vector[RawThread] = args.threads
   def profilingLog: Option[ProfilingLog] = args.profilingLog
   def profileGatheringLog: Option[ProfilingLog] = args.profileGatheringLog
 
   def withMeta(value: ProfileMeta): Profile =
     copy(_.copy(meta = value))
   
-  def withLibs(value: Array[Lib]): Profile =
+  def withLibs(value: Vector[Lib]): Profile =
     copy(_.copy(libs = value))
   
   def withPages(value: Option[PageList]): Profile =
     copy(_.copy(pages = value))
   
-  def withCounters(value: Option[Array[RawCounter]]): Profile =
+  def withCounters(value: Option[Vector[RawCounter]]): Profile =
     copy(_.copy(counters = value))
   
-  def withProfilerOverhead(value: Option[Array[ProfilerOverhead]]): Profile =
+  def withProfilerOverhead(value: Option[Vector[ProfilerOverhead]]): Profile =
     copy(_.copy(profilerOverhead = value))
   
   def withShared(value: RawProfileSharedData): Profile =
     copy(_.copy(shared = value))
   
-  def withThreads(value: Array[RawThread]): Profile =
+  def withThreads(value: Vector[RawThread]): Profile =
     copy(_.copy(threads = value))
   
   def withProfilingLog(value: Option[ProfilingLog]): Profile =
@@ -44,6 +44,9 @@ class Profile private (args: ProfileArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object Profile {
   def apply(
     meta: ProfileMeta,
@@ -53,15 +56,29 @@ object Profile {
       meta = meta,
       shared = shared,
     ))
+  given JsonValueCodec[Profile] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: Profile) = 
+        new Profile(summon[JsonValueCodec[ProfileArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: Profile, out: JsonWriter) = 
+        summon[JsonValueCodec[ProfileArgs]].encodeValue(x.args, out)
+      
+      def nullValue: Profile = null
+    }
+  
 }
 private[fxprof] case class ProfileArgs(
   meta: ProfileMeta,
-  libs: Array[Lib] = Array.empty,
+  libs: Vector[Lib] = Vector.empty,
   pages: Option[PageList] = None,
-  counters: Option[Array[RawCounter]] = None,
-  profilerOverhead: Option[Array[ProfilerOverhead]] = None,
+  counters: Option[Vector[RawCounter]] = None,
+  profilerOverhead: Option[Vector[ProfilerOverhead]] = None,
   shared: RawProfileSharedData,
-  threads: Array[RawThread] = Array.empty,
+  threads: Vector[RawThread] = Vector.empty,
   profilingLog: Option[ProfilingLog] = None,
   profileGatheringLog: Option[ProfilingLog] = None,
 )
+private[fxprof] object ProfileArgs {
+  given JsonValueCodec[ProfileArgs] = JsonCodecMaker.make
+}

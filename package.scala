@@ -1,3 +1,4 @@
+import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
 package object fxprof {
   type Milliseconds = Double
   type Pid = String
@@ -29,7 +30,7 @@ package object fxprof {
   sealed trait Tid extends Product with Serializable
   object Tid {
     case class Number(value: Double) extends Tid
-    case class String(value: String) extends Tid
+    case class Str(value: String) extends Tid
   }
   type IndexIntoJsTracerEvents = Double;
   type CounterIndex = Double;
@@ -84,7 +85,7 @@ package object fxprof {
     case object IntervalEnd extends MarkerPhase(3)
   }
 
-  type ProcessProfilingLog = Map[String, Any]
+  type ProcessProfilingLog = Map[String, Array[Byte]]
   type ProfilingLog = Map[Double, ProcessProfilingLog]
 
   // export type ProcessType =
@@ -238,6 +239,9 @@ package object fxprof {
         extends MarkerPayload
     case class Url(payload: UrlMarkerPayload) extends MarkerPayload
     case class HostResolver(payload: HostResolverPayload) extends MarkerPayload
+
+    given JsonValueCodec[MarkerPayload] = ???
+
   }
 
   class StringLiteral(value: String)

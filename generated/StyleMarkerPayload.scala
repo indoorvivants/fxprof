@@ -1,6 +1,6 @@
 package fxprof
 
-class StyleMarkerPayload private (args: StyleMarkerPayloadArgs) {
+class StyleMarkerPayload private (private[fxprof] val args: StyleMarkerPayloadArgs) {
   def `type`: StyleMarkerPayload_Type.type = args.`type`
   def category: StyleMarkerPayload_Category.type = args.category
   def cause: Option[CauseBacktrace] = args.cause
@@ -40,6 +40,9 @@ class StyleMarkerPayload private (args: StyleMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object StyleMarkerPayload {
   def apply(
     `type`: StyleMarkerPayload_Type.type,
@@ -59,6 +62,17 @@ object StyleMarkerPayload {
       stylesShared = stylesShared,
       stylesReused = stylesReused,
     ))
+  given JsonValueCodec[StyleMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: StyleMarkerPayload) = 
+        new StyleMarkerPayload(summon[JsonValueCodec[StyleMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: StyleMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[StyleMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: StyleMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class StyleMarkerPayloadArgs(
   `type`: StyleMarkerPayload_Type.type,
@@ -70,3 +84,6 @@ private[fxprof] case class StyleMarkerPayloadArgs(
   stylesShared: Double,
   stylesReused: Double,
 )
+private[fxprof] object StyleMarkerPayloadArgs {
+  given JsonValueCodec[StyleMarkerPayloadArgs] = JsonCodecMaker.make
+}

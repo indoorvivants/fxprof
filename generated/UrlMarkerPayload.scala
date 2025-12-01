@@ -1,6 +1,6 @@
 package fxprof
 
-class UrlMarkerPayload private (args: UrlMarkerPayloadArgs) {
+class UrlMarkerPayload private (private[fxprof] val args: UrlMarkerPayloadArgs) {
   def `type`: UrlMarkerPayload_Type.type = args.`type`
   def url: String = args.url
 
@@ -16,6 +16,9 @@ class UrlMarkerPayload private (args: UrlMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object UrlMarkerPayload {
   def apply(
     `type`: UrlMarkerPayload_Type.type,
@@ -25,8 +28,22 @@ object UrlMarkerPayload {
       `type` = `type`,
       url = url,
     ))
+  given JsonValueCodec[UrlMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: UrlMarkerPayload) = 
+        new UrlMarkerPayload(summon[JsonValueCodec[UrlMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: UrlMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[UrlMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: UrlMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class UrlMarkerPayloadArgs(
   `type`: UrlMarkerPayload_Type.type,
   url: String,
 )
+private[fxprof] object UrlMarkerPayloadArgs {
+  given JsonValueCodec[UrlMarkerPayloadArgs] = JsonCodecMaker.make
+}

@@ -1,6 +1,6 @@
 package fxprof
 
-class UserTimingMarkerPayload private (args: UserTimingMarkerPayloadArgs) {
+class UserTimingMarkerPayload private (private[fxprof] val args: UserTimingMarkerPayloadArgs) {
   def `type`: UserTimingMarkerPayload_Type.type = args.`type`
   def name: String = args.name
   def entryType: UserTimingMarkerPayload_EntryType = args.entryType
@@ -20,6 +20,9 @@ class UserTimingMarkerPayload private (args: UserTimingMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object UserTimingMarkerPayload {
   def apply(
     `type`: UserTimingMarkerPayload_Type.type,
@@ -31,9 +34,23 @@ object UserTimingMarkerPayload {
       name = name,
       entryType = entryType,
     ))
+  given JsonValueCodec[UserTimingMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: UserTimingMarkerPayload) = 
+        new UserTimingMarkerPayload(summon[JsonValueCodec[UserTimingMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: UserTimingMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[UserTimingMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: UserTimingMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class UserTimingMarkerPayloadArgs(
   `type`: UserTimingMarkerPayload_Type.type,
   name: String,
   entryType: UserTimingMarkerPayload_EntryType,
 )
+private[fxprof] object UserTimingMarkerPayloadArgs {
+  given JsonValueCodec[UserTimingMarkerPayloadArgs] = JsonCodecMaker.make
+}

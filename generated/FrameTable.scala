@@ -1,42 +1,42 @@
 package fxprof
 
-class FrameTable private (args: FrameTableArgs) {
-  def address: Array[FrameTable_Address] = args.address
-  def inlineDepth: Array[Double] = args.inlineDepth
-  def category: Array[Option[IndexIntoCategoryList]] = args.category
-  def subcategory: Array[Option[IndexIntoSubcategoryListForCategory]] = args.subcategory
-  def func: Array[IndexIntoFuncTable] = args.func
-  def nativeSymbol: Array[Option[IndexIntoNativeSymbolTable]] = args.nativeSymbol
-  def innerWindowID: Array[Option[InnerWindowID]] = args.innerWindowID
-  def line: Array[Option[Double]] = args.line
-  def column: Array[Option[Double]] = args.column
+class FrameTable private (private[fxprof] val args: FrameTableArgs) {
+  def address: Vector[FrameTable_Address] = args.address
+  def inlineDepth: Vector[Double] = args.inlineDepth
+  def category: Vector[Option[IndexIntoCategoryList]] = args.category
+  def subcategory: Vector[Option[IndexIntoSubcategoryListForCategory]] = args.subcategory
+  def func: Vector[IndexIntoFuncTable] = args.func
+  def nativeSymbol: Vector[Option[IndexIntoNativeSymbolTable]] = args.nativeSymbol
+  def innerWindowID: Vector[Option[InnerWindowID]] = args.innerWindowID
+  def line: Vector[Option[Double]] = args.line
+  def column: Vector[Option[Double]] = args.column
   def length: Double = args.length
 
-  def withAddress(value: Array[FrameTable_Address]): FrameTable =
+  def withAddress(value: Vector[FrameTable_Address]): FrameTable =
     copy(_.copy(address = value))
   
-  def withInlineDepth(value: Array[Double]): FrameTable =
+  def withInlineDepth(value: Vector[Double]): FrameTable =
     copy(_.copy(inlineDepth = value))
   
-  def withCategory(value: Array[Option[IndexIntoCategoryList]]): FrameTable =
+  def withCategory(value: Vector[Option[IndexIntoCategoryList]]): FrameTable =
     copy(_.copy(category = value))
   
-  def withSubcategory(value: Array[Option[IndexIntoSubcategoryListForCategory]]): FrameTable =
+  def withSubcategory(value: Vector[Option[IndexIntoSubcategoryListForCategory]]): FrameTable =
     copy(_.copy(subcategory = value))
   
-  def withFunc(value: Array[IndexIntoFuncTable]): FrameTable =
+  def withFunc(value: Vector[IndexIntoFuncTable]): FrameTable =
     copy(_.copy(func = value))
   
-  def withNativeSymbol(value: Array[Option[IndexIntoNativeSymbolTable]]): FrameTable =
+  def withNativeSymbol(value: Vector[Option[IndexIntoNativeSymbolTable]]): FrameTable =
     copy(_.copy(nativeSymbol = value))
   
-  def withInnerWindowID(value: Array[Option[InnerWindowID]]): FrameTable =
+  def withInnerWindowID(value: Vector[Option[InnerWindowID]]): FrameTable =
     copy(_.copy(innerWindowID = value))
   
-  def withLine(value: Array[Option[Double]]): FrameTable =
+  def withLine(value: Vector[Option[Double]]): FrameTable =
     copy(_.copy(line = value))
   
-  def withColumn(value: Array[Option[Double]]): FrameTable =
+  def withColumn(value: Vector[Option[Double]]): FrameTable =
     copy(_.copy(column = value))
   
   def withLength(value: Double): FrameTable =
@@ -48,6 +48,9 @@ class FrameTable private (args: FrameTableArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object FrameTable {
   def apply(
     length: Double,
@@ -55,16 +58,30 @@ object FrameTable {
     new FrameTable(FrameTableArgs(
       length = length,
     ))
+  given JsonValueCodec[FrameTable] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: FrameTable) = 
+        new FrameTable(summon[JsonValueCodec[FrameTableArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: FrameTable, out: JsonWriter) = 
+        summon[JsonValueCodec[FrameTableArgs]].encodeValue(x.args, out)
+      
+      def nullValue: FrameTable = null
+    }
+  
 }
 private[fxprof] case class FrameTableArgs(
-  address: Array[FrameTable_Address] = Array.empty,
-  inlineDepth: Array[Double] = Array.empty,
-  category: Array[Option[IndexIntoCategoryList]] = Array.empty,
-  subcategory: Array[Option[IndexIntoSubcategoryListForCategory]] = Array.empty,
-  func: Array[IndexIntoFuncTable] = Array.empty,
-  nativeSymbol: Array[Option[IndexIntoNativeSymbolTable]] = Array.empty,
-  innerWindowID: Array[Option[InnerWindowID]] = Array.empty,
-  line: Array[Option[Double]] = Array.empty,
-  column: Array[Option[Double]] = Array.empty,
+  address: Vector[FrameTable_Address] = Vector.empty,
+  inlineDepth: Vector[Double] = Vector.empty,
+  category: Vector[Option[IndexIntoCategoryList]] = Vector.empty,
+  subcategory: Vector[Option[IndexIntoSubcategoryListForCategory]] = Vector.empty,
+  func: Vector[IndexIntoFuncTable] = Vector.empty,
+  nativeSymbol: Vector[Option[IndexIntoNativeSymbolTable]] = Vector.empty,
+  innerWindowID: Vector[Option[InnerWindowID]] = Vector.empty,
+  line: Vector[Option[Double]] = Vector.empty,
+  column: Vector[Option[Double]] = Vector.empty,
   length: Double,
 )
+private[fxprof] object FrameTableArgs {
+  given JsonValueCodec[FrameTableArgs] = JsonCodecMaker.make
+}

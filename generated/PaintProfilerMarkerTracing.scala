@@ -1,6 +1,6 @@
 package fxprof
 
-class PaintProfilerMarkerTracing private (args: PaintProfilerMarkerTracingArgs) {
+class PaintProfilerMarkerTracing private (private[fxprof] val args: PaintProfilerMarkerTracingArgs) {
   def `type`: PaintProfilerMarkerTracing_Type.type = args.`type`
   def category: PaintProfilerMarkerTracing_Category.type = args.category
   def cause: Option[CauseBacktrace] = args.cause
@@ -20,6 +20,9 @@ class PaintProfilerMarkerTracing private (args: PaintProfilerMarkerTracingArgs) 
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object PaintProfilerMarkerTracing {
   def apply(
     `type`: PaintProfilerMarkerTracing_Type.type,
@@ -29,9 +32,23 @@ object PaintProfilerMarkerTracing {
       `type` = `type`,
       category = category,
     ))
+  given JsonValueCodec[PaintProfilerMarkerTracing] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: PaintProfilerMarkerTracing) = 
+        new PaintProfilerMarkerTracing(summon[JsonValueCodec[PaintProfilerMarkerTracingArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: PaintProfilerMarkerTracing, out: JsonWriter) = 
+        summon[JsonValueCodec[PaintProfilerMarkerTracingArgs]].encodeValue(x.args, out)
+      
+      def nullValue: PaintProfilerMarkerTracing = null
+    }
+  
 }
 private[fxprof] case class PaintProfilerMarkerTracingArgs(
   `type`: PaintProfilerMarkerTracing_Type.type,
   category: PaintProfilerMarkerTracing_Category.type,
   cause: Option[CauseBacktrace] = None,
 )
+private[fxprof] object PaintProfilerMarkerTracingArgs {
+  given JsonValueCodec[PaintProfilerMarkerTracingArgs] = JsonCodecMaker.make
+}

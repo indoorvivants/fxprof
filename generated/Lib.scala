@@ -1,6 +1,6 @@
 package fxprof
 
-class Lib private (args: LibArgs) {
+class Lib private (private[fxprof] val args: LibArgs) {
   def arch: String = args.arch
   def name: String = args.name
   def path: String = args.path
@@ -36,6 +36,9 @@ class Lib private (args: LibArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object Lib {
   def apply(
     arch: String,
@@ -53,6 +56,17 @@ object Lib {
       debugPath = debugPath,
       breakpadId = breakpadId,
     ))
+  given JsonValueCodec[Lib] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: Lib) = 
+        new Lib(summon[JsonValueCodec[LibArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: Lib, out: JsonWriter) = 
+        summon[JsonValueCodec[LibArgs]].encodeValue(x.args, out)
+      
+      def nullValue: Lib = null
+    }
+  
 }
 private[fxprof] case class LibArgs(
   arch: String,
@@ -63,3 +77,6 @@ private[fxprof] case class LibArgs(
   breakpadId: String,
   codeId: Option[String] = None,
 )
+private[fxprof] object LibArgs {
+  given JsonValueCodec[LibArgs] = JsonCodecMaker.make
+}

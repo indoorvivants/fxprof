@@ -1,34 +1,34 @@
 package fxprof
 
-class FuncTable private (args: FuncTableArgs) {
-  def name: Array[IndexIntoStringTable] = args.name
-  def isJS: Array[Boolean] = args.isJS
-  def relevantForJS: Array[Boolean] = args.relevantForJS
-  def resource: Array[FuncTable_Resource] = args.resource
-  def source: Array[Option[IndexIntoSourceTable]] = args.source
-  def lineNumber: Array[Option[Double]] = args.lineNumber
-  def columnNumber: Array[Option[Double]] = args.columnNumber
+class FuncTable private (private[fxprof] val args: FuncTableArgs) {
+  def name: Vector[IndexIntoStringTable] = args.name
+  def isJS: Vector[Boolean] = args.isJS
+  def relevantForJS: Vector[Boolean] = args.relevantForJS
+  def resource: Vector[FuncTable_Resource] = args.resource
+  def source: Vector[Option[IndexIntoSourceTable]] = args.source
+  def lineNumber: Vector[Option[Double]] = args.lineNumber
+  def columnNumber: Vector[Option[Double]] = args.columnNumber
   def length: Double = args.length
 
-  def withName(value: Array[IndexIntoStringTable]): FuncTable =
+  def withName(value: Vector[IndexIntoStringTable]): FuncTable =
     copy(_.copy(name = value))
   
-  def withIsJS(value: Array[Boolean]): FuncTable =
+  def withIsJS(value: Vector[Boolean]): FuncTable =
     copy(_.copy(isJS = value))
   
-  def withRelevantForJS(value: Array[Boolean]): FuncTable =
+  def withRelevantForJS(value: Vector[Boolean]): FuncTable =
     copy(_.copy(relevantForJS = value))
   
-  def withResource(value: Array[FuncTable_Resource]): FuncTable =
+  def withResource(value: Vector[FuncTable_Resource]): FuncTable =
     copy(_.copy(resource = value))
   
-  def withSource(value: Array[Option[IndexIntoSourceTable]]): FuncTable =
+  def withSource(value: Vector[Option[IndexIntoSourceTable]]): FuncTable =
     copy(_.copy(source = value))
   
-  def withLineNumber(value: Array[Option[Double]]): FuncTable =
+  def withLineNumber(value: Vector[Option[Double]]): FuncTable =
     copy(_.copy(lineNumber = value))
   
-  def withColumnNumber(value: Array[Option[Double]]): FuncTable =
+  def withColumnNumber(value: Vector[Option[Double]]): FuncTable =
     copy(_.copy(columnNumber = value))
   
   def withLength(value: Double): FuncTable =
@@ -40,6 +40,9 @@ class FuncTable private (args: FuncTableArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object FuncTable {
   def apply(
     length: Double,
@@ -47,14 +50,28 @@ object FuncTable {
     new FuncTable(FuncTableArgs(
       length = length,
     ))
+  given JsonValueCodec[FuncTable] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: FuncTable) = 
+        new FuncTable(summon[JsonValueCodec[FuncTableArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: FuncTable, out: JsonWriter) = 
+        summon[JsonValueCodec[FuncTableArgs]].encodeValue(x.args, out)
+      
+      def nullValue: FuncTable = null
+    }
+  
 }
 private[fxprof] case class FuncTableArgs(
-  name: Array[IndexIntoStringTable] = Array.empty,
-  isJS: Array[Boolean] = Array.empty,
-  relevantForJS: Array[Boolean] = Array.empty,
-  resource: Array[FuncTable_Resource] = Array.empty,
-  source: Array[Option[IndexIntoSourceTable]] = Array.empty,
-  lineNumber: Array[Option[Double]] = Array.empty,
-  columnNumber: Array[Option[Double]] = Array.empty,
+  name: Vector[IndexIntoStringTable] = Vector.empty,
+  isJS: Vector[Boolean] = Vector.empty,
+  relevantForJS: Vector[Boolean] = Vector.empty,
+  resource: Vector[FuncTable_Resource] = Vector.empty,
+  source: Vector[Option[IndexIntoSourceTable]] = Vector.empty,
+  lineNumber: Vector[Option[Double]] = Vector.empty,
+  columnNumber: Vector[Option[Double]] = Vector.empty,
   length: Double,
 )
+private[fxprof] object FuncTableArgs {
+  given JsonValueCodec[FuncTableArgs] = JsonCodecMaker.make
+}

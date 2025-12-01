@@ -1,26 +1,26 @@
 package fxprof
 
-class ProfilerOverheadSamplesTable private (args: ProfilerOverheadSamplesTableArgs) {
-  def counters: Array[Microseconds] = args.counters
-  def expiredMarkerCleaning: Array[Microseconds] = args.expiredMarkerCleaning
-  def locking: Array[Microseconds] = args.locking
-  def threads: Array[Microseconds] = args.threads
-  def time: Array[Milliseconds] = args.time
+class ProfilerOverheadSamplesTable private (private[fxprof] val args: ProfilerOverheadSamplesTableArgs) {
+  def counters: Vector[Microseconds] = args.counters
+  def expiredMarkerCleaning: Vector[Microseconds] = args.expiredMarkerCleaning
+  def locking: Vector[Microseconds] = args.locking
+  def threads: Vector[Microseconds] = args.threads
+  def time: Vector[Milliseconds] = args.time
   def length: Double = args.length
 
-  def withCounters(value: Array[Microseconds]): ProfilerOverheadSamplesTable =
+  def withCounters(value: Vector[Microseconds]): ProfilerOverheadSamplesTable =
     copy(_.copy(counters = value))
   
-  def withExpiredMarkerCleaning(value: Array[Microseconds]): ProfilerOverheadSamplesTable =
+  def withExpiredMarkerCleaning(value: Vector[Microseconds]): ProfilerOverheadSamplesTable =
     copy(_.copy(expiredMarkerCleaning = value))
   
-  def withLocking(value: Array[Microseconds]): ProfilerOverheadSamplesTable =
+  def withLocking(value: Vector[Microseconds]): ProfilerOverheadSamplesTable =
     copy(_.copy(locking = value))
   
-  def withThreads(value: Array[Microseconds]): ProfilerOverheadSamplesTable =
+  def withThreads(value: Vector[Microseconds]): ProfilerOverheadSamplesTable =
     copy(_.copy(threads = value))
   
-  def withTime(value: Array[Milliseconds]): ProfilerOverheadSamplesTable =
+  def withTime(value: Vector[Milliseconds]): ProfilerOverheadSamplesTable =
     copy(_.copy(time = value))
   
   def withLength(value: Double): ProfilerOverheadSamplesTable =
@@ -32,6 +32,9 @@ class ProfilerOverheadSamplesTable private (args: ProfilerOverheadSamplesTableAr
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object ProfilerOverheadSamplesTable {
   def apply(
     length: Double,
@@ -39,12 +42,26 @@ object ProfilerOverheadSamplesTable {
     new ProfilerOverheadSamplesTable(ProfilerOverheadSamplesTableArgs(
       length = length,
     ))
+  given JsonValueCodec[ProfilerOverheadSamplesTable] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: ProfilerOverheadSamplesTable) = 
+        new ProfilerOverheadSamplesTable(summon[JsonValueCodec[ProfilerOverheadSamplesTableArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: ProfilerOverheadSamplesTable, out: JsonWriter) = 
+        summon[JsonValueCodec[ProfilerOverheadSamplesTableArgs]].encodeValue(x.args, out)
+      
+      def nullValue: ProfilerOverheadSamplesTable = null
+    }
+  
 }
 private[fxprof] case class ProfilerOverheadSamplesTableArgs(
-  counters: Array[Microseconds] = Array.empty,
-  expiredMarkerCleaning: Array[Microseconds] = Array.empty,
-  locking: Array[Microseconds] = Array.empty,
-  threads: Array[Microseconds] = Array.empty,
-  time: Array[Milliseconds] = Array.empty,
+  counters: Vector[Microseconds] = Vector.empty,
+  expiredMarkerCleaning: Vector[Microseconds] = Vector.empty,
+  locking: Vector[Microseconds] = Vector.empty,
+  threads: Vector[Microseconds] = Vector.empty,
+  time: Vector[Milliseconds] = Vector.empty,
   length: Double,
 )
+private[fxprof] object ProfilerOverheadSamplesTableArgs {
+  given JsonValueCodec[ProfilerOverheadSamplesTableArgs] = JsonCodecMaker.make
+}

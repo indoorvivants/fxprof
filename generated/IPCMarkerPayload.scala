@@ -1,6 +1,6 @@
 package fxprof
 
-class IPCMarkerPayload private (args: IPCMarkerPayloadArgs) {
+class IPCMarkerPayload private (private[fxprof] val args: IPCMarkerPayloadArgs) {
   def `type`: IPCMarkerPayload_Type.type = args.`type`
   def startTime: Milliseconds = args.startTime
   def endTime: Milliseconds = args.endTime
@@ -76,6 +76,9 @@ class IPCMarkerPayload private (args: IPCMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object IPCMarkerPayload {
   def apply(
     `type`: IPCMarkerPayload_Type.type,
@@ -99,6 +102,17 @@ object IPCMarkerPayload {
       direction = direction,
       sync = sync,
     ))
+  given JsonValueCodec[IPCMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: IPCMarkerPayload) = 
+        new IPCMarkerPayload(summon[JsonValueCodec[IPCMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: IPCMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[IPCMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: IPCMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class IPCMarkerPayloadArgs(
   `type`: IPCMarkerPayload_Type.type,
@@ -119,3 +133,6 @@ private[fxprof] case class IPCMarkerPayloadArgs(
   recvTid: Option[Tid] = None,
   niceDirection: Option[String] = None,
 )
+private[fxprof] object IPCMarkerPayloadArgs {
+  given JsonValueCodec[IPCMarkerPayloadArgs] = JsonCodecMaker.make
+}

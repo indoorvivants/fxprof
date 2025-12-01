@@ -1,6 +1,6 @@
 package fxprof
 
-class ProfilerOverheadStats private (args: ProfilerOverheadStatsArgs) {
+class ProfilerOverheadStats private (private[fxprof] val args: ProfilerOverheadStatsArgs) {
   def maxCleaning: Microseconds = args.maxCleaning
   def maxCounter: Microseconds = args.maxCounter
   def maxInterval: Microseconds = args.maxInterval
@@ -96,6 +96,9 @@ class ProfilerOverheadStats private (args: ProfilerOverheadStatsArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object ProfilerOverheadStats {
   def apply(
     maxCleaning: Microseconds,
@@ -145,6 +148,17 @@ object ProfilerOverheadStats {
       profiledDuration = profiledDuration,
       samplingCount = samplingCount,
     ))
+  given JsonValueCodec[ProfilerOverheadStats] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: ProfilerOverheadStats) = 
+        new ProfilerOverheadStats(summon[JsonValueCodec[ProfilerOverheadStatsArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: ProfilerOverheadStats, out: JsonWriter) = 
+        summon[JsonValueCodec[ProfilerOverheadStatsArgs]].encodeValue(x.args, out)
+      
+      def nullValue: ProfilerOverheadStats = null
+    }
+  
 }
 private[fxprof] case class ProfilerOverheadStatsArgs(
   maxCleaning: Microseconds,
@@ -170,3 +184,6 @@ private[fxprof] case class ProfilerOverheadStatsArgs(
   profiledDuration: Microseconds,
   samplingCount: Microseconds,
 )
+private[fxprof] object ProfilerOverheadStatsArgs {
+  given JsonValueCodec[ProfilerOverheadStatsArgs] = JsonCodecMaker.make
+}

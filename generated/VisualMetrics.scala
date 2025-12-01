@@ -1,14 +1,14 @@
 package fxprof
 
-class VisualMetrics private (args: VisualMetricsArgs) {
+class VisualMetrics private (private[fxprof] val args: VisualMetricsArgs) {
   def FirstVisualChange: Double = args.FirstVisualChange
   def LastVisualChange: Double = args.LastVisualChange
   def SpeedIndex: Double = args.SpeedIndex
-  def VisualProgress: Array[ProgressGraphData] = args.VisualProgress
+  def VisualProgress: Vector[ProgressGraphData] = args.VisualProgress
   def ContentfulSpeedIndex: Option[Double] = args.ContentfulSpeedIndex
-  def ContentfulSpeedIndexProgress: Option[Array[ProgressGraphData]] = args.ContentfulSpeedIndexProgress
+  def ContentfulSpeedIndexProgress: Option[Vector[ProgressGraphData]] = args.ContentfulSpeedIndexProgress
   def PerceptualSpeedIndex: Option[Double] = args.PerceptualSpeedIndex
-  def PerceptualSpeedIndexProgress: Option[Array[ProgressGraphData]] = args.PerceptualSpeedIndexProgress
+  def PerceptualSpeedIndexProgress: Option[Vector[ProgressGraphData]] = args.PerceptualSpeedIndexProgress
   def VisualReadiness: Double = args.VisualReadiness
   def VisualComplete85: Double = args.VisualComplete85
   def VisualComplete95: Double = args.VisualComplete95
@@ -23,19 +23,19 @@ class VisualMetrics private (args: VisualMetricsArgs) {
   def withSpeedIndex(value: Double): VisualMetrics =
     copy(_.copy(SpeedIndex = value))
   
-  def withVisualProgress(value: Array[ProgressGraphData]): VisualMetrics =
+  def withVisualProgress(value: Vector[ProgressGraphData]): VisualMetrics =
     copy(_.copy(VisualProgress = value))
   
   def withContentfulSpeedIndex(value: Option[Double]): VisualMetrics =
     copy(_.copy(ContentfulSpeedIndex = value))
   
-  def withContentfulSpeedIndexProgress(value: Option[Array[ProgressGraphData]]): VisualMetrics =
+  def withContentfulSpeedIndexProgress(value: Option[Vector[ProgressGraphData]]): VisualMetrics =
     copy(_.copy(ContentfulSpeedIndexProgress = value))
   
   def withPerceptualSpeedIndex(value: Option[Double]): VisualMetrics =
     copy(_.copy(PerceptualSpeedIndex = value))
   
-  def withPerceptualSpeedIndexProgress(value: Option[Array[ProgressGraphData]]): VisualMetrics =
+  def withPerceptualSpeedIndexProgress(value: Option[Vector[ProgressGraphData]]): VisualMetrics =
     copy(_.copy(PerceptualSpeedIndexProgress = value))
   
   def withVisualReadiness(value: Double): VisualMetrics =
@@ -56,6 +56,9 @@ class VisualMetrics private (args: VisualMetricsArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object VisualMetrics {
   def apply(
     FirstVisualChange: Double,
@@ -75,18 +78,32 @@ object VisualMetrics {
       VisualComplete95 = VisualComplete95,
       VisualComplete99 = VisualComplete99,
     ))
+  given JsonValueCodec[VisualMetrics] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: VisualMetrics) = 
+        new VisualMetrics(summon[JsonValueCodec[VisualMetricsArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: VisualMetrics, out: JsonWriter) = 
+        summon[JsonValueCodec[VisualMetricsArgs]].encodeValue(x.args, out)
+      
+      def nullValue: VisualMetrics = null
+    }
+  
 }
 private[fxprof] case class VisualMetricsArgs(
   FirstVisualChange: Double,
   LastVisualChange: Double,
   SpeedIndex: Double,
-  VisualProgress: Array[ProgressGraphData] = Array.empty,
+  VisualProgress: Vector[ProgressGraphData] = Vector.empty,
   ContentfulSpeedIndex: Option[Double] = None,
-  ContentfulSpeedIndexProgress: Option[Array[ProgressGraphData]] = None,
+  ContentfulSpeedIndexProgress: Option[Vector[ProgressGraphData]] = None,
   PerceptualSpeedIndex: Option[Double] = None,
-  PerceptualSpeedIndexProgress: Option[Array[ProgressGraphData]] = None,
+  PerceptualSpeedIndexProgress: Option[Vector[ProgressGraphData]] = None,
   VisualReadiness: Double,
   VisualComplete85: Double,
   VisualComplete95: Double,
   VisualComplete99: Double,
 )
+private[fxprof] object VisualMetricsArgs {
+  given JsonValueCodec[VisualMetricsArgs] = JsonCodecMaker.make
+}

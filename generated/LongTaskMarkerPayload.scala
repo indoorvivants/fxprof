@@ -1,6 +1,6 @@
 package fxprof
 
-class LongTaskMarkerPayload private (args: LongTaskMarkerPayloadArgs) {
+class LongTaskMarkerPayload private (private[fxprof] val args: LongTaskMarkerPayloadArgs) {
   def `type`: LongTaskMarkerPayload_Type.type = args.`type`
   def category: LongTaskMarkerPayload_Category.type = args.category
 
@@ -16,6 +16,9 @@ class LongTaskMarkerPayload private (args: LongTaskMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object LongTaskMarkerPayload {
   def apply(
     `type`: LongTaskMarkerPayload_Type.type,
@@ -25,8 +28,22 @@ object LongTaskMarkerPayload {
       `type` = `type`,
       category = category,
     ))
+  given JsonValueCodec[LongTaskMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: LongTaskMarkerPayload) = 
+        new LongTaskMarkerPayload(summon[JsonValueCodec[LongTaskMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: LongTaskMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[LongTaskMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: LongTaskMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class LongTaskMarkerPayloadArgs(
   `type`: LongTaskMarkerPayload_Type.type,
   category: LongTaskMarkerPayload_Category.type,
 )
+private[fxprof] object LongTaskMarkerPayloadArgs {
+  given JsonValueCodec[LongTaskMarkerPayloadArgs] = JsonCodecMaker.make
+}

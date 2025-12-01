@@ -1,6 +1,6 @@
 package fxprof
 
-class ProfilerOverhead private (args: ProfilerOverheadArgs) {
+class ProfilerOverhead private (private[fxprof] val args: ProfilerOverheadArgs) {
   def samples: ProfilerOverheadSamplesTable = args.samples
   def statistics: Option[ProfilerOverheadStats] = args.statistics
   def pid: Pid = args.pid
@@ -24,6 +24,9 @@ class ProfilerOverhead private (args: ProfilerOverheadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object ProfilerOverhead {
   def apply(
     samples: ProfilerOverheadSamplesTable,
@@ -35,6 +38,17 @@ object ProfilerOverhead {
       pid = pid,
       mainThreadIndex = mainThreadIndex,
     ))
+  given JsonValueCodec[ProfilerOverhead] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: ProfilerOverhead) = 
+        new ProfilerOverhead(summon[JsonValueCodec[ProfilerOverheadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: ProfilerOverhead, out: JsonWriter) = 
+        summon[JsonValueCodec[ProfilerOverheadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: ProfilerOverhead = null
+    }
+  
 }
 private[fxprof] case class ProfilerOverheadArgs(
   samples: ProfilerOverheadSamplesTable,
@@ -42,3 +56,6 @@ private[fxprof] case class ProfilerOverheadArgs(
   pid: Pid,
   mainThreadIndex: ThreadIndex,
 )
+private[fxprof] object ProfilerOverheadArgs {
+  given JsonValueCodec[ProfilerOverheadArgs] = JsonCodecMaker.make
+}

@@ -1,6 +1,6 @@
 package fxprof
 
-class TextMarkerPayload private (args: TextMarkerPayloadArgs) {
+class TextMarkerPayload private (private[fxprof] val args: TextMarkerPayloadArgs) {
   def `type`: TextMarkerPayload_Type.type = args.`type`
   def name: String = args.name
   def cause: Option[CauseBacktrace] = args.cause
@@ -24,6 +24,9 @@ class TextMarkerPayload private (args: TextMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object TextMarkerPayload {
   def apply(
     `type`: TextMarkerPayload_Type.type,
@@ -33,6 +36,17 @@ object TextMarkerPayload {
       `type` = `type`,
       name = name,
     ))
+  given JsonValueCodec[TextMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: TextMarkerPayload) = 
+        new TextMarkerPayload(summon[JsonValueCodec[TextMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: TextMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[TextMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: TextMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class TextMarkerPayloadArgs(
   `type`: TextMarkerPayload_Type.type,
@@ -40,3 +54,6 @@ private[fxprof] case class TextMarkerPayloadArgs(
   cause: Option[CauseBacktrace] = None,
   innerWindowID: Option[Double] = None,
 )
+private[fxprof] object TextMarkerPayloadArgs {
+  given JsonValueCodec[TextMarkerPayloadArgs] = JsonCodecMaker.make
+}

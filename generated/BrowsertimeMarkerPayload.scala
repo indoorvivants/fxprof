@@ -1,6 +1,6 @@
 package fxprof
 
-class BrowsertimeMarkerPayload private (args: BrowsertimeMarkerPayloadArgs) {
+class BrowsertimeMarkerPayload private (private[fxprof] val args: BrowsertimeMarkerPayloadArgs) {
   def `type`: BrowsertimeMarkerPayload_Type.type = args.`type`
   def percentage: Double = args.percentage
 
@@ -16,6 +16,9 @@ class BrowsertimeMarkerPayload private (args: BrowsertimeMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object BrowsertimeMarkerPayload {
   def apply(
     `type`: BrowsertimeMarkerPayload_Type.type,
@@ -25,8 +28,22 @@ object BrowsertimeMarkerPayload {
       `type` = `type`,
       percentage = percentage,
     ))
+  given JsonValueCodec[BrowsertimeMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: BrowsertimeMarkerPayload) = 
+        new BrowsertimeMarkerPayload(summon[JsonValueCodec[BrowsertimeMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: BrowsertimeMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[BrowsertimeMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: BrowsertimeMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class BrowsertimeMarkerPayloadArgs(
   `type`: BrowsertimeMarkerPayload_Type.type,
   percentage: Double,
 )
+private[fxprof] object BrowsertimeMarkerPayloadArgs {
+  given JsonValueCodec[BrowsertimeMarkerPayloadArgs] = JsonCodecMaker.make
+}

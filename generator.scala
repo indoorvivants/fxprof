@@ -29,11 +29,11 @@ enum Type:
           (s"Option[${inner.tpe}]", extraDefs ++ inner.extraDefs)
         case ArrayOf(t) =>
           val inner = t.renderAsScala
-          (s"Array[${inner.tpe}]", extraDefs ++ inner.extraDefs)
+          (s"Vector[${inner.tpe}]", extraDefs ++ inner.extraDefs)
         case Number                     => ("Double", extraDefs)
         case Str                        => ("String", extraDefs)
         case Bool                       => ("Boolean", extraDefs)
-        case Bytes                      => ("Array[Byte]", extraDefs)
+        case Bytes                      => ("Vector[Byte]", extraDefs)
         case Ref(what)                  => (what, extraDefs)
         case LiteralString(name, value) =>
           (name + ".type", ExtraDef.LiteralStr(name, value) :: extraDefs)
@@ -286,7 +286,9 @@ def render(struct: String, params: List[(String, Type)]) =
   lb.use:
     line("package fxprof")
     emptyLine()
-    curlyBlock(s"class $struct private (args: ${struct}Args)"):
+    curlyBlock(
+      s"class $struct private (private[fxprof] val args: ${struct}Args)"
+    ):
       params.foreach: (name, tpe) =>
         line(
           s"def ${sanitiseFieldName(name)}: ${types(name)} = args.${sanitiseFieldName(name)}"
@@ -305,6 +307,9 @@ def render(struct: String, params: List[(String, Type)]) =
 
     emptyLine()
 
+    line("import com.github.plokhotnyuk.jsoniter_scala.macros._")
+    line("import com.github.plokhotnyuk.jsoniter_scala.core._")
+    emptyLine()
     block(s"object $struct {", "}"):
       // block("def apply(", s"): $struct = "):
       line("def apply(")
@@ -322,6 +327,25 @@ def render(struct: String, params: List[(String, Type)]) =
               line(
                 s"${sanitiseFieldName(name)} = ${sanitiseFieldName(name)},"
               )
+      block(s"given JsonValueCodec[$struct] = ", ""):
+        block("new JsonValueCodec {", "}"):
+          block(
+            s"def decodeValue(in: JsonReader, default: $struct) = ",
+            ""
+          ):
+            line(
+              s"new $struct(summon[JsonValueCodec[${struct}Args]].decodeValue(in, default.args))"
+            )
+
+          block(
+            s"def encodeValue(x: $struct, out: JsonWriter) = ",
+            ""
+          ):
+            line(
+              s"summon[JsonValueCodec[${struct}Args]].encodeValue(x.args, out)"
+            )
+
+          line(s"def nullValue: $struct = null")
 
     block(s"private[fxprof] case class ${struct}Args(", ")"):
       params.map: (name, tpe) =>
@@ -329,10 +353,13 @@ def render(struct: String, params: List[(String, Type)]) =
             defaultScalaValue(tpe).map(" = " + _).getOrElse("")
           }},")
 
+    block(s"private[fxprof] object ${struct}Args {", "}"):
+      line(s"given JsonValueCodec[${struct}Args] = JsonCodecMaker.make")
+
     lb.result -> extra
 
 def defaultScalaValue(tpe: Type) =
   tpe match
     case Type.Optional(t) => Some("None")
-    case Type.ArrayOf(t)  => Some("Array.empty")
+    case Type.ArrayOf(t)  => Some("Vector.empty")
     case _                => None

@@ -1,6 +1,6 @@
 package fxprof
 
-class NetworkPayload private (args: NetworkPayloadArgs) {
+class NetworkPayload private (private[fxprof] val args: NetworkPayloadArgs) {
   def `type`: NetworkPayload_Type.type = args.`type`
   def innerWindowID: Option[Double] = args.innerWindowID
   def URI: String = args.URI
@@ -132,6 +132,9 @@ class NetworkPayload private (args: NetworkPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object NetworkPayload {
   def apply(
     `type`: NetworkPayload_Type.type,
@@ -151,6 +154,17 @@ object NetworkPayload {
       startTime = startTime,
       endTime = endTime,
     ))
+  given JsonValueCodec[NetworkPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: NetworkPayload) = 
+        new NetworkPayload(summon[JsonValueCodec[NetworkPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: NetworkPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[NetworkPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: NetworkPayload = null
+    }
+  
 }
 private[fxprof] case class NetworkPayloadArgs(
   `type`: NetworkPayload_Type.type,
@@ -185,3 +199,6 @@ private[fxprof] case class NetworkPayloadArgs(
   responseStart: Option[Milliseconds] = None,
   responseEnd: Option[Milliseconds] = None,
 )
+private[fxprof] object NetworkPayloadArgs {
+  given JsonValueCodec[NetworkPayloadArgs] = JsonCodecMaker.make
+}

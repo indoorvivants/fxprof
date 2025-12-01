@@ -1,26 +1,26 @@
 package fxprof
 
-class JsTracerTable private (args: JsTracerTableArgs) {
-  def events: Array[IndexIntoStringTable] = args.events
-  def timestamps: Array[Microseconds] = args.timestamps
-  def durations: Array[Option[Microseconds]] = args.durations
-  def line: Array[Option[Double]] = args.line
-  def column: Array[Option[Double]] = args.column
+class JsTracerTable private (private[fxprof] val args: JsTracerTableArgs) {
+  def events: Vector[IndexIntoStringTable] = args.events
+  def timestamps: Vector[Microseconds] = args.timestamps
+  def durations: Vector[Option[Microseconds]] = args.durations
+  def line: Vector[Option[Double]] = args.line
+  def column: Vector[Option[Double]] = args.column
   def length: Double = args.length
 
-  def withEvents(value: Array[IndexIntoStringTable]): JsTracerTable =
+  def withEvents(value: Vector[IndexIntoStringTable]): JsTracerTable =
     copy(_.copy(events = value))
   
-  def withTimestamps(value: Array[Microseconds]): JsTracerTable =
+  def withTimestamps(value: Vector[Microseconds]): JsTracerTable =
     copy(_.copy(timestamps = value))
   
-  def withDurations(value: Array[Option[Microseconds]]): JsTracerTable =
+  def withDurations(value: Vector[Option[Microseconds]]): JsTracerTable =
     copy(_.copy(durations = value))
   
-  def withLine(value: Array[Option[Double]]): JsTracerTable =
+  def withLine(value: Vector[Option[Double]]): JsTracerTable =
     copy(_.copy(line = value))
   
-  def withColumn(value: Array[Option[Double]]): JsTracerTable =
+  def withColumn(value: Vector[Option[Double]]): JsTracerTable =
     copy(_.copy(column = value))
   
   def withLength(value: Double): JsTracerTable =
@@ -32,6 +32,9 @@ class JsTracerTable private (args: JsTracerTableArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object JsTracerTable {
   def apply(
     length: Double,
@@ -39,12 +42,26 @@ object JsTracerTable {
     new JsTracerTable(JsTracerTableArgs(
       length = length,
     ))
+  given JsonValueCodec[JsTracerTable] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: JsTracerTable) = 
+        new JsTracerTable(summon[JsonValueCodec[JsTracerTableArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: JsTracerTable, out: JsonWriter) = 
+        summon[JsonValueCodec[JsTracerTableArgs]].encodeValue(x.args, out)
+      
+      def nullValue: JsTracerTable = null
+    }
+  
 }
 private[fxprof] case class JsTracerTableArgs(
-  events: Array[IndexIntoStringTable] = Array.empty,
-  timestamps: Array[Microseconds] = Array.empty,
-  durations: Array[Option[Microseconds]] = Array.empty,
-  line: Array[Option[Double]] = Array.empty,
-  column: Array[Option[Double]] = Array.empty,
+  events: Vector[IndexIntoStringTable] = Vector.empty,
+  timestamps: Vector[Microseconds] = Vector.empty,
+  durations: Vector[Option[Microseconds]] = Vector.empty,
+  line: Vector[Option[Double]] = Vector.empty,
+  column: Vector[Option[Double]] = Vector.empty,
   length: Double,
 )
+private[fxprof] object JsTracerTableArgs {
+  given JsonValueCodec[JsTracerTableArgs] = JsonCodecMaker.make
+}

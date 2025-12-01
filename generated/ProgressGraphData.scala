@@ -1,6 +1,6 @@
 package fxprof
 
-class ProgressGraphData private (args: ProgressGraphDataArgs) {
+class ProgressGraphData private (private[fxprof] val args: ProgressGraphDataArgs) {
   def percent: Double = args.percent
   def timestamp: Option[Milliseconds] = args.timestamp
 
@@ -16,6 +16,9 @@ class ProgressGraphData private (args: ProgressGraphDataArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object ProgressGraphData {
   def apply(
     percent: Double,
@@ -23,8 +26,22 @@ object ProgressGraphData {
     new ProgressGraphData(ProgressGraphDataArgs(
       percent = percent,
     ))
+  given JsonValueCodec[ProgressGraphData] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: ProgressGraphData) = 
+        new ProgressGraphData(summon[JsonValueCodec[ProgressGraphDataArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: ProgressGraphData, out: JsonWriter) = 
+        summon[JsonValueCodec[ProgressGraphDataArgs]].encodeValue(x.args, out)
+      
+      def nullValue: ProgressGraphData = null
+    }
+  
 }
 private[fxprof] case class ProgressGraphDataArgs(
   percent: Double,
   timestamp: Option[Milliseconds] = None,
 )
+private[fxprof] object ProgressGraphDataArgs {
+  given JsonValueCodec[ProgressGraphDataArgs] = JsonCodecMaker.make
+}

@@ -1,6 +1,6 @@
 package fxprof
 
-class ProfileMeta private (args: ProfileMetaArgs) {
+class ProfileMeta private (private[fxprof] val args: ProfileMetaArgs) {
   def interval: Milliseconds = args.interval
   def startTime: Milliseconds = args.startTime
   def startTimeAsClockMonotonicNanosecondsSinceBoot: Option[Double] = args.startTimeAsClockMonotonicNanosecondsSinceBoot
@@ -38,8 +38,8 @@ class ProfileMeta private (args: ProfileMetaArgs) {
   def fileSize: Option[Bytes] = args.fileSize
   def usesOnlyOneStackType: Option[Boolean] = args.usesOnlyOneStackType
   def sourceCodeIsNotOnSearchfox: Option[Boolean] = args.sourceCodeIsNotOnSearchfox
-  def initialVisibleThreads: Option[Array[ThreadIndex]] = args.initialVisibleThreads
-  def initialSelectedThreads: Option[Array[ThreadIndex]] = args.initialSelectedThreads
+  def initialVisibleThreads: Option[Vector[ThreadIndex]] = args.initialVisibleThreads
+  def initialSelectedThreads: Option[Vector[ThreadIndex]] = args.initialSelectedThreads
   def keepProfileThreadOrder: Option[Boolean] = args.keepProfileThreadOrder
   def gramsOfCO2ePerKWh: Option[Double] = args.gramsOfCO2ePerKWh
 
@@ -154,10 +154,10 @@ class ProfileMeta private (args: ProfileMetaArgs) {
   def withSourceCodeIsNotOnSearchfox(value: Option[Boolean]): ProfileMeta =
     copy(_.copy(sourceCodeIsNotOnSearchfox = value))
   
-  def withInitialVisibleThreads(value: Option[Array[ThreadIndex]]): ProfileMeta =
+  def withInitialVisibleThreads(value: Option[Vector[ThreadIndex]]): ProfileMeta =
     copy(_.copy(initialVisibleThreads = value))
   
-  def withInitialSelectedThreads(value: Option[Array[ThreadIndex]]): ProfileMeta =
+  def withInitialSelectedThreads(value: Option[Vector[ThreadIndex]]): ProfileMeta =
     copy(_.copy(initialSelectedThreads = value))
   
   def withKeepProfileThreadOrder(value: Option[Boolean]): ProfileMeta =
@@ -171,6 +171,9 @@ class ProfileMeta private (args: ProfileMetaArgs) {
     new ProfileMeta(f(args))
   
 }
+
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object ProfileMeta {
   def apply(
@@ -191,6 +194,17 @@ object ProfileMeta {
       version = version,
       preprocessedProfileVersion = preprocessedProfileVersion,
     ))
+  given JsonValueCodec[ProfileMeta] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: ProfileMeta) = 
+        new ProfileMeta(summon[JsonValueCodec[ProfileMetaArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: ProfileMeta, out: JsonWriter) = 
+        summon[JsonValueCodec[ProfileMetaArgs]].encodeValue(x.args, out)
+      
+      def nullValue: ProfileMeta = null
+    }
+  
 }
 private[fxprof] case class ProfileMetaArgs(
   interval: Milliseconds,
@@ -230,8 +244,11 @@ private[fxprof] case class ProfileMetaArgs(
   fileSize: Option[Bytes] = None,
   usesOnlyOneStackType: Option[Boolean] = None,
   sourceCodeIsNotOnSearchfox: Option[Boolean] = None,
-  initialVisibleThreads: Option[Array[ThreadIndex]] = None,
-  initialSelectedThreads: Option[Array[ThreadIndex]] = None,
+  initialVisibleThreads: Option[Vector[ThreadIndex]] = None,
+  initialSelectedThreads: Option[Vector[ThreadIndex]] = None,
   keepProfileThreadOrder: Option[Boolean] = None,
   gramsOfCO2ePerKWh: Option[Double] = None,
 )
+private[fxprof] object ProfileMetaArgs {
+  given JsonValueCodec[ProfileMetaArgs] = JsonCodecMaker.make
+}

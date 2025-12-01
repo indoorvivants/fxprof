@@ -1,34 +1,34 @@
 package fxprof
 
-class RawMarkerTable private (args: RawMarkerTableArgs) {
-  def data: Array[Option[MarkerPayload]] = args.data
-  def name: Array[IndexIntoStringTable] = args.name
-  def startTime: Array[Option[Double]] = args.startTime
-  def endTime: Array[Option[Double]] = args.endTime
-  def phase: Array[MarkerPhase] = args.phase
-  def category: Array[IndexIntoCategoryList] = args.category
-  def threadId: Option[Array[Option[Tid]]] = args.threadId
+class RawMarkerTable private (private[fxprof] val args: RawMarkerTableArgs) {
+  def data: Vector[Option[MarkerPayload]] = args.data
+  def name: Vector[IndexIntoStringTable] = args.name
+  def startTime: Vector[Option[Double]] = args.startTime
+  def endTime: Vector[Option[Double]] = args.endTime
+  def phase: Vector[MarkerPhase] = args.phase
+  def category: Vector[IndexIntoCategoryList] = args.category
+  def threadId: Option[Vector[Option[Tid]]] = args.threadId
   def length: Double = args.length
 
-  def withData(value: Array[Option[MarkerPayload]]): RawMarkerTable =
+  def withData(value: Vector[Option[MarkerPayload]]): RawMarkerTable =
     copy(_.copy(data = value))
   
-  def withName(value: Array[IndexIntoStringTable]): RawMarkerTable =
+  def withName(value: Vector[IndexIntoStringTable]): RawMarkerTable =
     copy(_.copy(name = value))
   
-  def withStartTime(value: Array[Option[Double]]): RawMarkerTable =
+  def withStartTime(value: Vector[Option[Double]]): RawMarkerTable =
     copy(_.copy(startTime = value))
   
-  def withEndTime(value: Array[Option[Double]]): RawMarkerTable =
+  def withEndTime(value: Vector[Option[Double]]): RawMarkerTable =
     copy(_.copy(endTime = value))
   
-  def withPhase(value: Array[MarkerPhase]): RawMarkerTable =
+  def withPhase(value: Vector[MarkerPhase]): RawMarkerTable =
     copy(_.copy(phase = value))
   
-  def withCategory(value: Array[IndexIntoCategoryList]): RawMarkerTable =
+  def withCategory(value: Vector[IndexIntoCategoryList]): RawMarkerTable =
     copy(_.copy(category = value))
   
-  def withThreadId(value: Option[Array[Option[Tid]]]): RawMarkerTable =
+  def withThreadId(value: Option[Vector[Option[Tid]]]): RawMarkerTable =
     copy(_.copy(threadId = value))
   
   def withLength(value: Double): RawMarkerTable =
@@ -40,6 +40,9 @@ class RawMarkerTable private (args: RawMarkerTableArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object RawMarkerTable {
   def apply(
     length: Double,
@@ -47,14 +50,28 @@ object RawMarkerTable {
     new RawMarkerTable(RawMarkerTableArgs(
       length = length,
     ))
+  given JsonValueCodec[RawMarkerTable] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: RawMarkerTable) = 
+        new RawMarkerTable(summon[JsonValueCodec[RawMarkerTableArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: RawMarkerTable, out: JsonWriter) = 
+        summon[JsonValueCodec[RawMarkerTableArgs]].encodeValue(x.args, out)
+      
+      def nullValue: RawMarkerTable = null
+    }
+  
 }
 private[fxprof] case class RawMarkerTableArgs(
-  data: Array[Option[MarkerPayload]] = Array.empty,
-  name: Array[IndexIntoStringTable] = Array.empty,
-  startTime: Array[Option[Double]] = Array.empty,
-  endTime: Array[Option[Double]] = Array.empty,
-  phase: Array[MarkerPhase] = Array.empty,
-  category: Array[IndexIntoCategoryList] = Array.empty,
-  threadId: Option[Array[Option[Tid]]] = None,
+  data: Vector[Option[MarkerPayload]] = Vector.empty,
+  name: Vector[IndexIntoStringTable] = Vector.empty,
+  startTime: Vector[Option[Double]] = Vector.empty,
+  endTime: Vector[Option[Double]] = Vector.empty,
+  phase: Vector[MarkerPhase] = Vector.empty,
+  category: Vector[IndexIntoCategoryList] = Vector.empty,
+  threadId: Option[Vector[Option[Tid]]] = None,
   length: Double,
 )
+private[fxprof] object RawMarkerTableArgs {
+  given JsonValueCodec[RawMarkerTableArgs] = JsonCodecMaker.make
+}

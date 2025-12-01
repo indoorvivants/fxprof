@@ -1,42 +1,42 @@
 package fxprof
 
-class RawSamplesTable private (args: RawSamplesTableArgs) {
-  def responsiveness: Option[Array[Option[Milliseconds]]] = args.responsiveness
-  def eventDelay: Option[Array[Option[Milliseconds]]] = args.eventDelay
-  def stack: Array[Option[IndexIntoStackTable]] = args.stack
-  def time: Option[Array[Milliseconds]] = args.time
-  def timeDeltas: Option[Array[Milliseconds]] = args.timeDeltas
-  def weight: Array[Option[Double]] = args.weight
+class RawSamplesTable private (private[fxprof] val args: RawSamplesTableArgs) {
+  def responsiveness: Option[Vector[Option[Milliseconds]]] = args.responsiveness
+  def eventDelay: Option[Vector[Option[Milliseconds]]] = args.eventDelay
+  def stack: Vector[Option[IndexIntoStackTable]] = args.stack
+  def time: Option[Vector[Milliseconds]] = args.time
+  def timeDeltas: Option[Vector[Milliseconds]] = args.timeDeltas
+  def weight: Vector[Option[Double]] = args.weight
   def weightType: WeightType = args.weightType
-  def threadCPUDelta: Option[Array[Option[Double]]] = args.threadCPUDelta
-  def threadId: Option[Array[Tid]] = args.threadId
+  def threadCPUDelta: Option[Vector[Option[Double]]] = args.threadCPUDelta
+  def threadId: Option[Vector[Tid]] = args.threadId
   def length: Double = args.length
 
-  def withResponsiveness(value: Option[Array[Option[Milliseconds]]]): RawSamplesTable =
+  def withResponsiveness(value: Option[Vector[Option[Milliseconds]]]): RawSamplesTable =
     copy(_.copy(responsiveness = value))
   
-  def withEventDelay(value: Option[Array[Option[Milliseconds]]]): RawSamplesTable =
+  def withEventDelay(value: Option[Vector[Option[Milliseconds]]]): RawSamplesTable =
     copy(_.copy(eventDelay = value))
   
-  def withStack(value: Array[Option[IndexIntoStackTable]]): RawSamplesTable =
+  def withStack(value: Vector[Option[IndexIntoStackTable]]): RawSamplesTable =
     copy(_.copy(stack = value))
   
-  def withTime(value: Option[Array[Milliseconds]]): RawSamplesTable =
+  def withTime(value: Option[Vector[Milliseconds]]): RawSamplesTable =
     copy(_.copy(time = value))
   
-  def withTimeDeltas(value: Option[Array[Milliseconds]]): RawSamplesTable =
+  def withTimeDeltas(value: Option[Vector[Milliseconds]]): RawSamplesTable =
     copy(_.copy(timeDeltas = value))
   
-  def withWeight(value: Array[Option[Double]]): RawSamplesTable =
+  def withWeight(value: Vector[Option[Double]]): RawSamplesTable =
     copy(_.copy(weight = value))
   
   def withWeightType(value: WeightType): RawSamplesTable =
     copy(_.copy(weightType = value))
   
-  def withThreadCPUDelta(value: Option[Array[Option[Double]]]): RawSamplesTable =
+  def withThreadCPUDelta(value: Option[Vector[Option[Double]]]): RawSamplesTable =
     copy(_.copy(threadCPUDelta = value))
   
-  def withThreadId(value: Option[Array[Tid]]): RawSamplesTable =
+  def withThreadId(value: Option[Vector[Tid]]): RawSamplesTable =
     copy(_.copy(threadId = value))
   
   def withLength(value: Double): RawSamplesTable =
@@ -48,6 +48,9 @@ class RawSamplesTable private (args: RawSamplesTableArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object RawSamplesTable {
   def apply(
     weightType: WeightType,
@@ -57,16 +60,30 @@ object RawSamplesTable {
       weightType = weightType,
       length = length,
     ))
+  given JsonValueCodec[RawSamplesTable] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: RawSamplesTable) = 
+        new RawSamplesTable(summon[JsonValueCodec[RawSamplesTableArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: RawSamplesTable, out: JsonWriter) = 
+        summon[JsonValueCodec[RawSamplesTableArgs]].encodeValue(x.args, out)
+      
+      def nullValue: RawSamplesTable = null
+    }
+  
 }
 private[fxprof] case class RawSamplesTableArgs(
-  responsiveness: Option[Array[Option[Milliseconds]]] = None,
-  eventDelay: Option[Array[Option[Milliseconds]]] = None,
-  stack: Array[Option[IndexIntoStackTable]] = Array.empty,
-  time: Option[Array[Milliseconds]] = None,
-  timeDeltas: Option[Array[Milliseconds]] = None,
-  weight: Array[Option[Double]] = Array.empty,
+  responsiveness: Option[Vector[Option[Milliseconds]]] = None,
+  eventDelay: Option[Vector[Option[Milliseconds]]] = None,
+  stack: Vector[Option[IndexIntoStackTable]] = Vector.empty,
+  time: Option[Vector[Milliseconds]] = None,
+  timeDeltas: Option[Vector[Milliseconds]] = None,
+  weight: Vector[Option[Double]] = Vector.empty,
   weightType: WeightType,
-  threadCPUDelta: Option[Array[Option[Double]]] = None,
-  threadId: Option[Array[Tid]] = None,
+  threadCPUDelta: Option[Vector[Option[Double]]] = None,
+  threadId: Option[Vector[Tid]] = None,
   length: Double,
 )
+private[fxprof] object RawSamplesTableArgs {
+  given JsonValueCodec[RawSamplesTableArgs] = JsonCodecMaker.make
+}

@@ -1,6 +1,6 @@
 package fxprof
 
-class CcMarkerTracing private (args: CcMarkerTracingArgs) {
+class CcMarkerTracing private (private[fxprof] val args: CcMarkerTracingArgs) {
   def `type`: CcMarkerTracing_Type.type = args.`type`
   def category: CcMarkerTracing_Category.type = args.category
   def first: Option[String] = args.first
@@ -28,6 +28,9 @@ class CcMarkerTracing private (args: CcMarkerTracingArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object CcMarkerTracing {
   def apply(
     `type`: CcMarkerTracing_Type.type,
@@ -37,6 +40,17 @@ object CcMarkerTracing {
       `type` = `type`,
       category = category,
     ))
+  given JsonValueCodec[CcMarkerTracing] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: CcMarkerTracing) = 
+        new CcMarkerTracing(summon[JsonValueCodec[CcMarkerTracingArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: CcMarkerTracing, out: JsonWriter) = 
+        summon[JsonValueCodec[CcMarkerTracingArgs]].encodeValue(x.args, out)
+      
+      def nullValue: CcMarkerTracing = null
+    }
+  
 }
 private[fxprof] case class CcMarkerTracingArgs(
   `type`: CcMarkerTracing_Type.type,
@@ -45,3 +59,6 @@ private[fxprof] case class CcMarkerTracingArgs(
   desc: Option[String] = None,
   second: Option[String] = None,
 )
+private[fxprof] object CcMarkerTracingArgs {
+  given JsonValueCodec[CcMarkerTracingArgs] = JsonCodecMaker.make
+}

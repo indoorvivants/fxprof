@@ -1,6 +1,6 @@
 package fxprof
 
-class Page private (args: PageArgs) {
+class Page private (private[fxprof] val args: PageArgs) {
   def tabID: TabID = args.tabID
   def innerWindowID: InnerWindowID = args.innerWindowID
   def url: String = args.url
@@ -32,6 +32,9 @@ class Page private (args: PageArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object Page {
   def apply(
     tabID: TabID,
@@ -45,6 +48,17 @@ object Page {
       url = url,
       embedderInnerWindowID = embedderInnerWindowID,
     ))
+  given JsonValueCodec[Page] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: Page) = 
+        new Page(summon[JsonValueCodec[PageArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: Page, out: JsonWriter) = 
+        summon[JsonValueCodec[PageArgs]].encodeValue(x.args, out)
+      
+      def nullValue: Page = null
+    }
+  
 }
 private[fxprof] case class PageArgs(
   tabID: TabID,
@@ -54,3 +68,6 @@ private[fxprof] case class PageArgs(
   isPrivateBrowsing: Option[Boolean] = None,
   favicon: Option[Option[String]] = None,
 )
+private[fxprof] object PageArgs {
+  given JsonValueCodec[PageArgs] = JsonCodecMaker.make
+}

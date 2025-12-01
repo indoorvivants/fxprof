@@ -1,6 +1,6 @@
 package fxprof
 
-class NoPayloadUserData private (args: NoPayloadUserDataArgs) {
+class NoPayloadUserData private (private[fxprof] val args: NoPayloadUserDataArgs) {
   def `type`: NoPayloadUserData_Type.type = args.`type`
   def innerWindowID: Option[Double] = args.innerWindowID
 
@@ -16,6 +16,9 @@ class NoPayloadUserData private (args: NoPayloadUserDataArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object NoPayloadUserData {
   def apply(
     `type`: NoPayloadUserData_Type.type,
@@ -23,8 +26,22 @@ object NoPayloadUserData {
     new NoPayloadUserData(NoPayloadUserDataArgs(
       `type` = `type`,
     ))
+  given JsonValueCodec[NoPayloadUserData] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: NoPayloadUserData) = 
+        new NoPayloadUserData(summon[JsonValueCodec[NoPayloadUserDataArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: NoPayloadUserData, out: JsonWriter) = 
+        summon[JsonValueCodec[NoPayloadUserDataArgs]].encodeValue(x.args, out)
+      
+      def nullValue: NoPayloadUserData = null
+    }
+  
 }
 private[fxprof] case class NoPayloadUserDataArgs(
   `type`: NoPayloadUserData_Type.type,
   innerWindowID: Option[Double] = None,
 )
+private[fxprof] object NoPayloadUserDataArgs {
+  given JsonValueCodec[NoPayloadUserDataArgs] = JsonCodecMaker.make
+}

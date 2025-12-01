@@ -1,38 +1,38 @@
 package fxprof
 
-class JsAllocationsTable private (args: JsAllocationsTableArgs) {
-  def time: Array[Milliseconds] = args.time
-  def className: Array[String] = args.className
-  def typeName: Array[String] = args.typeName
-  def coarseType: Array[String] = args.coarseType
-  def weight: Array[Bytes] = args.weight
+class JsAllocationsTable private (private[fxprof] val args: JsAllocationsTableArgs) {
+  def time: Vector[Milliseconds] = args.time
+  def className: Vector[String] = args.className
+  def typeName: Vector[String] = args.typeName
+  def coarseType: Vector[String] = args.coarseType
+  def weight: Vector[Bytes] = args.weight
   def weightType: JsAllocationsTable_WeightType.type = args.weightType
-  def inNursery: Array[Boolean] = args.inNursery
-  def stack: Array[Option[IndexIntoStackTable]] = args.stack
+  def inNursery: Vector[Boolean] = args.inNursery
+  def stack: Vector[Option[IndexIntoStackTable]] = args.stack
   def length: Double = args.length
 
-  def withTime(value: Array[Milliseconds]): JsAllocationsTable =
+  def withTime(value: Vector[Milliseconds]): JsAllocationsTable =
     copy(_.copy(time = value))
   
-  def withClassName(value: Array[String]): JsAllocationsTable =
+  def withClassName(value: Vector[String]): JsAllocationsTable =
     copy(_.copy(className = value))
   
-  def withTypeName(value: Array[String]): JsAllocationsTable =
+  def withTypeName(value: Vector[String]): JsAllocationsTable =
     copy(_.copy(typeName = value))
   
-  def withCoarseType(value: Array[String]): JsAllocationsTable =
+  def withCoarseType(value: Vector[String]): JsAllocationsTable =
     copy(_.copy(coarseType = value))
   
-  def withWeight(value: Array[Bytes]): JsAllocationsTable =
+  def withWeight(value: Vector[Bytes]): JsAllocationsTable =
     copy(_.copy(weight = value))
   
   def withWeightType(value: JsAllocationsTable_WeightType.type): JsAllocationsTable =
     copy(_.copy(weightType = value))
   
-  def withInNursery(value: Array[Boolean]): JsAllocationsTable =
+  def withInNursery(value: Vector[Boolean]): JsAllocationsTable =
     copy(_.copy(inNursery = value))
   
-  def withStack(value: Array[Option[IndexIntoStackTable]]): JsAllocationsTable =
+  def withStack(value: Vector[Option[IndexIntoStackTable]]): JsAllocationsTable =
     copy(_.copy(stack = value))
   
   def withLength(value: Double): JsAllocationsTable =
@@ -44,6 +44,9 @@ class JsAllocationsTable private (args: JsAllocationsTableArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object JsAllocationsTable {
   def apply(
     weightType: JsAllocationsTable_WeightType.type,
@@ -53,15 +56,29 @@ object JsAllocationsTable {
       weightType = weightType,
       length = length,
     ))
+  given JsonValueCodec[JsAllocationsTable] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: JsAllocationsTable) = 
+        new JsAllocationsTable(summon[JsonValueCodec[JsAllocationsTableArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: JsAllocationsTable, out: JsonWriter) = 
+        summon[JsonValueCodec[JsAllocationsTableArgs]].encodeValue(x.args, out)
+      
+      def nullValue: JsAllocationsTable = null
+    }
+  
 }
 private[fxprof] case class JsAllocationsTableArgs(
-  time: Array[Milliseconds] = Array.empty,
-  className: Array[String] = Array.empty,
-  typeName: Array[String] = Array.empty,
-  coarseType: Array[String] = Array.empty,
-  weight: Array[Bytes] = Array.empty,
+  time: Vector[Milliseconds] = Vector.empty,
+  className: Vector[String] = Vector.empty,
+  typeName: Vector[String] = Vector.empty,
+  coarseType: Vector[String] = Vector.empty,
+  weight: Vector[Bytes] = Vector.empty,
   weightType: JsAllocationsTable_WeightType.type,
-  inNursery: Array[Boolean] = Array.empty,
-  stack: Array[Option[IndexIntoStackTable]] = Array.empty,
+  inNursery: Vector[Boolean] = Vector.empty,
+  stack: Vector[Option[IndexIntoStackTable]] = Vector.empty,
   length: Double,
 )
+private[fxprof] object JsAllocationsTableArgs {
+  given JsonValueCodec[JsAllocationsTableArgs] = JsonCodecMaker.make
+}

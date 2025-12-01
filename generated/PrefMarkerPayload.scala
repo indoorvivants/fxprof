@@ -1,6 +1,6 @@
 package fxprof
 
-class PrefMarkerPayload private (args: PrefMarkerPayloadArgs) {
+class PrefMarkerPayload private (private[fxprof] val args: PrefMarkerPayloadArgs) {
   def `type`: PrefMarkerPayload_Type.type = args.`type`
   def prefAccessTime: Milliseconds = args.prefAccessTime
   def prefName: String = args.prefName
@@ -32,6 +32,9 @@ class PrefMarkerPayload private (args: PrefMarkerPayloadArgs) {
   
 }
 
+import com.github.plokhotnyuk.jsoniter_scala.macros._
+import com.github.plokhotnyuk.jsoniter_scala.core._
+
 object PrefMarkerPayload {
   def apply(
     `type`: PrefMarkerPayload_Type.type,
@@ -49,6 +52,17 @@ object PrefMarkerPayload {
       prefType = prefType,
       prefValue = prefValue,
     ))
+  given JsonValueCodec[PrefMarkerPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: PrefMarkerPayload) = 
+        new PrefMarkerPayload(summon[JsonValueCodec[PrefMarkerPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: PrefMarkerPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[PrefMarkerPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: PrefMarkerPayload = null
+    }
+  
 }
 private[fxprof] case class PrefMarkerPayloadArgs(
   `type`: PrefMarkerPayload_Type.type,
@@ -58,3 +72,6 @@ private[fxprof] case class PrefMarkerPayloadArgs(
   prefType: String,
   prefValue: String,
 )
+private[fxprof] object PrefMarkerPayloadArgs {
+  given JsonValueCodec[PrefMarkerPayloadArgs] = JsonCodecMaker.make
+}
