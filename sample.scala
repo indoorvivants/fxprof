@@ -1,5 +1,6 @@
 import fxprof.*
 import com.github.plokhotnyuk.jsoniter_scala.core._
+import java.time.Instant
 
 val profile = Profile(
   meta = ProfileMeta(
@@ -23,7 +24,24 @@ val profile = Profile(
       pid = "1",
       tid = Tid.Str("thread-1"),
       samples = RawSamplesTable(WeightType.Samples, 0),
-      markers = RawMarkerTable(1).withData(Vector(None)).withName(Vector(0)),
+      markers = RawMarkerTable(1)
+        .withStartTime(Vector(Some(Instant.now().toEpochMilli() - 400)))
+        .withEndTime(Vector(Some(Instant.now().toEpochMilli())))
+        .withPhase(Vector(MarkerPhase.Instant))
+        .withData(
+          Vector(
+            Some(
+              MarkerPayload.UserTiming(
+                UserTimingMarkerPayload(
+                  `type` = UserTimingMarkerPayload_Type,
+                  "hello",
+                  entryType = UserTimingMarkerPayload_EntryType.MEASURE
+                )
+              )
+            )
+          )
+        )
+        .withName(Vector(0)),
       stackTable = RawStackTable(0),
       frameTable = FrameTable(0.0),
       funcTable = FuncTable(0),

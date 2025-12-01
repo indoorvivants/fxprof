@@ -88,7 +88,7 @@ package object fxprof {
     case object DarkGrey extends CategoryColor
     case object Grey extends CategoryColor
   }
-  sealed abstract class MarkerPhase(value: Int)
+  sealed abstract class MarkerPhase(val value: Int)
       extends Product
       with Serializable
   object MarkerPhase {
@@ -96,6 +96,18 @@ package object fxprof {
     case object Interval extends MarkerPhase(1)
     case object IntervalStart extends MarkerPhase(2)
     case object IntervalEnd extends MarkerPhase(3)
+
+    given JsonValueCodec[MarkerPhase] = new JsonValueCodec[MarkerPhase] {
+      override def encodeValue(x: MarkerPhase, out: JsonWriter): Unit =
+        out.writeVal(x.value)
+
+      override def decodeValue(
+          in: JsonReader,
+          default: MarkerPhase
+      ): MarkerPhase = ???
+      override def nullValue: MarkerPhase = ???
+
+    }
   }
 
   import com.github.plokhotnyuk.jsoniter_scala.core._
@@ -275,7 +287,21 @@ package object fxprof {
     case class Url(payload: UrlMarkerPayload) extends MarkerPayload
     case class HostResolver(payload: HostResolverPayload) extends MarkerPayload
 
-    given JsonValueCodec[MarkerPayload] = ???
+    given JsonValueCodec[MarkerPayload] = new JsonValueCodec[MarkerPayload] {
+
+      override def encodeValue(x: MarkerPayload, out: JsonWriter): Unit =
+        x match {
+          case UserTiming(payload) =>
+            summon[JsonValueCodec[UserTimingMarkerPayload]]
+              .encodeValue(payload, out)
+        }
+
+      override def decodeValue(
+          in: JsonReader,
+          default: MarkerPayload
+      ): MarkerPayload = ???
+      override def nullValue: MarkerPayload = null
+    }
 
   }
 
