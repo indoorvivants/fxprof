@@ -25,6 +25,7 @@ object NoPayloadUserData {
   ): NoPayloadUserData = 
     new NoPayloadUserData(NoPayloadUserDataArgs(
       `type` = `type`,
+      innerWindowID = None,
     ))
   given JsonValueCodec[NoPayloadUserData] = 
     new JsonValueCodec {
@@ -40,7 +41,7 @@ object NoPayloadUserData {
 }
 private[fxprof] case class NoPayloadUserDataArgs(
   `type`: NoPayloadUserData_Type.type,
-  innerWindowID: Option[Double] = None,
+  innerWindowID: Option[Double],
 )
 private[fxprof] object NoPayloadUserDataArgs {
   given JsonValueCodec[NoPayloadUserDataArgs] = JsonCodecMaker.make

@@ -53,7 +53,14 @@ object JsAllocationsTable {
     length: Double,
   ): JsAllocationsTable = 
     new JsAllocationsTable(JsAllocationsTableArgs(
+      time = Vector.empty,
+      className = Vector.empty,
+      typeName = Vector.empty,
+      coarseType = Vector.empty,
+      weight = Vector.empty,
       weightType = weightType,
+      inNursery = Vector.empty,
+      stack = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[JsAllocationsTable] = 
@@ -69,14 +76,14 @@ object JsAllocationsTable {
   
 }
 private[fxprof] case class JsAllocationsTableArgs(
-  time: Vector[Milliseconds] = Vector.empty,
-  className: Vector[String] = Vector.empty,
-  typeName: Vector[String] = Vector.empty,
-  coarseType: Vector[String] = Vector.empty,
-  weight: Vector[Bytes] = Vector.empty,
+  time: Vector[Milliseconds],
+  className: Vector[String],
+  typeName: Vector[String],
+  coarseType: Vector[String],
+  weight: Vector[Bytes],
   weightType: JsAllocationsTable_WeightType.type,
-  inNursery: Vector[Boolean] = Vector.empty,
-  stack: Vector[Option[IndexIntoStackTable]] = Vector.empty,
+  inNursery: Vector[Boolean],
+  stack: Vector[Option[IndexIntoStackTable]],
   length: Double,
 )
 private[fxprof] object JsAllocationsTableArgs {

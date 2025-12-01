@@ -55,6 +55,7 @@ object Lib {
       debugName = debugName,
       debugPath = debugPath,
       breakpadId = breakpadId,
+      codeId = None,
     ))
   given JsonValueCodec[Lib] = 
     new JsonValueCodec {
@@ -75,7 +76,7 @@ private[fxprof] case class LibArgs(
   debugName: String,
   debugPath: String,
   breakpadId: String,
-  codeId: Option[String] = None,
+  codeId: Option[String],
 )
 private[fxprof] object LibArgs {
   given JsonValueCodec[LibArgs] = JsonCodecMaker.make

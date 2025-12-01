@@ -56,6 +56,15 @@ object FrameTable {
     length: Double,
   ): FrameTable = 
     new FrameTable(FrameTableArgs(
+      address = Vector.empty,
+      inlineDepth = Vector.empty,
+      category = Vector.empty,
+      subcategory = Vector.empty,
+      func = Vector.empty,
+      nativeSymbol = Vector.empty,
+      innerWindowID = Vector.empty,
+      line = Vector.empty,
+      column = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[FrameTable] = 
@@ -71,15 +80,15 @@ object FrameTable {
   
 }
 private[fxprof] case class FrameTableArgs(
-  address: Vector[FrameTable_Address] = Vector.empty,
-  inlineDepth: Vector[Double] = Vector.empty,
-  category: Vector[Option[IndexIntoCategoryList]] = Vector.empty,
-  subcategory: Vector[Option[IndexIntoSubcategoryListForCategory]] = Vector.empty,
-  func: Vector[IndexIntoFuncTable] = Vector.empty,
-  nativeSymbol: Vector[Option[IndexIntoNativeSymbolTable]] = Vector.empty,
-  innerWindowID: Vector[Option[InnerWindowID]] = Vector.empty,
-  line: Vector[Option[Double]] = Vector.empty,
-  column: Vector[Option[Double]] = Vector.empty,
+  address: Vector[FrameTable_Address],
+  inlineDepth: Vector[Double],
+  category: Vector[Option[IndexIntoCategoryList]],
+  subcategory: Vector[Option[IndexIntoSubcategoryListForCategory]],
+  func: Vector[IndexIntoFuncTable],
+  nativeSymbol: Vector[Option[IndexIntoNativeSymbolTable]],
+  innerWindowID: Vector[Option[InnerWindowID]],
+  line: Vector[Option[Double]],
+  column: Vector[Option[Double]],
   length: Double,
 )
 private[fxprof] object FrameTableArgs {

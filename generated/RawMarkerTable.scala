@@ -48,6 +48,13 @@ object RawMarkerTable {
     length: Double,
   ): RawMarkerTable = 
     new RawMarkerTable(RawMarkerTableArgs(
+      data = Vector.empty,
+      name = Vector.empty,
+      startTime = Vector.empty,
+      endTime = Vector.empty,
+      phase = Vector.empty,
+      category = Vector.empty,
+      threadId = None,
       length = length,
     ))
   given JsonValueCodec[RawMarkerTable] = 
@@ -63,13 +70,13 @@ object RawMarkerTable {
   
 }
 private[fxprof] case class RawMarkerTableArgs(
-  data: Vector[Option[MarkerPayload]] = Vector.empty,
-  name: Vector[IndexIntoStringTable] = Vector.empty,
-  startTime: Vector[Option[Double]] = Vector.empty,
-  endTime: Vector[Option[Double]] = Vector.empty,
-  phase: Vector[MarkerPhase] = Vector.empty,
-  category: Vector[IndexIntoCategoryList] = Vector.empty,
-  threadId: Option[Vector[Option[Tid]]] = None,
+  data: Vector[Option[MarkerPayload]],
+  name: Vector[IndexIntoStringTable],
+  startTime: Vector[Option[Double]],
+  endTime: Vector[Option[Double]],
+  phase: Vector[MarkerPhase],
+  category: Vector[IndexIntoCategoryList],
+  threadId: Option[Vector[Option[Tid]]],
   length: Double,
 )
 private[fxprof] object RawMarkerTableArgs {

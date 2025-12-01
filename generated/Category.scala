@@ -31,6 +31,7 @@ object Category {
     new Category(CategoryArgs(
       name = name,
       color = color,
+      subcategories = Vector.empty,
     ))
   given JsonValueCodec[Category] = 
     new JsonValueCodec {
@@ -47,7 +48,7 @@ object Category {
 private[fxprof] case class CategoryArgs(
   name: String,
   color: CategoryColor,
-  subcategories: Vector[String] = Vector.empty,
+  subcategories: Vector[String],
 )
 private[fxprof] object CategoryArgs {
   given JsonValueCodec[CategoryArgs] = JsonCodecMaker.make

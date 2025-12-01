@@ -35,6 +35,7 @@ object ProfilerOverhead {
   ): ProfilerOverhead = 
     new ProfilerOverhead(ProfilerOverheadArgs(
       samples = samples,
+      statistics = None,
       pid = pid,
       mainThreadIndex = mainThreadIndex,
     ))
@@ -52,7 +53,7 @@ object ProfilerOverhead {
 }
 private[fxprof] case class ProfilerOverheadArgs(
   samples: ProfilerOverheadSamplesTable,
-  statistics: Option[ProfilerOverheadStats] = None,
+  statistics: Option[ProfilerOverheadStats],
   pid: Pid,
   mainThreadIndex: ThreadIndex,
 )

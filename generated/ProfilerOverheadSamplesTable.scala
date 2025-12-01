@@ -40,6 +40,11 @@ object ProfilerOverheadSamplesTable {
     length: Double,
   ): ProfilerOverheadSamplesTable = 
     new ProfilerOverheadSamplesTable(ProfilerOverheadSamplesTableArgs(
+      counters = Vector.empty,
+      expiredMarkerCleaning = Vector.empty,
+      locking = Vector.empty,
+      threads = Vector.empty,
+      time = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[ProfilerOverheadSamplesTable] = 
@@ -55,11 +60,11 @@ object ProfilerOverheadSamplesTable {
   
 }
 private[fxprof] case class ProfilerOverheadSamplesTableArgs(
-  counters: Vector[Microseconds] = Vector.empty,
-  expiredMarkerCleaning: Vector[Microseconds] = Vector.empty,
-  locking: Vector[Microseconds] = Vector.empty,
-  threads: Vector[Microseconds] = Vector.empty,
-  time: Vector[Milliseconds] = Vector.empty,
+  counters: Vector[Microseconds],
+  expiredMarkerCleaning: Vector[Microseconds],
+  locking: Vector[Microseconds],
+  threads: Vector[Microseconds],
+  time: Vector[Milliseconds],
   length: Double,
 )
 private[fxprof] object ProfilerOverheadSamplesTableArgs {

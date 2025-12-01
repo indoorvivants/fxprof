@@ -40,6 +40,11 @@ object JsTracerTable {
     length: Double,
   ): JsTracerTable = 
     new JsTracerTable(JsTracerTableArgs(
+      events = Vector.empty,
+      timestamps = Vector.empty,
+      durations = Vector.empty,
+      line = Vector.empty,
+      column = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[JsTracerTable] = 
@@ -55,11 +60,11 @@ object JsTracerTable {
   
 }
 private[fxprof] case class JsTracerTableArgs(
-  events: Vector[IndexIntoStringTable] = Vector.empty,
-  timestamps: Vector[Microseconds] = Vector.empty,
-  durations: Vector[Option[Microseconds]] = Vector.empty,
-  line: Vector[Option[Double]] = Vector.empty,
-  column: Vector[Option[Double]] = Vector.empty,
+  events: Vector[IndexIntoStringTable],
+  timestamps: Vector[Microseconds],
+  durations: Vector[Option[Microseconds]],
+  line: Vector[Option[Double]],
+  column: Vector[Option[Double]],
   length: Double,
 )
 private[fxprof] object JsTracerTableArgs {

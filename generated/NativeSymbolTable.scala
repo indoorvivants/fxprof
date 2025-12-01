@@ -36,6 +36,10 @@ object NativeSymbolTable {
     length: Double,
   ): NativeSymbolTable = 
     new NativeSymbolTable(NativeSymbolTableArgs(
+      libIndex = Vector.empty,
+      address = Vector.empty,
+      name = Vector.empty,
+      functionSize = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[NativeSymbolTable] = 
@@ -51,10 +55,10 @@ object NativeSymbolTable {
   
 }
 private[fxprof] case class NativeSymbolTableArgs(
-  libIndex: Vector[IndexIntoLibs] = Vector.empty,
-  address: Vector[Address] = Vector.empty,
-  name: Vector[IndexIntoStringTable] = Vector.empty,
-  functionSize: Vector[Option[Bytes]] = Vector.empty,
+  libIndex: Vector[IndexIntoLibs],
+  address: Vector[Address],
+  name: Vector[IndexIntoStringTable],
+  functionSize: Vector[Option[Bytes]],
   length: Double,
 )
 private[fxprof] object NativeSymbolTableArgs {

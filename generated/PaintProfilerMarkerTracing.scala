@@ -31,6 +31,7 @@ object PaintProfilerMarkerTracing {
     new PaintProfilerMarkerTracing(PaintProfilerMarkerTracingArgs(
       `type` = `type`,
       category = category,
+      cause = None,
     ))
   given JsonValueCodec[PaintProfilerMarkerTracing] = 
     new JsonValueCodec {
@@ -47,7 +48,7 @@ object PaintProfilerMarkerTracing {
 private[fxprof] case class PaintProfilerMarkerTracingArgs(
   `type`: PaintProfilerMarkerTracing_Type.type,
   category: PaintProfilerMarkerTracing_Category.type,
-  cause: Option[CauseBacktrace] = None,
+  cause: Option[CauseBacktrace],
 )
 private[fxprof] object PaintProfilerMarkerTracingArgs {
   given JsonValueCodec[PaintProfilerMarkerTracingArgs] = JsonCodecMaker.make

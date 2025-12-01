@@ -32,6 +32,9 @@ object ExtensionTable {
     length: Double,
   ): ExtensionTable = 
     new ExtensionTable(ExtensionTableArgs(
+      baseURL = Vector.empty,
+      id = Vector.empty,
+      name = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[ExtensionTable] = 
@@ -47,9 +50,9 @@ object ExtensionTable {
   
 }
 private[fxprof] case class ExtensionTableArgs(
-  baseURL: Vector[String] = Vector.empty,
-  id: Vector[String] = Vector.empty,
-  name: Vector[String] = Vector.empty,
+  baseURL: Vector[String],
+  id: Vector[String],
+  name: Vector[String],
   length: Double,
 )
 private[fxprof] object ExtensionTableArgs {

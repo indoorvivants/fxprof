@@ -37,6 +37,10 @@ object ResourceTable {
   ): ResourceTable = 
     new ResourceTable(ResourceTableArgs(
       length = length,
+      lib = Vector.empty,
+      name = Vector.empty,
+      host = Vector.empty,
+      `type` = Vector.empty,
     ))
   given JsonValueCodec[ResourceTable] = 
     new JsonValueCodec {
@@ -52,10 +56,10 @@ object ResourceTable {
 }
 private[fxprof] case class ResourceTableArgs(
   length: Double,
-  lib: Vector[Option[IndexIntoLibs]] = Vector.empty,
-  name: Vector[IndexIntoStringTable] = Vector.empty,
-  host: Vector[Option[IndexIntoStringTable]] = Vector.empty,
-  `type`: Vector[ResourceTypeEnum] = Vector.empty,
+  lib: Vector[Option[IndexIntoLibs]],
+  name: Vector[IndexIntoStringTable],
+  host: Vector[Option[IndexIntoStringTable]],
+  `type`: Vector[ResourceTypeEnum],
 )
 private[fxprof] object ResourceTableArgs {
   given JsonValueCodec[ResourceTableArgs] = JsonCodecMaker.make

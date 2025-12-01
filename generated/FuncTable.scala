@@ -48,6 +48,13 @@ object FuncTable {
     length: Double,
   ): FuncTable = 
     new FuncTable(FuncTableArgs(
+      name = Vector.empty,
+      isJS = Vector.empty,
+      relevantForJS = Vector.empty,
+      resource = Vector.empty,
+      source = Vector.empty,
+      lineNumber = Vector.empty,
+      columnNumber = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[FuncTable] = 
@@ -63,13 +70,13 @@ object FuncTable {
   
 }
 private[fxprof] case class FuncTableArgs(
-  name: Vector[IndexIntoStringTable] = Vector.empty,
-  isJS: Vector[Boolean] = Vector.empty,
-  relevantForJS: Vector[Boolean] = Vector.empty,
-  resource: Vector[FuncTable_Resource] = Vector.empty,
-  source: Vector[Option[IndexIntoSourceTable]] = Vector.empty,
-  lineNumber: Vector[Option[Double]] = Vector.empty,
-  columnNumber: Vector[Option[Double]] = Vector.empty,
+  name: Vector[IndexIntoStringTable],
+  isJS: Vector[Boolean],
+  relevantForJS: Vector[Boolean],
+  resource: Vector[FuncTable_Resource],
+  source: Vector[Option[IndexIntoSourceTable]],
+  lineNumber: Vector[Option[Double]],
+  columnNumber: Vector[Option[Double]],
   length: Double,
 )
 private[fxprof] object FuncTableArgs {

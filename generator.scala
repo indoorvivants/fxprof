@@ -322,11 +322,16 @@ def render(struct: String, params: List[(String, Type)]) =
       nest:
         block(s"new $struct(${struct}Args(", "))"):
           params.foreach: (name, tpe) =>
-            val hasDefault = defaultScalaValue(tpe).nonEmpty
-            if !hasDefault then
-              line(
-                s"${sanitiseFieldName(name)} = ${sanitiseFieldName(name)},"
-              )
+            defaultScalaValue(tpe) match
+              case None =>
+                line(
+                  s"${sanitiseFieldName(name)} = ${sanitiseFieldName(name)},"
+                )
+              case Some(value) =>
+                line(
+                  s"${sanitiseFieldName(name)} = ${value},"
+                )
+
       block(s"given JsonValueCodec[$struct] = ", ""):
         block("new JsonValueCodec {", "}"):
           block(
@@ -349,9 +354,7 @@ def render(struct: String, params: List[(String, Type)]) =
 
     block(s"private[fxprof] case class ${struct}Args(", ")"):
       params.map: (name, tpe) =>
-        line(s"${sanitiseFieldName(name)}: ${types(name)}${{
-            defaultScalaValue(tpe).map(" = " + _).getOrElse("")
-          }},")
+        line(s"${sanitiseFieldName(name)}: ${types(name)},")
 
     block(s"private[fxprof] object ${struct}Args {", "}"):
       line(s"given JsonValueCodec[${struct}Args] = JsonCodecMaker.make")

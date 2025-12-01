@@ -1,4 +1,6 @@
 import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
+import com.github.plokhotnyuk.jsoniter_scala.core.JsonWriter
+import com.github.plokhotnyuk.jsoniter_scala.core.JsonReader
 package object fxprof {
   type Milliseconds = Double
   type Pid = String
@@ -31,6 +33,17 @@ package object fxprof {
   object Tid {
     case class Number(value: Double) extends Tid
     case class Str(value: String) extends Tid
+
+    given JsonValueCodec[Tid] = new JsonValueCodec[Tid] {
+      override def encodeValue(x: Tid, out: JsonWriter): Unit =
+        x match
+          case Number(value) => out.writeVal(value)
+          case Str(value)    => out.writeVal(value)
+
+      override def decodeValue(in: JsonReader, default: Tid): Tid = ???
+      override def nullValue: Tid = ???
+
+    }
   }
   type IndexIntoJsTracerEvents = Double;
   type CounterIndex = Double;
@@ -85,11 +98,36 @@ package object fxprof {
     case object IntervalEnd extends MarkerPhase(3)
   }
 
+  import com.github.plokhotnyuk.jsoniter_scala.core._
+
   // figure out how to deal with this
-  type ProcessProfilingLog = Map[String, Array[Byte]]
+  case class ProcessProfilingLog(m: Map[String, Array[Byte]]):
+    def add[T: JsonValueCodec](key: String, t: T) =
+      copy(m = m.updated(key, writeToArray(t)))
+
+  object ProcessProfilingLog {
+    def empty: ProcessProfilingLog = ProcessProfilingLog(Map.empty)
+
+    given JsonValueCodec[ProcessProfilingLog] =
+      new JsonValueCodec[ProcessProfilingLog] {
+        override def decodeValue(
+            in: JsonReader,
+            default: ProcessProfilingLog
+        ): ProcessProfilingLog =
+          in.objectStartOrNullError()
+          // TODO: do this
+
+          in.objectEndOrCommaError()
+        override def encodeValue(
+            x: ProcessProfilingLog,
+            out: JsonWriter
+        ): Unit = ???
+        override def nullValue: ProcessProfilingLog = empty
+      }
+  }
   type ProfilingLog = Map[Double, ProcessProfilingLog]
 
-  sealed abstract class ProcessType(value: String)
+  sealed abstract class ProcessType(val value: String)
       extends Product
       with Serializable
   object ProcessType {
@@ -102,6 +140,16 @@ package object fxprof {
     case object Pdfium extends ProcessType("pdfium")
     case object Vr extends ProcessType("vr")
     case object Invalid extends ProcessType("invalid")
+
+    given JsonValueCodec[ProcessType] =
+      new JsonValueCodec[ProcessType] {
+        def decodeValue(in: JsonReader, default: ProcessType): ProcessType = ???
+
+        def encodeValue(x: ProcessType, out: JsonWriter): Unit =
+          out.writeVal(x.value)
+
+        override def nullValue: ProcessType = null
+      }
   }
 
   type PageList = Array[Page]

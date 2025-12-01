@@ -36,6 +36,10 @@ object RawCounterSamplesTable {
     length: Double,
   ): RawCounterSamplesTable = 
     new RawCounterSamplesTable(RawCounterSamplesTableArgs(
+      time = None,
+      timeDeltas = None,
+      number = None,
+      count = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[RawCounterSamplesTable] = 
@@ -51,10 +55,10 @@ object RawCounterSamplesTable {
   
 }
 private[fxprof] case class RawCounterSamplesTableArgs(
-  time: Option[Vector[Milliseconds]] = None,
-  timeDeltas: Option[Vector[Milliseconds]] = None,
-  number: Option[Vector[Double]] = None,
-  count: Vector[Double] = Vector.empty,
+  time: Option[Vector[Milliseconds]],
+  timeDeltas: Option[Vector[Milliseconds]],
+  number: Option[Vector[Double]],
+  count: Vector[Double],
   length: Double,
 )
 private[fxprof] object RawCounterSamplesTableArgs {

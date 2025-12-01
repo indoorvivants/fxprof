@@ -34,7 +34,9 @@ object DOMEventMarkerPayload {
   ): DOMEventMarkerPayload = 
     new DOMEventMarkerPayload(DOMEventMarkerPayloadArgs(
       `type` = `type`,
+      latency = None,
       eventType = eventType,
+      innerWindowID = None,
     ))
   given JsonValueCodec[DOMEventMarkerPayload] = 
     new JsonValueCodec {
@@ -50,9 +52,9 @@ object DOMEventMarkerPayload {
 }
 private[fxprof] case class DOMEventMarkerPayloadArgs(
   `type`: DOMEventMarkerPayload_Type.type,
-  latency: Option[Milliseconds] = None,
+  latency: Option[Milliseconds],
   eventType: String,
-  innerWindowID: Option[Double] = None,
+  innerWindowID: Option[Double],
 )
 private[fxprof] object DOMEventMarkerPayloadArgs {
   given JsonValueCodec[DOMEventMarkerPayloadArgs] = JsonCodecMaker.make

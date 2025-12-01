@@ -54,7 +54,14 @@ object Profile {
   ): Profile = 
     new Profile(ProfileArgs(
       meta = meta,
+      libs = Vector.empty,
+      pages = None,
+      counters = None,
+      profilerOverhead = None,
       shared = shared,
+      threads = Vector.empty,
+      profilingLog = None,
+      profileGatheringLog = None,
     ))
   given JsonValueCodec[Profile] = 
     new JsonValueCodec {
@@ -70,14 +77,14 @@ object Profile {
 }
 private[fxprof] case class ProfileArgs(
   meta: ProfileMeta,
-  libs: Vector[Lib] = Vector.empty,
-  pages: Option[PageList] = None,
-  counters: Option[Vector[RawCounter]] = None,
-  profilerOverhead: Option[Vector[ProfilerOverhead]] = None,
+  libs: Vector[Lib],
+  pages: Option[PageList],
+  counters: Option[Vector[RawCounter]],
+  profilerOverhead: Option[Vector[ProfilerOverhead]],
   shared: RawProfileSharedData,
-  threads: Vector[RawThread] = Vector.empty,
-  profilingLog: Option[ProfilingLog] = None,
-  profileGatheringLog: Option[ProfilingLog] = None,
+  threads: Vector[RawThread],
+  profilingLog: Option[ProfilingLog],
+  profileGatheringLog: Option[ProfilingLog],
 )
 private[fxprof] object ProfileArgs {
   given JsonValueCodec[ProfileArgs] = JsonCodecMaker.make

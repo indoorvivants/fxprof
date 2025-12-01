@@ -36,7 +36,11 @@ object ProfilerConfiguration {
     capacity: Bytes,
   ): ProfilerConfiguration = 
     new ProfilerConfiguration(ProfilerConfigurationArgs(
+      threads = Vector.empty,
+      features = Vector.empty,
       capacity = capacity,
+      duration = None,
+      activeTabID = None,
     ))
   given JsonValueCodec[ProfilerConfiguration] = 
     new JsonValueCodec {
@@ -51,11 +55,11 @@ object ProfilerConfiguration {
   
 }
 private[fxprof] case class ProfilerConfigurationArgs(
-  threads: Vector[String] = Vector.empty,
-  features: Vector[String] = Vector.empty,
+  threads: Vector[String],
+  features: Vector[String],
   capacity: Bytes,
-  duration: Option[Double] = None,
-  activeTabID: Option[TabID] = None,
+  duration: Option[Double],
+  activeTabID: Option[TabID],
 )
 private[fxprof] object ProfilerConfigurationArgs {
   given JsonValueCodec[ProfilerConfigurationArgs] = JsonCodecMaker.make

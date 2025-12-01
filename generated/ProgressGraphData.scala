@@ -25,6 +25,7 @@ object ProgressGraphData {
   ): ProgressGraphData = 
     new ProgressGraphData(ProgressGraphDataArgs(
       percent = percent,
+      timestamp = None,
     ))
   given JsonValueCodec[ProgressGraphData] = 
     new JsonValueCodec {
@@ -40,7 +41,7 @@ object ProgressGraphData {
 }
 private[fxprof] case class ProgressGraphDataArgs(
   percent: Double,
-  timestamp: Option[Milliseconds] = None,
+  timestamp: Option[Milliseconds],
 )
 private[fxprof] object ProgressGraphDataArgs {
   given JsonValueCodec[ProgressGraphDataArgs] = JsonCodecMaker.make

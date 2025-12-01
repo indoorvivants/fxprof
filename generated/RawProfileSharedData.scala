@@ -24,6 +24,7 @@ object RawProfileSharedData {
     sources: SourceTable,
   ): RawProfileSharedData = 
     new RawProfileSharedData(RawProfileSharedDataArgs(
+      stringArray = Vector.empty,
       sources = sources,
     ))
   given JsonValueCodec[RawProfileSharedData] = 
@@ -39,7 +40,7 @@ object RawProfileSharedData {
   
 }
 private[fxprof] case class RawProfileSharedDataArgs(
-  stringArray: Vector[String] = Vector.empty,
+  stringArray: Vector[String],
   sources: SourceTable,
 )
 private[fxprof] object RawProfileSharedDataArgs {

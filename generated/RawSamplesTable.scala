@@ -57,7 +57,15 @@ object RawSamplesTable {
     length: Double,
   ): RawSamplesTable = 
     new RawSamplesTable(RawSamplesTableArgs(
+      responsiveness = None,
+      eventDelay = None,
+      stack = Vector.empty,
+      time = None,
+      timeDeltas = None,
+      weight = Vector.empty,
       weightType = weightType,
+      threadCPUDelta = None,
+      threadId = None,
       length = length,
     ))
   given JsonValueCodec[RawSamplesTable] = 
@@ -73,15 +81,15 @@ object RawSamplesTable {
   
 }
 private[fxprof] case class RawSamplesTableArgs(
-  responsiveness: Option[Vector[Option[Milliseconds]]] = None,
-  eventDelay: Option[Vector[Option[Milliseconds]]] = None,
-  stack: Vector[Option[IndexIntoStackTable]] = Vector.empty,
-  time: Option[Vector[Milliseconds]] = None,
-  timeDeltas: Option[Vector[Milliseconds]] = None,
-  weight: Vector[Option[Double]] = Vector.empty,
+  responsiveness: Option[Vector[Option[Milliseconds]]],
+  eventDelay: Option[Vector[Option[Milliseconds]]],
+  stack: Vector[Option[IndexIntoStackTable]],
+  time: Option[Vector[Milliseconds]],
+  timeDeltas: Option[Vector[Milliseconds]],
+  weight: Vector[Option[Double]],
   weightType: WeightType,
-  threadCPUDelta: Option[Vector[Option[Double]]] = None,
-  threadId: Option[Vector[Tid]] = None,
+  threadCPUDelta: Option[Vector[Option[Double]]],
+  threadId: Option[Vector[Tid]],
   length: Double,
 )
 private[fxprof] object RawSamplesTableArgs {

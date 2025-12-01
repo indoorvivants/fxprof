@@ -35,6 +35,8 @@ object TextMarkerPayload {
     new TextMarkerPayload(TextMarkerPayloadArgs(
       `type` = `type`,
       name = name,
+      cause = None,
+      innerWindowID = None,
     ))
   given JsonValueCodec[TextMarkerPayload] = 
     new JsonValueCodec {
@@ -51,8 +53,8 @@ object TextMarkerPayload {
 private[fxprof] case class TextMarkerPayloadArgs(
   `type`: TextMarkerPayload_Type.type,
   name: String,
-  cause: Option[CauseBacktrace] = None,
-  innerWindowID: Option[Double] = None,
+  cause: Option[CauseBacktrace],
+  innerWindowID: Option[Double],
 )
 private[fxprof] object TextMarkerPayloadArgs {
   given JsonValueCodec[TextMarkerPayloadArgs] = JsonCodecMaker.make

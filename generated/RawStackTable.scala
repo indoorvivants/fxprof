@@ -28,6 +28,8 @@ object RawStackTable {
     length: Double,
   ): RawStackTable = 
     new RawStackTable(RawStackTableArgs(
+      frame = Vector.empty,
+      prefix = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[RawStackTable] = 
@@ -43,8 +45,8 @@ object RawStackTable {
   
 }
 private[fxprof] case class RawStackTableArgs(
-  frame: Vector[IndexIntoFrameTable] = Vector.empty,
-  prefix: Vector[Option[IndexIntoStackTable]] = Vector.empty,
+  frame: Vector[IndexIntoFrameTable],
+  prefix: Vector[Option[IndexIntoStackTable]],
   length: Double,
 )
 private[fxprof] object RawStackTableArgs {

@@ -100,7 +100,15 @@ object IPCMarkerPayload {
       messageSeqno = messageSeqno,
       side = side,
       direction = direction,
+      phase = None,
       sync = sync,
+      threadId = None,
+      sendStartTime = None,
+      sendEndTime = None,
+      recvEndTime = None,
+      sendTid = None,
+      recvTid = None,
+      niceDirection = None,
     ))
   given JsonValueCodec[IPCMarkerPayload] = 
     new JsonValueCodec {
@@ -123,15 +131,15 @@ private[fxprof] case class IPCMarkerPayloadArgs(
   messageSeqno: Double,
   side: IPCMarkerPayload_Side,
   direction: IPCMarkerPayload_Direction,
-  phase: Option[IPCMarkerPayload_Phase] = None,
+  phase: Option[IPCMarkerPayload_Phase],
   sync: Boolean,
-  threadId: Option[Double] = None,
-  sendStartTime: Option[Milliseconds] = None,
-  sendEndTime: Option[Milliseconds] = None,
-  recvEndTime: Option[Milliseconds] = None,
-  sendTid: Option[Tid] = None,
-  recvTid: Option[Tid] = None,
-  niceDirection: Option[String] = None,
+  threadId: Option[Double],
+  sendStartTime: Option[Milliseconds],
+  sendEndTime: Option[Milliseconds],
+  recvEndTime: Option[Milliseconds],
+  sendTid: Option[Tid],
+  recvTid: Option[Tid],
+  niceDirection: Option[String],
 )
 private[fxprof] object IPCMarkerPayloadArgs {
   given JsonValueCodec[IPCMarkerPayloadArgs] = JsonCodecMaker.make

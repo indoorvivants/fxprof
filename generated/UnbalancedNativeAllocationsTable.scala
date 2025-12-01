@@ -37,7 +37,10 @@ object UnbalancedNativeAllocationsTable {
     length: Double,
   ): UnbalancedNativeAllocationsTable = 
     new UnbalancedNativeAllocationsTable(UnbalancedNativeAllocationsTableArgs(
+      time = Vector.empty,
+      weight = Vector.empty,
       weightType = weightType,
+      stack = Vector.empty,
       length = length,
     ))
   given JsonValueCodec[UnbalancedNativeAllocationsTable] = 
@@ -53,10 +56,10 @@ object UnbalancedNativeAllocationsTable {
   
 }
 private[fxprof] case class UnbalancedNativeAllocationsTableArgs(
-  time: Vector[Milliseconds] = Vector.empty,
-  weight: Vector[Bytes] = Vector.empty,
+  time: Vector[Milliseconds],
+  weight: Vector[Bytes],
   weightType: UnbalancedNativeAllocationsTable_WeightType.type,
-  stack: Vector[Option[IndexIntoStackTable]] = Vector.empty,
+  stack: Vector[Option[IndexIntoStackTable]],
   length: Double,
 )
 private[fxprof] object UnbalancedNativeAllocationsTableArgs {

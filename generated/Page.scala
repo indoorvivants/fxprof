@@ -47,6 +47,8 @@ object Page {
       innerWindowID = innerWindowID,
       url = url,
       embedderInnerWindowID = embedderInnerWindowID,
+      isPrivateBrowsing = None,
+      favicon = None,
     ))
   given JsonValueCodec[Page] = 
     new JsonValueCodec {
@@ -65,8 +67,8 @@ private[fxprof] case class PageArgs(
   innerWindowID: InnerWindowID,
   url: String,
   embedderInnerWindowID: Double,
-  isPrivateBrowsing: Option[Boolean] = None,
-  favicon: Option[Option[String]] = None,
+  isPrivateBrowsing: Option[Boolean],
+  favicon: Option[Option[String]],
 )
 private[fxprof] object PageArgs {
   given JsonValueCodec[PageArgs] = JsonCodecMaker.make

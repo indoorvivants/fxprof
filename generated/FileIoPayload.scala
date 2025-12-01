@@ -43,8 +43,11 @@ object FileIoPayload {
   ): FileIoPayload = 
     new FileIoPayload(FileIoPayloadArgs(
       `type` = `type`,
+      cause = None,
       source = source,
       operation = operation,
+      filename = None,
+      threadId = None,
     ))
   given JsonValueCodec[FileIoPayload] = 
     new JsonValueCodec {
@@ -60,11 +63,11 @@ object FileIoPayload {
 }
 private[fxprof] case class FileIoPayloadArgs(
   `type`: FileIoPayload_Type.type,
-  cause: Option[CauseBacktrace] = None,
+  cause: Option[CauseBacktrace],
   source: String,
   operation: String,
-  filename: Option[String] = None,
-  threadId: Option[Double] = None,
+  filename: Option[String],
+  threadId: Option[Double],
 )
 private[fxprof] object FileIoPayloadArgs {
   given JsonValueCodec[FileIoPayloadArgs] = JsonCodecMaker.make

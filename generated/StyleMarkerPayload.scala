@@ -56,6 +56,7 @@ object StyleMarkerPayload {
     new StyleMarkerPayload(StyleMarkerPayloadArgs(
       `type` = `type`,
       category = category,
+      cause = None,
       elementsTraversed = elementsTraversed,
       elementsStyled = elementsStyled,
       elementsMatched = elementsMatched,
@@ -77,7 +78,7 @@ object StyleMarkerPayload {
 private[fxprof] case class StyleMarkerPayloadArgs(
   `type`: StyleMarkerPayload_Type.type,
   category: StyleMarkerPayload_Category.type,
-  cause: Option[CauseBacktrace] = None,
+  cause: Option[CauseBacktrace],
   elementsTraversed: Double,
   elementsStyled: Double,
   elementsMatched: Double,

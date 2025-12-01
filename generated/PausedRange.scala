@@ -28,6 +28,8 @@ object PausedRange {
     reason: PausedRange_Reason,
   ): PausedRange = 
     new PausedRange(PausedRangeArgs(
+      startTime = None,
+      endTime = None,
       reason = reason,
     ))
   given JsonValueCodec[PausedRange] = 
@@ -43,8 +45,8 @@ object PausedRange {
   
 }
 private[fxprof] case class PausedRangeArgs(
-  startTime: Option[Milliseconds] = None,
-  endTime: Option[Milliseconds] = None,
+  startTime: Option[Milliseconds],
+  endTime: Option[Milliseconds],
   reason: PausedRange_Reason,
 )
 private[fxprof] object PausedRangeArgs {

@@ -35,6 +35,8 @@ object NavigationMarkerPayload {
     new NavigationMarkerPayload(NavigationMarkerPayloadArgs(
       `type` = `type`,
       category = category,
+      eventType = None,
+      innerWindowID = None,
     ))
   given JsonValueCodec[NavigationMarkerPayload] = 
     new JsonValueCodec {
@@ -51,8 +53,8 @@ object NavigationMarkerPayload {
 private[fxprof] case class NavigationMarkerPayloadArgs(
   `type`: NavigationMarkerPayload_Type.type,
   category: NavigationMarkerPayload_Category.type,
-  eventType: Option[String] = None,
-  innerWindowID: Option[Double] = None,
+  eventType: Option[String],
+  innerWindowID: Option[Double],
 )
 private[fxprof] object NavigationMarkerPayloadArgs {
   given JsonValueCodec[NavigationMarkerPayloadArgs] = JsonCodecMaker.make

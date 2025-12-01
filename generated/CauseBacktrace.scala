@@ -27,6 +27,9 @@ object CauseBacktrace {
   def apply(
   ): CauseBacktrace = 
     new CauseBacktrace(CauseBacktraceArgs(
+      tid = None,
+      time = None,
+      stack = None,
     ))
   given JsonValueCodec[CauseBacktrace] = 
     new JsonValueCodec {
@@ -41,9 +44,9 @@ object CauseBacktrace {
   
 }
 private[fxprof] case class CauseBacktraceArgs(
-  tid: Option[Tid] = None,
-  time: Option[Milliseconds] = None,
-  stack: Option[IndexIntoStackTable] = None,
+  tid: Option[Tid],
+  time: Option[Milliseconds],
+  stack: Option[IndexIntoStackTable],
 )
 private[fxprof] object CauseBacktraceArgs {
   given JsonValueCodec[CauseBacktraceArgs] = JsonCodecMaker.make

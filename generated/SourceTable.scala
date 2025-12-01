@@ -7,17 +7,16 @@ class SourceTable private (private[fxprof] val args: SourceTableArgs) {
 
   def withLength(value: Double): SourceTable =
     copy(_.copy(length = value))
-  
+
   def withUuid(value: Vector[Option[String]]): SourceTable =
     copy(_.copy(uuid = value))
-  
+
   def withFilename(value: Vector[IndexIntoStringTable]): SourceTable =
     copy(_.copy(filename = value))
-  
 
-  private def copy(f: SourceTableArgs => SourceTableArgs) = 
+  private def copy(f: SourceTableArgs => SourceTableArgs) =
     new SourceTable(f(args))
-  
+
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -25,27 +24,33 @@ import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object SourceTable {
   def apply(
-    length: Double,
-  ): SourceTable = 
-    new SourceTable(SourceTableArgs(
-      length = length,
-    ))
-  given JsonValueCodec[SourceTable] = 
+      length: Double
+  ): SourceTable =
+    new SourceTable(
+      SourceTableArgs(
+        length = length,
+        uuid = Vector.empty,
+        filename = Vector.empty
+      )
+    )
+  given JsonValueCodec[SourceTable] =
     new JsonValueCodec {
-      def decodeValue(in: JsonReader, default: SourceTable) = 
-        new SourceTable(summon[JsonValueCodec[SourceTableArgs]].decodeValue(in, default.args))
-      
-      def encodeValue(x: SourceTable, out: JsonWriter) = 
+      def decodeValue(in: JsonReader, default: SourceTable) =
+        new SourceTable(
+          summon[JsonValueCodec[SourceTableArgs]].decodeValue(in, default.args)
+        )
+
+      def encodeValue(x: SourceTable, out: JsonWriter) =
         summon[JsonValueCodec[SourceTableArgs]].encodeValue(x.args, out)
-      
+
       def nullValue: SourceTable = null
     }
-  
+
 }
 private[fxprof] case class SourceTableArgs(
-  length: Double,
-  uuid: Vector[Option[String]] = Vector.empty,
-  filename: Vector[IndexIntoStringTable] = Vector.empty,
+    length: Double,
+    uuid: Vector[Option[String]],
+    filename: Vector[IndexIntoStringTable]
 )
 private[fxprof] object SourceTableArgs {
   given JsonValueCodec[SourceTableArgs] = JsonCodecMaker.make

@@ -39,6 +39,9 @@ object CcMarkerTracing {
     new CcMarkerTracing(CcMarkerTracingArgs(
       `type` = `type`,
       category = category,
+      first = None,
+      desc = None,
+      second = None,
     ))
   given JsonValueCodec[CcMarkerTracing] = 
     new JsonValueCodec {
@@ -55,9 +58,9 @@ object CcMarkerTracing {
 private[fxprof] case class CcMarkerTracingArgs(
   `type`: CcMarkerTracing_Type.type,
   category: CcMarkerTracing_Category.type,
-  first: Option[String] = None,
-  desc: Option[String] = None,
-  second: Option[String] = None,
+  first: Option[String],
+  desc: Option[String],
+  second: Option[String],
 )
 private[fxprof] object CcMarkerTracingArgs {
   given JsonValueCodec[CcMarkerTracingArgs] = JsonCodecMaker.make
