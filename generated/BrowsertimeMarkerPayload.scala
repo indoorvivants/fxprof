@@ -16,6 +16,16 @@ class BrowsertimeMarkerPayload private (args: BrowsertimeMarkerPayloadArgs) {
   
 }
 
+object BrowsertimeMarkerPayload {
+  def apply(
+    `type`: BrowsertimeMarkerPayload_Type.type,
+    percentage: Double,
+  ): BrowsertimeMarkerPayload = 
+    new BrowsertimeMarkerPayload(BrowsertimeMarkerPayloadArgs(
+      `type` = `type`,
+      percentage = percentage,
+    ))
+}
 private[fxprof] case class BrowsertimeMarkerPayloadArgs(
   `type`: BrowsertimeMarkerPayload_Type.type,
   percentage: Double,

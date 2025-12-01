@@ -16,6 +16,16 @@ class UrlMarkerPayload private (args: UrlMarkerPayloadArgs) {
   
 }
 
+object UrlMarkerPayload {
+  def apply(
+    `type`: UrlMarkerPayload_Type.type,
+    url: String,
+  ): UrlMarkerPayload = 
+    new UrlMarkerPayload(UrlMarkerPayloadArgs(
+      `type` = `type`,
+      url = url,
+    ))
+}
 private[fxprof] case class UrlMarkerPayloadArgs(
   `type`: UrlMarkerPayload_Type.type,
   url: String,

@@ -32,11 +32,23 @@ class FileIoPayload private (args: FileIoPayloadArgs) {
   
 }
 
+object FileIoPayload {
+  def apply(
+    `type`: FileIoPayload_Type.type,
+    source: String,
+    operation: String,
+  ): FileIoPayload = 
+    new FileIoPayload(FileIoPayloadArgs(
+      `type` = `type`,
+      source = source,
+      operation = operation,
+    ))
+}
 private[fxprof] case class FileIoPayloadArgs(
   `type`: FileIoPayload_Type.type,
-  cause: Option[CauseBacktrace],
+  cause: Option[CauseBacktrace] = None,
   source: String,
   operation: String,
-  filename: Option[String],
-  threadId: Option[Double],
+  filename: Option[String] = None,
+  threadId: Option[Double] = None,
 )

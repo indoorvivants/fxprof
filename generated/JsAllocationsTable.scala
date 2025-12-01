@@ -44,14 +44,24 @@ class JsAllocationsTable private (args: JsAllocationsTableArgs) {
   
 }
 
+object JsAllocationsTable {
+  def apply(
+    weightType: JsAllocationsTable_WeightType.type,
+    length: Double,
+  ): JsAllocationsTable = 
+    new JsAllocationsTable(JsAllocationsTableArgs(
+      weightType = weightType,
+      length = length,
+    ))
+}
 private[fxprof] case class JsAllocationsTableArgs(
-  time: Array[Milliseconds],
-  className: Array[String],
-  typeName: Array[String],
-  coarseType: Array[String],
-  weight: Array[Bytes],
+  time: Array[Milliseconds] = Array.empty,
+  className: Array[String] = Array.empty,
+  typeName: Array[String] = Array.empty,
+  coarseType: Array[String] = Array.empty,
+  weight: Array[Bytes] = Array.empty,
   weightType: JsAllocationsTable_WeightType.type,
-  inNursery: Array[Boolean],
-  stack: Array[Option[IndexIntoStackTable]],
+  inNursery: Array[Boolean] = Array.empty,
+  stack: Array[Option[IndexIntoStackTable]] = Array.empty,
   length: Double,
 )

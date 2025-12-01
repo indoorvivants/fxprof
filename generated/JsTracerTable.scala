@@ -32,11 +32,19 @@ class JsTracerTable private (args: JsTracerTableArgs) {
   
 }
 
+object JsTracerTable {
+  def apply(
+    length: Double,
+  ): JsTracerTable = 
+    new JsTracerTable(JsTracerTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class JsTracerTableArgs(
-  events: Array[IndexIntoStringTable],
-  timestamps: Array[Microseconds],
-  durations: Array[Option[Microseconds]],
-  line: Array[Option[Double]],
-  column: Array[Option[Double]],
+  events: Array[IndexIntoStringTable] = Array.empty,
+  timestamps: Array[Microseconds] = Array.empty,
+  durations: Array[Option[Microseconds]] = Array.empty,
+  line: Array[Option[Double]] = Array.empty,
+  column: Array[Option[Double]] = Array.empty,
   length: Double,
 )

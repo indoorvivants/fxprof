@@ -36,6 +36,24 @@ class Lib private (args: LibArgs) {
   
 }
 
+object Lib {
+  def apply(
+    arch: String,
+    name: String,
+    path: String,
+    debugName: String,
+    debugPath: String,
+    breakpadId: String,
+  ): Lib = 
+    new Lib(LibArgs(
+      arch = arch,
+      name = name,
+      path = path,
+      debugName = debugName,
+      debugPath = debugPath,
+      breakpadId = breakpadId,
+    ))
+}
 private[fxprof] case class LibArgs(
   arch: String,
   name: String,
@@ -43,5 +61,5 @@ private[fxprof] case class LibArgs(
   debugName: String,
   debugPath: String,
   breakpadId: String,
-  codeId: Option[String],
+  codeId: Option[String] = None,
 )

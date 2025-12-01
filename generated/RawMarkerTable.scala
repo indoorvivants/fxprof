@@ -40,13 +40,21 @@ class RawMarkerTable private (args: RawMarkerTableArgs) {
   
 }
 
+object RawMarkerTable {
+  def apply(
+    length: Double,
+  ): RawMarkerTable = 
+    new RawMarkerTable(RawMarkerTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class RawMarkerTableArgs(
-  data: Array[Option[MarkerPayload]],
-  name: Array[IndexIntoStringTable],
-  startTime: Array[Option[Double]],
-  endTime: Array[Option[Double]],
-  phase: Array[MarkerPhase],
-  category: Array[IndexIntoCategoryList],
-  threadId: Option[Array[Option[Tid]]],
+  data: Array[Option[MarkerPayload]] = Array.empty,
+  name: Array[IndexIntoStringTable] = Array.empty,
+  startTime: Array[Option[Double]] = Array.empty,
+  endTime: Array[Option[Double]] = Array.empty,
+  phase: Array[MarkerPhase] = Array.empty,
+  category: Array[IndexIntoCategoryList] = Array.empty,
+  threadId: Option[Array[Option[Tid]]] = None,
   length: Double,
 )

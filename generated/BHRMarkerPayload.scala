@@ -5,13 +5,22 @@ class BHRMarkerPayload private (args: BHRMarkerPayloadArgs) {
 
   def `withtype`(value: BHRMarkerPayload_Type.type): BHRMarkerPayload =
     copy(_.copy(`type` = value))
-  
 
-  private def copy(f: BHRMarkerPayloadArgs => BHRMarkerPayloadArgs) = 
+  private def copy(f: BHRMarkerPayloadArgs => BHRMarkerPayloadArgs) =
     new BHRMarkerPayload(f(args))
-  
+
 }
 
+object BHRMarkerPayload {
+  def apply(
+      `type`: BHRMarkerPayload_Type.type
+  ): BHRMarkerPayload =
+    new BHRMarkerPayload(
+      BHRMarkerPayloadArgs(
+        `type` = `type`
+      )
+    )
+}
 private[fxprof] case class BHRMarkerPayloadArgs(
-  `type`: BHRMarkerPayload_Type.type,
+    `type`: BHRMarkerPayload_Type.type
 )

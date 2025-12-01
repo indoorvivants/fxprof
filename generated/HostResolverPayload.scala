@@ -24,6 +24,20 @@ class HostResolverPayload private (args: HostResolverPayloadArgs) {
   
 }
 
+object HostResolverPayload {
+  def apply(
+    `type`: HostResolverPayload_Type.type,
+    host: String,
+    originSuffix: String,
+    flags: String,
+  ): HostResolverPayload = 
+    new HostResolverPayload(HostResolverPayloadArgs(
+      `type` = `type`,
+      host = host,
+      originSuffix = originSuffix,
+      flags = flags,
+    ))
+}
 private[fxprof] case class HostResolverPayloadArgs(
   `type`: HostResolverPayload_Type.type,
   host: String,

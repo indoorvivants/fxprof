@@ -28,6 +28,22 @@ class GPUMarkerPayload private (args: GPUMarkerPayloadArgs) {
   
 }
 
+object GPUMarkerPayload {
+  def apply(
+    `type`: GPUMarkerPayload_Type.type,
+    cpustart: Milliseconds,
+    cpuend: Milliseconds,
+    gpustart: Milliseconds,
+    gpuend: Milliseconds,
+  ): GPUMarkerPayload = 
+    new GPUMarkerPayload(GPUMarkerPayloadArgs(
+      `type` = `type`,
+      cpustart = cpustart,
+      cpuend = cpuend,
+      gpustart = gpustart,
+      gpuend = gpuend,
+    ))
+}
 private[fxprof] case class GPUMarkerPayloadArgs(
   `type`: GPUMarkerPayload_Type.type,
   cpustart: Milliseconds,

@@ -56,15 +56,35 @@ class VisualMetrics private (args: VisualMetricsArgs) {
   
 }
 
+object VisualMetrics {
+  def apply(
+    FirstVisualChange: Double,
+    LastVisualChange: Double,
+    SpeedIndex: Double,
+    VisualReadiness: Double,
+    VisualComplete85: Double,
+    VisualComplete95: Double,
+    VisualComplete99: Double,
+  ): VisualMetrics = 
+    new VisualMetrics(VisualMetricsArgs(
+      FirstVisualChange = FirstVisualChange,
+      LastVisualChange = LastVisualChange,
+      SpeedIndex = SpeedIndex,
+      VisualReadiness = VisualReadiness,
+      VisualComplete85 = VisualComplete85,
+      VisualComplete95 = VisualComplete95,
+      VisualComplete99 = VisualComplete99,
+    ))
+}
 private[fxprof] case class VisualMetricsArgs(
   FirstVisualChange: Double,
   LastVisualChange: Double,
   SpeedIndex: Double,
-  VisualProgress: Array[ProgressGraphData],
-  ContentfulSpeedIndex: Option[Double],
-  ContentfulSpeedIndexProgress: Option[Array[ProgressGraphData]],
-  PerceptualSpeedIndex: Option[Double],
-  PerceptualSpeedIndexProgress: Option[Array[ProgressGraphData]],
+  VisualProgress: Array[ProgressGraphData] = Array.empty,
+  ContentfulSpeedIndex: Option[Double] = None,
+  ContentfulSpeedIndexProgress: Option[Array[ProgressGraphData]] = None,
+  PerceptualSpeedIndex: Option[Double] = None,
+  PerceptualSpeedIndexProgress: Option[Array[ProgressGraphData]] = None,
   VisualReadiness: Double,
   VisualComplete85: Double,
   VisualComplete95: Double,

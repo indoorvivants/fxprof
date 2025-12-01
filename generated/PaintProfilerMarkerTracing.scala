@@ -20,8 +20,18 @@ class PaintProfilerMarkerTracing private (args: PaintProfilerMarkerTracingArgs) 
   
 }
 
+object PaintProfilerMarkerTracing {
+  def apply(
+    `type`: PaintProfilerMarkerTracing_Type.type,
+    category: PaintProfilerMarkerTracing_Category.type,
+  ): PaintProfilerMarkerTracing = 
+    new PaintProfilerMarkerTracing(PaintProfilerMarkerTracingArgs(
+      `type` = `type`,
+      category = category,
+    ))
+}
 private[fxprof] case class PaintProfilerMarkerTracingArgs(
   `type`: PaintProfilerMarkerTracing_Type.type,
   category: PaintProfilerMarkerTracing_Category.type,
-  cause: Option[CauseBacktrace],
+  cause: Option[CauseBacktrace] = None,
 )

@@ -16,7 +16,15 @@ class ProgressGraphData private (args: ProgressGraphDataArgs) {
   
 }
 
+object ProgressGraphData {
+  def apply(
+    percent: Double,
+  ): ProgressGraphData = 
+    new ProgressGraphData(ProgressGraphDataArgs(
+      percent = percent,
+    ))
+}
 private[fxprof] case class ProgressGraphDataArgs(
   percent: Double,
-  timestamp: Option[Milliseconds],
+  timestamp: Option[Milliseconds] = None,
 )

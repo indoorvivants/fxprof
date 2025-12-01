@@ -24,9 +24,19 @@ class DOMEventMarkerPayload private (args: DOMEventMarkerPayloadArgs) {
   
 }
 
+object DOMEventMarkerPayload {
+  def apply(
+    `type`: DOMEventMarkerPayload_Type.type,
+    eventType: String,
+  ): DOMEventMarkerPayload = 
+    new DOMEventMarkerPayload(DOMEventMarkerPayloadArgs(
+      `type` = `type`,
+      eventType = eventType,
+    ))
+}
 private[fxprof] case class DOMEventMarkerPayloadArgs(
   `type`: DOMEventMarkerPayload_Type.type,
-  latency: Option[Milliseconds],
+  latency: Option[Milliseconds] = None,
   eventType: String,
-  innerWindowID: Option[Double],
+  innerWindowID: Option[Double] = None,
 )

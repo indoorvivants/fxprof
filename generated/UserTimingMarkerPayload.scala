@@ -20,6 +20,18 @@ class UserTimingMarkerPayload private (args: UserTimingMarkerPayloadArgs) {
   
 }
 
+object UserTimingMarkerPayload {
+  def apply(
+    `type`: UserTimingMarkerPayload_Type.type,
+    name: String,
+    entryType: UserTimingMarkerPayload_EntryType,
+  ): UserTimingMarkerPayload = 
+    new UserTimingMarkerPayload(UserTimingMarkerPayloadArgs(
+      `type` = `type`,
+      name = name,
+      entryType = entryType,
+    ))
+}
 private[fxprof] case class UserTimingMarkerPayloadArgs(
   `type`: UserTimingMarkerPayload_Type.type,
   name: String,

@@ -304,8 +304,35 @@ def render(struct: String, params: List[(String, Type)]) =
         line(s"new $struct(f(args))")
 
     emptyLine()
+
+    block(s"object $struct {", "}"):
+      // block("def apply(", s"): $struct = "):
+      line("def apply(")
+      nest:
+        params.foreach: (name, tpe) =>
+          val hasDefault = defaultScalaValue(tpe).nonEmpty
+          if !hasDefault then
+            line(s"${sanitiseFieldName(name)}: ${types(name)},")
+      line(s"): $struct = ")
+      nest:
+        block(s"new $struct(${struct}Args(", "))"):
+          params.foreach: (name, tpe) =>
+            val hasDefault = defaultScalaValue(tpe).nonEmpty
+            if !hasDefault then
+              line(
+                s"${sanitiseFieldName(name)} = ${sanitiseFieldName(name)},"
+              )
+
     block(s"private[fxprof] case class ${struct}Args(", ")"):
       params.map: (name, tpe) =>
-        line(s"${sanitiseFieldName(name)}: ${tpe.renderAsScala.tpe},")
+        line(s"${sanitiseFieldName(name)}: ${types(name)}${{
+            defaultScalaValue(tpe).map(" = " + _).getOrElse("")
+          }},")
 
     lb.result -> extra
+
+def defaultScalaValue(tpe: Type) =
+  tpe match
+    case Type.Optional(t) => Some("None")
+    case Type.ArrayOf(t)  => Some("Array.empty")
+    case _                => None

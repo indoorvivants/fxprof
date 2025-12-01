@@ -24,9 +24,21 @@ class ProfilerOverhead private (args: ProfilerOverheadArgs) {
   
 }
 
+object ProfilerOverhead {
+  def apply(
+    samples: ProfilerOverheadSamplesTable,
+    pid: Pid,
+    mainThreadIndex: ThreadIndex,
+  ): ProfilerOverhead = 
+    new ProfilerOverhead(ProfilerOverheadArgs(
+      samples = samples,
+      pid = pid,
+      mainThreadIndex = mainThreadIndex,
+    ))
+}
 private[fxprof] case class ProfilerOverheadArgs(
   samples: ProfilerOverheadSamplesTable,
-  statistics: Option[ProfilerOverheadStats],
+  statistics: Option[ProfilerOverheadStats] = None,
   pid: Pid,
   mainThreadIndex: ThreadIndex,
 )

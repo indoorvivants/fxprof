@@ -40,10 +40,30 @@ class StyleMarkerPayload private (args: StyleMarkerPayloadArgs) {
   
 }
 
+object StyleMarkerPayload {
+  def apply(
+    `type`: StyleMarkerPayload_Type.type,
+    category: StyleMarkerPayload_Category.type,
+    elementsTraversed: Double,
+    elementsStyled: Double,
+    elementsMatched: Double,
+    stylesShared: Double,
+    stylesReused: Double,
+  ): StyleMarkerPayload = 
+    new StyleMarkerPayload(StyleMarkerPayloadArgs(
+      `type` = `type`,
+      category = category,
+      elementsTraversed = elementsTraversed,
+      elementsStyled = elementsStyled,
+      elementsMatched = elementsMatched,
+      stylesShared = stylesShared,
+      stylesReused = stylesReused,
+    ))
+}
 private[fxprof] case class StyleMarkerPayloadArgs(
   `type`: StyleMarkerPayload_Type.type,
   category: StyleMarkerPayload_Category.type,
-  cause: Option[CauseBacktrace],
+  cause: Option[CauseBacktrace] = None,
   elementsTraversed: Double,
   elementsStyled: Double,
   elementsMatched: Double,

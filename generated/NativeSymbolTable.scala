@@ -28,10 +28,18 @@ class NativeSymbolTable private (args: NativeSymbolTableArgs) {
   
 }
 
+object NativeSymbolTable {
+  def apply(
+    length: Double,
+  ): NativeSymbolTable = 
+    new NativeSymbolTable(NativeSymbolTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class NativeSymbolTableArgs(
-  libIndex: Array[IndexIntoLibs],
-  address: Array[Address],
-  name: Array[IndexIntoStringTable],
-  functionSize: Array[Option[Bytes]],
+  libIndex: Array[IndexIntoLibs] = Array.empty,
+  address: Array[Address] = Array.empty,
+  name: Array[IndexIntoStringTable] = Array.empty,
+  functionSize: Array[Option[Bytes]] = Array.empty,
   length: Double,
 )

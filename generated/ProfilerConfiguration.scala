@@ -28,10 +28,18 @@ class ProfilerConfiguration private (args: ProfilerConfigurationArgs) {
   
 }
 
+object ProfilerConfiguration {
+  def apply(
+    capacity: Bytes,
+  ): ProfilerConfiguration = 
+    new ProfilerConfiguration(ProfilerConfigurationArgs(
+      capacity = capacity,
+    ))
+}
 private[fxprof] case class ProfilerConfigurationArgs(
-  threads: Array[String],
-  features: Array[String],
+  threads: Array[String] = Array.empty,
+  features: Array[String] = Array.empty,
   capacity: Bytes,
-  duration: Option[Double],
-  activeTabID: Option[TabID],
+  duration: Option[Double] = None,
+  activeTabID: Option[TabID] = None,
 )

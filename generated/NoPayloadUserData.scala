@@ -16,7 +16,15 @@ class NoPayloadUserData private (args: NoPayloadUserDataArgs) {
   
 }
 
+object NoPayloadUserData {
+  def apply(
+    `type`: NoPayloadUserData_Type.type,
+  ): NoPayloadUserData = 
+    new NoPayloadUserData(NoPayloadUserDataArgs(
+      `type` = `type`,
+    ))
+}
 private[fxprof] case class NoPayloadUserDataArgs(
   `type`: NoPayloadUserData_Type.type,
-  innerWindowID: Option[Double],
+  innerWindowID: Option[Double] = None,
 )

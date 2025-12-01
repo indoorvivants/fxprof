@@ -44,14 +44,24 @@ class Profile private (args: ProfileArgs) {
   
 }
 
+object Profile {
+  def apply(
+    meta: ProfileMeta,
+    shared: RawProfileSharedData,
+  ): Profile = 
+    new Profile(ProfileArgs(
+      meta = meta,
+      shared = shared,
+    ))
+}
 private[fxprof] case class ProfileArgs(
   meta: ProfileMeta,
-  libs: Array[Lib],
-  pages: Option[PageList],
-  counters: Option[Array[RawCounter]],
-  profilerOverhead: Option[Array[ProfilerOverhead]],
+  libs: Array[Lib] = Array.empty,
+  pages: Option[PageList] = None,
+  counters: Option[Array[RawCounter]] = None,
+  profilerOverhead: Option[Array[ProfilerOverhead]] = None,
   shared: RawProfileSharedData,
-  threads: Array[RawThread],
-  profilingLog: Option[ProfilingLog],
-  profileGatheringLog: Option[ProfilingLog],
+  threads: Array[RawThread] = Array.empty,
+  profilingLog: Option[ProfilingLog] = None,
+  profileGatheringLog: Option[ProfilingLog] = None,
 )

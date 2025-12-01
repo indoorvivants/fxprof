@@ -24,9 +24,17 @@ class ExtensionTable private (args: ExtensionTableArgs) {
   
 }
 
+object ExtensionTable {
+  def apply(
+    length: Double,
+  ): ExtensionTable = 
+    new ExtensionTable(ExtensionTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class ExtensionTableArgs(
-  baseURL: Array[String],
-  id: Array[String],
-  name: Array[String],
+  baseURL: Array[String] = Array.empty,
+  id: Array[String] = Array.empty,
+  name: Array[String] = Array.empty,
   length: Double,
 )

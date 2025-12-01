@@ -28,10 +28,20 @@ class UnbalancedNativeAllocationsTable private (args: UnbalancedNativeAllocation
   
 }
 
+object UnbalancedNativeAllocationsTable {
+  def apply(
+    weightType: UnbalancedNativeAllocationsTable_WeightType.type,
+    length: Double,
+  ): UnbalancedNativeAllocationsTable = 
+    new UnbalancedNativeAllocationsTable(UnbalancedNativeAllocationsTableArgs(
+      weightType = weightType,
+      length = length,
+    ))
+}
 private[fxprof] case class UnbalancedNativeAllocationsTableArgs(
-  time: Array[Milliseconds],
-  weight: Array[Bytes],
+  time: Array[Milliseconds] = Array.empty,
+  weight: Array[Bytes] = Array.empty,
   weightType: UnbalancedNativeAllocationsTable_WeightType.type,
-  stack: Array[Option[IndexIntoStackTable]],
+  stack: Array[Option[IndexIntoStackTable]] = Array.empty,
   length: Double,
 )

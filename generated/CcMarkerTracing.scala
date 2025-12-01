@@ -28,10 +28,20 @@ class CcMarkerTracing private (args: CcMarkerTracingArgs) {
   
 }
 
+object CcMarkerTracing {
+  def apply(
+    `type`: CcMarkerTracing_Type.type,
+    category: CcMarkerTracing_Category.type,
+  ): CcMarkerTracing = 
+    new CcMarkerTracing(CcMarkerTracingArgs(
+      `type` = `type`,
+      category = category,
+    ))
+}
 private[fxprof] case class CcMarkerTracingArgs(
   `type`: CcMarkerTracing_Type.type,
   category: CcMarkerTracing_Category.type,
-  first: Option[String],
-  desc: Option[String],
-  second: Option[String],
+  first: Option[String] = None,
+  desc: Option[String] = None,
+  second: Option[String] = None,
 )

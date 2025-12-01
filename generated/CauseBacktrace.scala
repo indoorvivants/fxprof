@@ -20,8 +20,14 @@ class CauseBacktrace private (args: CauseBacktraceArgs) {
   
 }
 
+object CauseBacktrace {
+  def apply(
+  ): CauseBacktrace = 
+    new CauseBacktrace(CauseBacktraceArgs(
+    ))
+}
 private[fxprof] case class CauseBacktraceArgs(
-  tid: Option[Tid],
-  time: Option[Milliseconds],
-  stack: Option[IndexIntoStackTable],
+  tid: Option[Tid] = None,
+  time: Option[Milliseconds] = None,
+  stack: Option[IndexIntoStackTable] = None,
 )

@@ -48,15 +48,25 @@ class RawSamplesTable private (args: RawSamplesTableArgs) {
   
 }
 
+object RawSamplesTable {
+  def apply(
+    weightType: WeightType,
+    length: Double,
+  ): RawSamplesTable = 
+    new RawSamplesTable(RawSamplesTableArgs(
+      weightType = weightType,
+      length = length,
+    ))
+}
 private[fxprof] case class RawSamplesTableArgs(
-  responsiveness: Option[Array[Option[Milliseconds]]],
-  eventDelay: Option[Array[Option[Milliseconds]]],
-  stack: Array[Option[IndexIntoStackTable]],
-  time: Option[Array[Milliseconds]],
-  timeDeltas: Option[Array[Milliseconds]],
-  weight: Array[Option[Double]],
+  responsiveness: Option[Array[Option[Milliseconds]]] = None,
+  eventDelay: Option[Array[Option[Milliseconds]]] = None,
+  stack: Array[Option[IndexIntoStackTable]] = Array.empty,
+  time: Option[Array[Milliseconds]] = None,
+  timeDeltas: Option[Array[Milliseconds]] = None,
+  weight: Array[Option[Double]] = Array.empty,
   weightType: WeightType,
-  threadCPUDelta: Option[Array[Option[Double]]],
-  threadId: Option[Array[Tid]],
+  threadCPUDelta: Option[Array[Option[Double]]] = None,
+  threadId: Option[Array[Tid]] = None,
   length: Double,
 )

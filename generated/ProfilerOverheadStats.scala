@@ -96,6 +96,56 @@ class ProfilerOverheadStats private (args: ProfilerOverheadStatsArgs) {
   
 }
 
+object ProfilerOverheadStats {
+  def apply(
+    maxCleaning: Microseconds,
+    maxCounter: Microseconds,
+    maxInterval: Microseconds,
+    maxLockings: Microseconds,
+    maxOverhead: Microseconds,
+    maxThread: Microseconds,
+    meanCleaning: Microseconds,
+    meanCounter: Microseconds,
+    meanInterval: Microseconds,
+    meanLockings: Microseconds,
+    meanOverhead: Microseconds,
+    meanThread: Microseconds,
+    minCleaning: Microseconds,
+    minCounter: Microseconds,
+    minInterval: Microseconds,
+    minLockings: Microseconds,
+    minOverhead: Microseconds,
+    minThread: Microseconds,
+    overheadDurations: Microseconds,
+    overheadPercentage: Microseconds,
+    profiledDuration: Microseconds,
+    samplingCount: Microseconds,
+  ): ProfilerOverheadStats = 
+    new ProfilerOverheadStats(ProfilerOverheadStatsArgs(
+      maxCleaning = maxCleaning,
+      maxCounter = maxCounter,
+      maxInterval = maxInterval,
+      maxLockings = maxLockings,
+      maxOverhead = maxOverhead,
+      maxThread = maxThread,
+      meanCleaning = meanCleaning,
+      meanCounter = meanCounter,
+      meanInterval = meanInterval,
+      meanLockings = meanLockings,
+      meanOverhead = meanOverhead,
+      meanThread = meanThread,
+      minCleaning = minCleaning,
+      minCounter = minCounter,
+      minInterval = minInterval,
+      minLockings = minLockings,
+      minOverhead = minOverhead,
+      minThread = minThread,
+      overheadDurations = overheadDurations,
+      overheadPercentage = overheadPercentage,
+      profiledDuration = profiledDuration,
+      samplingCount = samplingCount,
+    ))
+}
 private[fxprof] case class ProfilerOverheadStatsArgs(
   maxCleaning: Microseconds,
   maxCounter: Microseconds,

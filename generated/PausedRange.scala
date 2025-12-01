@@ -20,8 +20,16 @@ class PausedRange private (args: PausedRangeArgs) {
   
 }
 
+object PausedRange {
+  def apply(
+    reason: PausedRange_Reason,
+  ): PausedRange = 
+    new PausedRange(PausedRangeArgs(
+      reason = reason,
+    ))
+}
 private[fxprof] case class PausedRangeArgs(
-  startTime: Option[Milliseconds],
-  endTime: Option[Milliseconds],
+  startTime: Option[Milliseconds] = None,
+  endTime: Option[Milliseconds] = None,
   reason: PausedRange_Reason,
 )

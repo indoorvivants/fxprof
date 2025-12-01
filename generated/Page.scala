@@ -32,11 +32,25 @@ class Page private (args: PageArgs) {
   
 }
 
+object Page {
+  def apply(
+    tabID: TabID,
+    innerWindowID: InnerWindowID,
+    url: String,
+    embedderInnerWindowID: Double,
+  ): Page = 
+    new Page(PageArgs(
+      tabID = tabID,
+      innerWindowID = innerWindowID,
+      url = url,
+      embedderInnerWindowID = embedderInnerWindowID,
+    ))
+}
 private[fxprof] case class PageArgs(
   tabID: TabID,
   innerWindowID: InnerWindowID,
   url: String,
   embedderInnerWindowID: Double,
-  isPrivateBrowsing: Option[Boolean],
-  favicon: Option[Option[String]],
+  isPrivateBrowsing: Option[Boolean] = None,
+  favicon: Option[Option[String]] = None,
 )

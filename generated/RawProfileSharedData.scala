@@ -16,7 +16,15 @@ class RawProfileSharedData private (args: RawProfileSharedDataArgs) {
   
 }
 
+object RawProfileSharedData {
+  def apply(
+    sources: SourceTable,
+  ): RawProfileSharedData = 
+    new RawProfileSharedData(RawProfileSharedDataArgs(
+      sources = sources,
+    ))
+}
 private[fxprof] case class RawProfileSharedDataArgs(
-  stringArray: Array[String],
+  stringArray: Array[String] = Array.empty,
   sources: SourceTable,
 )

@@ -24,9 +24,19 @@ class NavigationMarkerPayload private (args: NavigationMarkerPayloadArgs) {
   
 }
 
+object NavigationMarkerPayload {
+  def apply(
+    `type`: NavigationMarkerPayload_Type.type,
+    category: NavigationMarkerPayload_Category.type,
+  ): NavigationMarkerPayload = 
+    new NavigationMarkerPayload(NavigationMarkerPayloadArgs(
+      `type` = `type`,
+      category = category,
+    ))
+}
 private[fxprof] case class NavigationMarkerPayloadArgs(
   `type`: NavigationMarkerPayload_Type.type,
   category: NavigationMarkerPayload_Category.type,
-  eventType: Option[String],
-  innerWindowID: Option[Double],
+  eventType: Option[String] = None,
+  innerWindowID: Option[Double] = None,
 )

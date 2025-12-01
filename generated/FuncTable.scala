@@ -40,13 +40,21 @@ class FuncTable private (args: FuncTableArgs) {
   
 }
 
+object FuncTable {
+  def apply(
+    length: Double,
+  ): FuncTable = 
+    new FuncTable(FuncTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class FuncTableArgs(
-  name: Array[IndexIntoStringTable],
-  isJS: Array[Boolean],
-  relevantForJS: Array[Boolean],
-  resource: Array[FuncTable_Resource],
-  source: Array[Option[IndexIntoSourceTable]],
-  lineNumber: Array[Option[Double]],
-  columnNumber: Array[Option[Double]],
+  name: Array[IndexIntoStringTable] = Array.empty,
+  isJS: Array[Boolean] = Array.empty,
+  relevantForJS: Array[Boolean] = Array.empty,
+  resource: Array[FuncTable_Resource] = Array.empty,
+  source: Array[Option[IndexIntoSourceTable]] = Array.empty,
+  lineNumber: Array[Option[Double]] = Array.empty,
+  columnNumber: Array[Option[Double]] = Array.empty,
   length: Double,
 )

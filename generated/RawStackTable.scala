@@ -20,8 +20,16 @@ class RawStackTable private (args: RawStackTableArgs) {
   
 }
 
+object RawStackTable {
+  def apply(
+    length: Double,
+  ): RawStackTable = 
+    new RawStackTable(RawStackTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class RawStackTableArgs(
-  frame: Array[IndexIntoFrameTable],
-  prefix: Array[Option[IndexIntoStackTable]],
+  frame: Array[IndexIntoFrameTable] = Array.empty,
+  prefix: Array[Option[IndexIntoStackTable]] = Array.empty,
   length: Double,
 )

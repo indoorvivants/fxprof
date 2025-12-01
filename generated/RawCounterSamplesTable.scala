@@ -28,10 +28,18 @@ class RawCounterSamplesTable private (args: RawCounterSamplesTableArgs) {
   
 }
 
+object RawCounterSamplesTable {
+  def apply(
+    length: Double,
+  ): RawCounterSamplesTable = 
+    new RawCounterSamplesTable(RawCounterSamplesTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class RawCounterSamplesTableArgs(
-  time: Option[Array[Milliseconds]],
-  timeDeltas: Option[Array[Milliseconds]],
-  number: Option[Array[Double]],
-  count: Array[Double],
+  time: Option[Array[Milliseconds]] = None,
+  timeDeltas: Option[Array[Milliseconds]] = None,
+  number: Option[Array[Double]] = None,
+  count: Array[Double] = Array.empty,
   length: Double,
 )

@@ -20,6 +20,18 @@ class LogMarkerPayload private (args: LogMarkerPayloadArgs) {
   
 }
 
+object LogMarkerPayload {
+  def apply(
+    `type`: LogMarkerPayload_Type.type,
+    name: String,
+    module: String,
+  ): LogMarkerPayload = 
+    new LogMarkerPayload(LogMarkerPayloadArgs(
+      `type` = `type`,
+      name = name,
+      module = module,
+    ))
+}
 private[fxprof] case class LogMarkerPayloadArgs(
   `type`: LogMarkerPayload_Type.type,
   name: String,

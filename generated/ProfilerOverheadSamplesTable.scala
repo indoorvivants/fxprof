@@ -32,11 +32,19 @@ class ProfilerOverheadSamplesTable private (args: ProfilerOverheadSamplesTableAr
   
 }
 
+object ProfilerOverheadSamplesTable {
+  def apply(
+    length: Double,
+  ): ProfilerOverheadSamplesTable = 
+    new ProfilerOverheadSamplesTable(ProfilerOverheadSamplesTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class ProfilerOverheadSamplesTableArgs(
-  counters: Array[Microseconds],
-  expiredMarkerCleaning: Array[Microseconds],
-  locking: Array[Microseconds],
-  threads: Array[Microseconds],
-  time: Array[Milliseconds],
+  counters: Array[Microseconds] = Array.empty,
+  expiredMarkerCleaning: Array[Microseconds] = Array.empty,
+  locking: Array[Microseconds] = Array.empty,
+  threads: Array[Microseconds] = Array.empty,
+  time: Array[Milliseconds] = Array.empty,
   length: Double,
 )

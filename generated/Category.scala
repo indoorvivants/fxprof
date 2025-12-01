@@ -20,8 +20,18 @@ class Category private (args: CategoryArgs) {
   
 }
 
+object Category {
+  def apply(
+    name: String,
+    color: CategoryColor,
+  ): Category = 
+    new Category(CategoryArgs(
+      name = name,
+      color = color,
+    ))
+}
 private[fxprof] case class CategoryArgs(
   name: String,
   color: CategoryColor,
-  subcategories: Array[String],
+  subcategories: Array[String] = Array.empty,
 )

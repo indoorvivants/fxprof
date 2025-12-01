@@ -16,6 +16,16 @@ class LongTaskMarkerPayload private (args: LongTaskMarkerPayloadArgs) {
   
 }
 
+object LongTaskMarkerPayload {
+  def apply(
+    `type`: LongTaskMarkerPayload_Type.type,
+    category: LongTaskMarkerPayload_Category.type,
+  ): LongTaskMarkerPayload = 
+    new LongTaskMarkerPayload(LongTaskMarkerPayloadArgs(
+      `type` = `type`,
+      category = category,
+    ))
+}
 private[fxprof] case class LongTaskMarkerPayloadArgs(
   `type`: LongTaskMarkerPayload_Type.type,
   category: LongTaskMarkerPayload_Category.type,

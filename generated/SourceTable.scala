@@ -20,8 +20,16 @@ class SourceTable private (args: SourceTableArgs) {
   
 }
 
+object SourceTable {
+  def apply(
+    length: Double,
+  ): SourceTable = 
+    new SourceTable(SourceTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class SourceTableArgs(
   length: Double,
-  uuid: Array[Option[String]],
-  filename: Array[IndexIntoStringTable],
+  uuid: Array[Option[String]] = Array.empty,
+  filename: Array[IndexIntoStringTable] = Array.empty,
 )

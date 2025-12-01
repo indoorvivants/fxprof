@@ -48,15 +48,23 @@ class FrameTable private (args: FrameTableArgs) {
   
 }
 
+object FrameTable {
+  def apply(
+    length: Double,
+  ): FrameTable = 
+    new FrameTable(FrameTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class FrameTableArgs(
-  address: Array[FrameTable_Address],
-  inlineDepth: Array[Double],
-  category: Array[Option[IndexIntoCategoryList]],
-  subcategory: Array[Option[IndexIntoSubcategoryListForCategory]],
-  func: Array[IndexIntoFuncTable],
-  nativeSymbol: Array[Option[IndexIntoNativeSymbolTable]],
-  innerWindowID: Array[Option[InnerWindowID]],
-  line: Array[Option[Double]],
-  column: Array[Option[Double]],
+  address: Array[FrameTable_Address] = Array.empty,
+  inlineDepth: Array[Double] = Array.empty,
+  category: Array[Option[IndexIntoCategoryList]] = Array.empty,
+  subcategory: Array[Option[IndexIntoSubcategoryListForCategory]] = Array.empty,
+  func: Array[IndexIntoFuncTable] = Array.empty,
+  nativeSymbol: Array[Option[IndexIntoNativeSymbolTable]] = Array.empty,
+  innerWindowID: Array[Option[InnerWindowID]] = Array.empty,
+  line: Array[Option[Double]] = Array.empty,
+  column: Array[Option[Double]] = Array.empty,
   length: Double,
 )

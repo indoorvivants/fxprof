@@ -20,6 +20,18 @@ class MediaSampleMarkerPayload private (args: MediaSampleMarkerPayloadArgs) {
   
 }
 
+object MediaSampleMarkerPayload {
+  def apply(
+    `type`: MediaSampleMarkerPayload_Type.type,
+    sampleStartTimeUs: Microseconds,
+    sampleEndTimeUs: Microseconds,
+  ): MediaSampleMarkerPayload = 
+    new MediaSampleMarkerPayload(MediaSampleMarkerPayloadArgs(
+      `type` = `type`,
+      sampleStartTimeUs = sampleStartTimeUs,
+      sampleEndTimeUs = sampleEndTimeUs,
+    ))
+}
 private[fxprof] case class MediaSampleMarkerPayloadArgs(
   `type`: MediaSampleMarkerPayload_Type.type,
   sampleStartTimeUs: Microseconds,

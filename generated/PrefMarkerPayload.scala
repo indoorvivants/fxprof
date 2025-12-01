@@ -32,6 +32,24 @@ class PrefMarkerPayload private (args: PrefMarkerPayloadArgs) {
   
 }
 
+object PrefMarkerPayload {
+  def apply(
+    `type`: PrefMarkerPayload_Type.type,
+    prefAccessTime: Milliseconds,
+    prefName: String,
+    prefKind: String,
+    prefType: String,
+    prefValue: String,
+  ): PrefMarkerPayload = 
+    new PrefMarkerPayload(PrefMarkerPayloadArgs(
+      `type` = `type`,
+      prefAccessTime = prefAccessTime,
+      prefName = prefName,
+      prefKind = prefKind,
+      prefType = prefType,
+      prefValue = prefValue,
+    ))
+}
 private[fxprof] case class PrefMarkerPayloadArgs(
   `type`: PrefMarkerPayload_Type.type,
   prefAccessTime: Milliseconds,

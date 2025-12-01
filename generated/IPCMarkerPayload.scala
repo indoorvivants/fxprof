@@ -76,6 +76,30 @@ class IPCMarkerPayload private (args: IPCMarkerPayloadArgs) {
   
 }
 
+object IPCMarkerPayload {
+  def apply(
+    `type`: IPCMarkerPayload_Type.type,
+    startTime: Milliseconds,
+    endTime: Milliseconds,
+    otherPid: Pid,
+    messageType: String,
+    messageSeqno: Double,
+    side: IPCMarkerPayload_Side,
+    direction: IPCMarkerPayload_Direction,
+    sync: Boolean,
+  ): IPCMarkerPayload = 
+    new IPCMarkerPayload(IPCMarkerPayloadArgs(
+      `type` = `type`,
+      startTime = startTime,
+      endTime = endTime,
+      otherPid = otherPid,
+      messageType = messageType,
+      messageSeqno = messageSeqno,
+      side = side,
+      direction = direction,
+      sync = sync,
+    ))
+}
 private[fxprof] case class IPCMarkerPayloadArgs(
   `type`: IPCMarkerPayload_Type.type,
   startTime: Milliseconds,
@@ -85,13 +109,13 @@ private[fxprof] case class IPCMarkerPayloadArgs(
   messageSeqno: Double,
   side: IPCMarkerPayload_Side,
   direction: IPCMarkerPayload_Direction,
-  phase: Option[IPCMarkerPayload_Phase],
+  phase: Option[IPCMarkerPayload_Phase] = None,
   sync: Boolean,
-  threadId: Option[Double],
-  sendStartTime: Option[Milliseconds],
-  sendEndTime: Option[Milliseconds],
-  recvEndTime: Option[Milliseconds],
-  sendTid: Option[Tid],
-  recvTid: Option[Tid],
-  niceDirection: Option[String],
+  threadId: Option[Double] = None,
+  sendStartTime: Option[Milliseconds] = None,
+  sendEndTime: Option[Milliseconds] = None,
+  recvEndTime: Option[Milliseconds] = None,
+  sendTid: Option[Tid] = None,
+  recvTid: Option[Tid] = None,
+  niceDirection: Option[String] = None,
 )

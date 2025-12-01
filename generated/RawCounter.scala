@@ -36,11 +36,29 @@ class RawCounter private (args: RawCounterArgs) {
   
 }
 
+object RawCounter {
+  def apply(
+    name: String,
+    category: String,
+    description: String,
+    pid: Pid,
+    mainThreadIndex: ThreadIndex,
+    samples: RawCounterSamplesTable,
+  ): RawCounter = 
+    new RawCounter(RawCounterArgs(
+      name = name,
+      category = category,
+      description = description,
+      pid = pid,
+      mainThreadIndex = mainThreadIndex,
+      samples = samples,
+    ))
+}
 private[fxprof] case class RawCounterArgs(
   name: String,
   category: String,
   description: String,
-  color: Option[GraphColor],
+  color: Option[GraphColor] = None,
   pid: Pid,
   mainThreadIndex: ThreadIndex,
   samples: RawCounterSamplesTable,

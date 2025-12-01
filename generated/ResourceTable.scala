@@ -28,10 +28,18 @@ class ResourceTable private (args: ResourceTableArgs) {
   
 }
 
+object ResourceTable {
+  def apply(
+    length: Double,
+  ): ResourceTable = 
+    new ResourceTable(ResourceTableArgs(
+      length = length,
+    ))
+}
 private[fxprof] case class ResourceTableArgs(
   length: Double,
-  lib: Array[Option[IndexIntoLibs]],
-  name: Array[IndexIntoStringTable],
-  host: Array[Option[IndexIntoStringTable]],
-  `type`: Array[ResourceTypeEnum],
+  lib: Array[Option[IndexIntoLibs]] = Array.empty,
+  name: Array[IndexIntoStringTable] = Array.empty,
+  host: Array[Option[IndexIntoStringTable]] = Array.empty,
+  `type`: Array[ResourceTypeEnum] = Array.empty,
 )
