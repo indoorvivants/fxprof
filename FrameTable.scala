@@ -1,7 +1,7 @@
 package fxprof
 
 class FrameTable private (args: FrameTableArgs) {
-  def address: Array[FrameTable.Address] = args.address
+  def address: Array[FrameTable_Address] = args.address
   def inlineDepth: Array[Double] = args.inlineDepth
   def category: Array[Option[IndexIntoCategoryList]] = args.category
   def subcategory: Array[Option[IndexIntoSubcategoryListForCategory]] = args.subcategory
@@ -12,7 +12,7 @@ class FrameTable private (args: FrameTableArgs) {
   def column: Array[Option[Double]] = args.column
   def length: Double = args.length
 
-  def withAddress(value: Array[FrameTable.Address]): FrameTable =
+  def withAddress(value: Array[FrameTable_Address]): FrameTable =
     copy(_.copy(address = value))
   
   def withInlineDepth(value: Array[Double]): FrameTable =
@@ -49,7 +49,7 @@ class FrameTable private (args: FrameTableArgs) {
 }
 
 private[fxprof] case class FrameTableArgs(
-  address: Array[FrameTable.Address],
+  address: Array[FrameTable_Address],
   inlineDepth: Array[Double],
   category: Array[Option[IndexIntoCategoryList]],
   subcategory: Array[Option[IndexIntoSubcategoryListForCategory]],

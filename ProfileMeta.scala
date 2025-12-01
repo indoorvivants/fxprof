@@ -12,8 +12,8 @@ class ProfileMeta private (args: ProfileMetaArgs) {
   def processType: Double = args.processType
   def extensions: Option[ExtensionTable] = args.extensions
   def categories: Option[CategoryList] = args.categories
-  def product: ProfileMeta.Product = args.product
-  def stackwalk: ProfileMeta.Stackwalk = args.stackwalk
+  def product: ProfileMeta_Product = args.product
+  def stackwalk: ProfileMeta_Stackwalk = args.stackwalk
   def debug: Option[Boolean] = args.debug
   def version: Double = args.version
   def preprocessedProfileVersion: Double = args.preprocessedProfileVersion
@@ -21,7 +21,7 @@ class ProfileMeta private (args: ProfileMetaArgs) {
   def misc: Option[String] = args.misc
   def oscpu: Option[String] = args.oscpu
   def mainMemory: Option[Bytes] = args.mainMemory
-  def toolkit: Option[ProfileMeta.Toolkit?] = args.toolkit
+  def toolkit: Option[ProfileMeta_Toolkit] = args.toolkit
   def appBuildID: Option[String] = args.appBuildID
   def arguments: Option[String] = args.arguments
   def sourceURL: Option[String] = args.sourceURL
@@ -32,15 +32,12 @@ class ProfileMeta private (args: ProfileMetaArgs) {
   def symbolicationNotSupported: Option[Boolean] = args.symbolicationNotSupported
   def visualMetrics: Option[VisualMetrics] = args.visualMetrics
   def configuration: Option[ProfilerConfiguration] = args.configuration
-  def markerSchema: Array[MarkerSchema] = args.markerSchema
-  def sampleUnits: Option[SampleUnits] = args.sampleUnits
   def device: Option[String] = args.device
   def importedFrom: Option[String] = args.importedFrom
   def fileName: Option[String] = args.fileName
   def fileSize: Option[Bytes] = args.fileSize
   def usesOnlyOneStackType: Option[Boolean] = args.usesOnlyOneStackType
   def sourceCodeIsNotOnSearchfox: Option[Boolean] = args.sourceCodeIsNotOnSearchfox
-  def extra: Option[Array[ExtraProfileInfoSection]] = args.extra
   def initialVisibleThreads: Option[Array[ThreadIndex]] = args.initialVisibleThreads
   def initialSelectedThreads: Option[Array[ThreadIndex]] = args.initialSelectedThreads
   def keepProfileThreadOrder: Option[Boolean] = args.keepProfileThreadOrder
@@ -79,10 +76,10 @@ class ProfileMeta private (args: ProfileMetaArgs) {
   def withCategories(value: Option[CategoryList]): ProfileMeta =
     copy(_.copy(categories = value))
   
-  def withProduct(value: ProfileMeta.Product): ProfileMeta =
+  def withProduct(value: ProfileMeta_Product): ProfileMeta =
     copy(_.copy(product = value))
   
-  def withStackwalk(value: ProfileMeta.Stackwalk): ProfileMeta =
+  def withStackwalk(value: ProfileMeta_Stackwalk): ProfileMeta =
     copy(_.copy(stackwalk = value))
   
   def withDebug(value: Option[Boolean]): ProfileMeta =
@@ -106,7 +103,7 @@ class ProfileMeta private (args: ProfileMetaArgs) {
   def withMainMemory(value: Option[Bytes]): ProfileMeta =
     copy(_.copy(mainMemory = value))
   
-  def withToolkit(value: Option[ProfileMeta.Toolkit?]): ProfileMeta =
+  def withToolkit(value: Option[ProfileMeta_Toolkit]): ProfileMeta =
     copy(_.copy(toolkit = value))
   
   def withAppBuildID(value: Option[String]): ProfileMeta =
@@ -139,12 +136,6 @@ class ProfileMeta private (args: ProfileMetaArgs) {
   def withConfiguration(value: Option[ProfilerConfiguration]): ProfileMeta =
     copy(_.copy(configuration = value))
   
-  def withMarkerSchema(value: Array[MarkerSchema]): ProfileMeta =
-    copy(_.copy(markerSchema = value))
-  
-  def withSampleUnits(value: Option[SampleUnits]): ProfileMeta =
-    copy(_.copy(sampleUnits = value))
-  
   def withDevice(value: Option[String]): ProfileMeta =
     copy(_.copy(device = value))
   
@@ -162,9 +153,6 @@ class ProfileMeta private (args: ProfileMetaArgs) {
   
   def withSourceCodeIsNotOnSearchfox(value: Option[Boolean]): ProfileMeta =
     copy(_.copy(sourceCodeIsNotOnSearchfox = value))
-  
-  def withExtra(value: Option[Array[ExtraProfileInfoSection]]): ProfileMeta =
-    copy(_.copy(extra = value))
   
   def withInitialVisibleThreads(value: Option[Array[ThreadIndex]]): ProfileMeta =
     copy(_.copy(initialVisibleThreads = value))
@@ -196,8 +184,8 @@ private[fxprof] case class ProfileMetaArgs(
   processType: Double,
   extensions: Option[ExtensionTable],
   categories: Option[CategoryList],
-  product: ProfileMeta.Product,
-  stackwalk: ProfileMeta.Stackwalk,
+  product: ProfileMeta_Product,
+  stackwalk: ProfileMeta_Stackwalk,
   debug: Option[Boolean],
   version: Double,
   preprocessedProfileVersion: Double,
@@ -205,7 +193,7 @@ private[fxprof] case class ProfileMetaArgs(
   misc: Option[String],
   oscpu: Option[String],
   mainMemory: Option[Bytes],
-  toolkit: Option[ProfileMeta.Toolkit?],
+  toolkit: Option[ProfileMeta_Toolkit],
   appBuildID: Option[String],
   arguments: Option[String],
   sourceURL: Option[String],
@@ -216,15 +204,12 @@ private[fxprof] case class ProfileMetaArgs(
   symbolicationNotSupported: Option[Boolean],
   visualMetrics: Option[VisualMetrics],
   configuration: Option[ProfilerConfiguration],
-  markerSchema: Array[MarkerSchema],
-  sampleUnits: Option[SampleUnits],
   device: Option[String],
   importedFrom: Option[String],
   fileName: Option[String],
   fileSize: Option[Bytes],
   usesOnlyOneStackType: Option[Boolean],
   sourceCodeIsNotOnSearchfox: Option[Boolean],
-  extra: Option[Array[ExtraProfileInfoSection]],
   initialVisibleThreads: Option[Array[ThreadIndex]],
   initialSelectedThreads: Option[Array[ThreadIndex]],
   keepProfileThreadOrder: Option[Boolean],

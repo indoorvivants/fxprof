@@ -4,7 +4,7 @@ class FuncTable private (args: FuncTableArgs) {
   def name: Array[IndexIntoStringTable] = args.name
   def isJS: Array[Boolean] = args.isJS
   def relevantForJS: Array[Boolean] = args.relevantForJS
-  def resource: Array[FuncTable.Resource] = args.resource
+  def resource: Array[FuncTable_Resource] = args.resource
   def source: Array[Option[IndexIntoSourceTable]] = args.source
   def lineNumber: Array[Option[Double]] = args.lineNumber
   def columnNumber: Array[Option[Double]] = args.columnNumber
@@ -19,7 +19,7 @@ class FuncTable private (args: FuncTableArgs) {
   def withRelevantForJS(value: Array[Boolean]): FuncTable =
     copy(_.copy(relevantForJS = value))
   
-  def withResource(value: Array[FuncTable.Resource]): FuncTable =
+  def withResource(value: Array[FuncTable_Resource]): FuncTable =
     copy(_.copy(resource = value))
   
   def withSource(value: Array[Option[IndexIntoSourceTable]]): FuncTable =
@@ -44,7 +44,7 @@ private[fxprof] case class FuncTableArgs(
   name: Array[IndexIntoStringTable],
   isJS: Array[Boolean],
   relevantForJS: Array[Boolean],
-  resource: Array[FuncTable.Resource],
+  resource: Array[FuncTable_Resource],
   source: Array[Option[IndexIntoSourceTable]],
   lineNumber: Array[Option[Double]],
   columnNumber: Array[Option[Double]],

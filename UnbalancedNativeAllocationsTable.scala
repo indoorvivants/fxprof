@@ -3,7 +3,7 @@ package fxprof
 class UnbalancedNativeAllocationsTable private (args: UnbalancedNativeAllocationsTableArgs) {
   def time: Array[Milliseconds] = args.time
   def weight: Array[Bytes] = args.weight
-  def weightType: Option[Any] /* literal string 'bytes' */ = args.weightType
+  def weightType: UnbalancedNativeAllocationsTable_WeightType.type = args.weightType
   def stack: Array[Option[IndexIntoStackTable]] = args.stack
   def length: Double = args.length
 
@@ -13,7 +13,7 @@ class UnbalancedNativeAllocationsTable private (args: UnbalancedNativeAllocation
   def withWeight(value: Array[Bytes]): UnbalancedNativeAllocationsTable =
     copy(_.copy(weight = value))
   
-  def withWeightType(value: Option[Any] /* literal string 'bytes' */): UnbalancedNativeAllocationsTable =
+  def withWeightType(value: UnbalancedNativeAllocationsTable_WeightType.type): UnbalancedNativeAllocationsTable =
     copy(_.copy(weightType = value))
   
   def withStack(value: Array[Option[IndexIntoStackTable]]): UnbalancedNativeAllocationsTable =
@@ -31,7 +31,7 @@ class UnbalancedNativeAllocationsTable private (args: UnbalancedNativeAllocation
 private[fxprof] case class UnbalancedNativeAllocationsTableArgs(
   time: Array[Milliseconds],
   weight: Array[Bytes],
-  weightType: Option[Any] /* literal string 'bytes' */,
+  weightType: UnbalancedNativeAllocationsTable_WeightType.type,
   stack: Array[Option[IndexIntoStackTable]],
   length: Double,
 )

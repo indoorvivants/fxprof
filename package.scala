@@ -116,4 +116,130 @@ package object fxprof {
     case object Invalid extends ProcessType("invalid")
   }
 
+  type PageList = Array[Page]
+  type CategoryList = Array[Category]
+
+  sealed abstract class ProfileMeta_Product(value: String)
+      extends Product
+      with Serializable
+  object ProfileMeta_Product {
+    case object Firefox extends ProfileMeta_Product("firefox")
+    case class Other(value: String) extends ProfileMeta_Product(value)
+  }
+
+  sealed abstract class ProfileMeta_Stackwalk(value: Int)
+      extends Product
+      with Serializable
+  object ProfileMeta_Stackwalk {
+    case object True extends ProfileMeta_Stackwalk(1)
+    case object False extends ProfileMeta_Stackwalk(0)
+  }
+
+  // sealed abstract class ProfileMeta_Toolkit(value: String)
+  //     extends Product
+  //     with Serializable
+  // object ProfileMeta_Toolkit {
+  //   case object Gtk extends ProfileMeta_Toolkit("gtk")
+  //   case object Gtk3 extends ProfileMeta_Toolkit("gtk3")
+  //   case object Windows extends ProfileMeta_Toolkit("windows")
+  //   case object Cocoa extends ProfileMeta_Toolkit("cocoa")
+  //   case object Android extends ProfileMeta_Toolkit("android")
+  //   case class Other(value: String) extends ProfileMeta_Toolkit(value)
+  // }
+
+  sealed abstract class FrameTable_Address(value: Double)
+      extends Product
+      with Serializable
+  object FrameTable_Address {
+    case object None extends FrameTable_Address(-1)
+    case class Addr(address: Address) extends FrameTable_Address(address)
+  }
+
+  sealed abstract class FuncTable_Resource(value: Double)
+      extends Product
+      with Serializable
+  object FuncTable_Resource {
+    case object None extends FuncTable_Resource(-1)
+    case class Table(address: IndexIntoResourceTable)
+        extends FuncTable_Resource(address)
+  }
+
+  // export type NetworkHttpVersion = 'h3' | 'h2' | 'http/1.1' | 'http/1.0';
+
+  // export type NetworkStatus =
+  //   | 'STATUS_START'
+  //   | 'STATUS_STOP'
+  //   | 'STATUS_REDIRECT'
+  //   | 'STATUS_CANCEL';
+
+  // export type NetworkRedirectType = 'Permanent' | 'Temporary' | 'Internal';
+
+  sealed abstract class NetworkStatus(value: String)
+      extends Product
+      with Serializable
+  object NetworkStatus {
+    case object Start extends NetworkStatus("STATUS_START")
+    case object Stop extends NetworkStatus("STATUS_STOP")
+    case object Redirect extends NetworkStatus("STATUS_REDIRECT")
+    case object Cancel extends NetworkStatus("STATUS_CANCEL")
+  }
+
+  sealed abstract class NetworkRedirectType(value: String)
+      extends Product
+      with Serializable
+  object NetworkRedirectType {
+    case object Permanent extends NetworkRedirectType("Permanent")
+    case object Temporary extends NetworkRedirectType("Temporary")
+    case object Internal extends NetworkRedirectType("Internal")
+  }
+
+  sealed abstract class NetworkHttpVersion(value: String)
+      extends Product
+      with Serializable
+  object NetworkHttpVersion {
+    case object H3 extends NetworkHttpVersion("h3")
+    case object H2 extends NetworkHttpVersion("h2")
+    case object Http11 extends NetworkHttpVersion("http/1.1")
+    case object Http10 extends NetworkHttpVersion("http/1.0")
+  }
+
+  sealed trait MarkerPayload extends Product with Serializable
+  object MarkerPayload {
+    case class FileIO(payload: FileIoPayload) extends MarkerPayload
+    case class GPU(payload: GPUMarkerPayload) extends MarkerPayload
+    case class Network(payload: NetworkPayload) extends MarkerPayload
+    case class UserTiming(payload: UserTimingMarkerPayload)
+        extends MarkerPayload
+    case class Text(payload: TextMarkerPayload) extends MarkerPayload
+    case class Log(payload: LogMarkerPayload) extends MarkerPayload
+    case class PaintProfiler(payload: PaintProfilerMarkerTracing)
+        extends MarkerPayload
+    case class Cc(payload: CcMarkerTracing) extends MarkerPayload
+    case class DOMEvent(payload: DOMEventMarkerPayload) extends MarkerPayload
+    // case class GCMinor(payload: GCMinorMarkerPayload) extends MarkerPayload
+    // case class GCMajor(payload: GCMajorMarkerPayload) extends MarkerPayload
+    // case class GCSlice(payload: GCSliceMarkerPayload) extends MarkerPayload
+    case class Style(payload: StyleMarkerPayload) extends MarkerPayload
+    case class BHR(payload: BHRMarkerPayload) extends MarkerPayload
+    case class LongTask(payload: LongTaskMarkerPayload) extends MarkerPayload
+    // case class VsyncTimestamp(payload: VsyncTimestampPayload)
+    //     extends MarkerPayload
+    // case class Screenshot(payload: ScreenshotPayload) extends MarkerPayload
+    case class Navigation(payload: NavigationMarkerPayload)
+        extends MarkerPayload
+    case class Pref(payload: PrefMarkerPayload) extends MarkerPayload
+    case class IPC(payload: IPCMarkerPayload) extends MarkerPayload
+    case class MediaSample(payload: MediaSampleMarkerPayload)
+        extends MarkerPayload
+    // case class Jank(payload: JankPayload) extends MarkerPayload
+    case class Browsertime(payload: BrowsertimeMarkerPayload)
+        extends MarkerPayload
+    case class NoPayloadUserData(payload: NoPayloadUserData)
+        extends MarkerPayload
+    case class Url(payload: UrlMarkerPayload) extends MarkerPayload
+    case class HostResolver(payload: HostResolverPayload) extends MarkerPayload
+  }
+
+  class StringLiteral(value: String)
+
 }

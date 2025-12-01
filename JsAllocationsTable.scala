@@ -6,7 +6,7 @@ class JsAllocationsTable private (args: JsAllocationsTableArgs) {
   def typeName: Array[String] = args.typeName
   def coarseType: Array[String] = args.coarseType
   def weight: Array[Bytes] = args.weight
-  def weightType: Option[Any] /* literal string 'bytes' */ = args.weightType
+  def weightType: JsAllocationsTable_WeightType.type = args.weightType
   def inNursery: Array[Boolean] = args.inNursery
   def stack: Array[Option[IndexIntoStackTable]] = args.stack
   def length: Double = args.length
@@ -26,7 +26,7 @@ class JsAllocationsTable private (args: JsAllocationsTableArgs) {
   def withWeight(value: Array[Bytes]): JsAllocationsTable =
     copy(_.copy(weight = value))
   
-  def withWeightType(value: Option[Any] /* literal string 'bytes' */): JsAllocationsTable =
+  def withWeightType(value: JsAllocationsTable_WeightType.type): JsAllocationsTable =
     copy(_.copy(weightType = value))
   
   def withInNursery(value: Array[Boolean]): JsAllocationsTable =
@@ -50,7 +50,7 @@ private[fxprof] case class JsAllocationsTableArgs(
   typeName: Array[String],
   coarseType: Array[String],
   weight: Array[Bytes],
-  weightType: Option[Any] /* literal string 'bytes' */,
+  weightType: JsAllocationsTable_WeightType.type,
   inNursery: Array[Boolean],
   stack: Array[Option[IndexIntoStackTable]],
   length: Double,

@@ -17,7 +17,6 @@ class RawThread private (args: RawThreadArgs) {
   def tid: Tid = args.tid
   def samples: RawSamplesTable = args.samples
   def jsAllocations: Option[JsAllocationsTable] = args.jsAllocations
-  def nativeAllocations: Option[NativeAllocationsTable] = args.nativeAllocations
   def markers: RawMarkerTable = args.markers
   def stackTable: RawStackTable = args.stackTable
   def frameTable: FrameTable = args.frameTable
@@ -55,7 +54,7 @@ class RawThread private (args: RawThreadArgs) {
   def withIsMainThread(value: Boolean): RawThread =
     copy(_.copy(isMainThread = value))
   
-  def with`eTLD+1`(value: Option[String]): RawThread =
+  def `witheTLD+1`(value: Option[String]): RawThread =
     copy(_.copy(`eTLD+1` = value))
   
   def withProcessName(value: Option[String]): RawThread =
@@ -75,9 +74,6 @@ class RawThread private (args: RawThreadArgs) {
   
   def withJsAllocations(value: Option[JsAllocationsTable]): RawThread =
     copy(_.copy(jsAllocations = value))
-  
-  def withNativeAllocations(value: Option[NativeAllocationsTable]): RawThread =
-    copy(_.copy(nativeAllocations = value))
   
   def withMarkers(value: RawMarkerTable): RawThread =
     copy(_.copy(markers = value))
@@ -129,7 +125,6 @@ private[fxprof] case class RawThreadArgs(
   tid: Tid,
   samples: RawSamplesTable,
   jsAllocations: Option[JsAllocationsTable],
-  nativeAllocations: Option[NativeAllocationsTable],
   markers: RawMarkerTable,
   stackTable: RawStackTable,
   frameTable: FrameTable,
