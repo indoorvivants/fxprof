@@ -85,22 +85,9 @@ package object fxprof {
     case object IntervalEnd extends MarkerPhase(3)
   }
 
+  // figure out how to deal with this
   type ProcessProfilingLog = Map[String, Array[Byte]]
   type ProfilingLog = Map[Double, ProcessProfilingLog]
-
-  // export type ProcessType =
-  //   | 'default'
-  //   | 'plugin'
-  //   | 'tab'
-  //   | 'ipdlunittest'
-  //   | 'geckomediaplugin'
-  //   | 'gpu'
-  //   | 'pdfium'
-  //   | 'vr'
-  //   // Unknown process type:
-  //   // https://searchfox.org/mozilla-central/rev/819cd31a93fd50b7167979607371878c4d6f18e8/toolkit/xre/nsEmbedFunctions.cpp#232
-  //   | 'invalid'
-  //   | string;
 
   sealed abstract class ProcessType(value: String)
       extends Product
