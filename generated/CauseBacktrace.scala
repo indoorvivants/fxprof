@@ -1,10 +1,27 @@
 package fxprof
 
+/**
+  * Markers can include a stack. These are converted to a cause backtrace, which includes
+  * the time the stack was taken. Sometimes this cause can be async, and triggered before
+  * the marker, or it can be synchronous, and the time is contained within the marker's
+  * start and end time.
+  */
 class CauseBacktrace private (private[fxprof] val args: CauseBacktraceArgs) {
+  /** `tid` is optional because older processed profiles may not have it.
+    * No upgrader was written for this change.
+    */
   def tid: Option[Tid] = args.tid
+
   def time: Option[Milliseconds] = args.time
+
   def stack: Option[IndexIntoStackTable] = args.stack
 
+
+  /** Setter for [[$name]] field
+
+    * `tid` is optional because older processed profiles may not have it.
+    * No upgrader was written for this change.
+    */
   def withTid(value: Option[Tid]): CauseBacktrace =
     copy(_.copy(tid = value))
   
@@ -24,6 +41,8 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object CauseBacktrace {
+  /** Construct a [[CauseBacktrace]]
+    */
   def apply(
   ): CauseBacktrace = 
     new CauseBacktrace(CauseBacktraceArgs(

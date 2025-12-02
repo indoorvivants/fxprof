@@ -2,9 +2,13 @@ package fxprof
 
 class DOMEventMarkerPayload private (private[fxprof] val args: DOMEventMarkerPayloadArgs) {
   def `type`: DOMEventMarkerPayload_Type.type = args.`type`
+
   def latency: Option[Milliseconds] = args.latency
+
   def eventType: String = args.eventType
+
   def innerWindowID: Option[Double] = args.innerWindowID
+
 
   def `withtype`(value: DOMEventMarkerPayload_Type.type): DOMEventMarkerPayload =
     copy(_.copy(`type` = value))
@@ -28,6 +32,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object DOMEventMarkerPayload {
+  /** Construct a [[DOMEventMarkerPayload]]
+      @param type
+      @param eventType
+    */
   def apply(
     `type`: DOMEventMarkerPayload_Type.type,
     eventType: String,

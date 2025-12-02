@@ -2,11 +2,17 @@ package fxprof
 
 class JsTracerTable private (private[fxprof] val args: JsTracerTableArgs) {
   def events: Vector[IndexIntoStringTable] = args.events
+
   def timestamps: Vector[Microseconds] = args.timestamps
+
   def durations: Vector[Option[Microseconds]] = args.durations
+
   def line: Vector[Option[Double]] = args.line
+
   def column: Vector[Option[Double]] = args.column
+
   def length: Double = args.length
+
 
   def withEvents(value: Vector[IndexIntoStringTable]): JsTracerTable =
     copy(_.copy(events = value))
@@ -36,6 +42,9 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object JsTracerTable {
+  /** Construct a [[JsTracerTable]]
+      @param length
+    */
   def apply(
     length: Double,
   ): JsTracerTable = 

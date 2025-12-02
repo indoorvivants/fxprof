@@ -2,8 +2,11 @@ package fxprof
 
 class PaintProfilerMarkerTracing private (private[fxprof] val args: PaintProfilerMarkerTracingArgs) {
   def `type`: PaintProfilerMarkerTracing_Type.type = args.`type`
+
   def category: PaintProfilerMarkerTracing_Category.type = args.category
+
   def cause: Option[CauseBacktrace] = args.cause
+
 
   def `withtype`(value: PaintProfilerMarkerTracing_Type.type): PaintProfilerMarkerTracing =
     copy(_.copy(`type` = value))
@@ -24,6 +27,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object PaintProfilerMarkerTracing {
+  /** Construct a [[PaintProfilerMarkerTracing]]
+      @param type
+      @param category
+    */
   def apply(
     `type`: PaintProfilerMarkerTracing_Type.type,
     category: PaintProfilerMarkerTracing_Category.type,

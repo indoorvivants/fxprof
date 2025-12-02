@@ -1,10 +1,18 @@
 package fxprof
 
-case object FileIoPayload_Type extends StringLiteral("FileIO")
-
 case object GPUMarkerPayload_Type extends StringLiteral("gpu_timer_query")
 
+case object PaintProfilerMarkerTracing_Type extends StringLiteral("tracing")
+
+case object PaintProfilerMarkerTracing_Category extends StringLiteral("Paint")
+
+case object CcMarkerTracing_Type extends StringLiteral("tracing")
+
+case object CcMarkerTracing_Category extends StringLiteral("CC")
+
 case object NetworkPayload_Type extends StringLiteral("Network")
+
+case object FileIoPayload_Type extends StringLiteral("FileIO")
 
 case object UserTimingMarkerPayload_Type extends StringLiteral("UserTiming")
 
@@ -18,15 +26,13 @@ case object TextMarkerPayload_Type extends StringLiteral("Text")
 
 case object LogMarkerPayload_Type extends StringLiteral("Log")
 
-case object PaintProfilerMarkerTracing_Type extends StringLiteral("tracing")
-
-case object PaintProfilerMarkerTracing_Category extends StringLiteral("Paint")
-
-case object CcMarkerTracing_Type extends StringLiteral("tracing")
-
-case object CcMarkerTracing_Category extends StringLiteral("CC")
-
 case object DOMEventMarkerPayload_Type extends StringLiteral("DOMEvent")
+
+case object PrefMarkerPayload_Type extends StringLiteral("PreferenceRead")
+
+case object NavigationMarkerPayload_Type extends StringLiteral("tracing")
+
+case object NavigationMarkerPayload_Category extends StringLiteral("Navigation")
 
 case object StyleMarkerPayload_Type extends StringLiteral("Styles")
 
@@ -37,12 +43,6 @@ case object BHRMarkerPayload_Type extends StringLiteral("BHR-detected hang")
 case object LongTaskMarkerPayload_Type extends StringLiteral("MainThreadLongTask")
 
 case object LongTaskMarkerPayload_Category extends StringLiteral("LongTask")
-
-case object NavigationMarkerPayload_Type extends StringLiteral("tracing")
-
-case object NavigationMarkerPayload_Category extends StringLiteral("Navigation")
-
-case object PrefMarkerPayload_Type extends StringLiteral("PreferenceRead")
 
 case object IPCMarkerPayload_Type extends StringLiteral("IPC")
 
@@ -75,15 +75,9 @@ case object UrlMarkerPayload_Type extends StringLiteral("Url")
 
 case object HostResolverPayload_Type extends StringLiteral("HostResolver")
 
-sealed abstract class ProfileMeta_Toolkit(value: String) extends StringLiteral(value)
-object ProfileMeta_Toolkit {
-  case object GTK extends ProfileMeta_Toolkit("gtk")
-  case object GTK3 extends ProfileMeta_Toolkit("gtk3")
-  case object WINDOWS extends ProfileMeta_Toolkit("windows")
-  case object COCOA extends ProfileMeta_Toolkit("cocoa")
-}
-
 case object JsAllocationsTable_WeightType extends StringLiteral("bytes")
+
+case object UnbalancedNativeAllocationsTable_WeightType extends StringLiteral("bytes")
 
 sealed abstract class PausedRange_Reason(value: String) extends StringLiteral(value)
 object PausedRange_Reason {
@@ -91,5 +85,11 @@ object PausedRange_Reason {
   case object COLLECTING extends PausedRange_Reason("collecting")
 }
 
-case object UnbalancedNativeAllocationsTable_WeightType extends StringLiteral("bytes")
+sealed abstract class ProfileMeta_Toolkit(value: String) extends StringLiteral(value)
+object ProfileMeta_Toolkit {
+  case object GTK extends ProfileMeta_Toolkit("gtk")
+  case object GTK3 extends ProfileMeta_Toolkit("gtk3")
+  case object WINDOWS extends ProfileMeta_Toolkit("windows")
+  case object COCOA extends ProfileMeta_Toolkit("cocoa")
+}
 

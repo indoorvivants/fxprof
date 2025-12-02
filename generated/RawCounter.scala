@@ -2,12 +2,19 @@ package fxprof
 
 class RawCounter private (private[fxprof] val args: RawCounterArgs) {
   def name: String = args.name
+
   def category: String = args.category
+
   def description: String = args.description
+
   def color: Option[GraphColor] = args.color
+
   def pid: Pid = args.pid
+
   def mainThreadIndex: ThreadIndex = args.mainThreadIndex
+
   def samples: RawCounterSamplesTable = args.samples
+
 
   def withName(value: String): RawCounter =
     copy(_.copy(name = value))
@@ -40,6 +47,14 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object RawCounter {
+  /** Construct a [[RawCounter]]
+      @param name
+      @param category
+      @param description
+      @param pid
+      @param mainThreadIndex
+      @param samples
+    */
   def apply(
     name: String,
     category: String,

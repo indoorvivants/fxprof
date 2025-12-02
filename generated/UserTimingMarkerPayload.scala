@@ -1,9 +1,16 @@
 package fxprof
 
+/**
+  * The payload for the UserTimings API. These are added through performance.measure()
+  * and performance.mark(). https://developer.mozilla.org/en-US/docs/Web/API/Performance
+  */
 class UserTimingMarkerPayload private (private[fxprof] val args: UserTimingMarkerPayloadArgs) {
   def `type`: UserTimingMarkerPayload_Type.type = args.`type`
+
   def name: String = args.name
+
   def entryType: UserTimingMarkerPayload_EntryType = args.entryType
+
 
   def `withtype`(value: UserTimingMarkerPayload_Type.type): UserTimingMarkerPayload =
     copy(_.copy(`type` = value))
@@ -24,6 +31,11 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object UserTimingMarkerPayload {
+  /** Construct a [[UserTimingMarkerPayload]]
+      @param type
+      @param name
+      @param entryType
+    */
   def apply(
     `type`: UserTimingMarkerPayload_Type.type,
     name: String,

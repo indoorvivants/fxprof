@@ -1,15 +1,32 @@
 package fxprof
 
+/**
+  * This variant is the original version of the table, before the memory address
+  * and threadId were added.
+  */
 class UnbalancedNativeAllocationsTable private (private[fxprof] val args: UnbalancedNativeAllocationsTableArgs) {
   def time: Vector[Milliseconds] = args.time
+
+  /** "weight" is used here rather than "bytes", so that this type will match the
+    * SamplesLikeTableShape.
+    */
   def weight: Vector[Bytes] = args.weight
+
   def weightType: UnbalancedNativeAllocationsTable_WeightType.type = args.weightType
+
   def stack: Vector[Option[IndexIntoStackTable]] = args.stack
+
   def length: Double = args.length
+
 
   def withTime(value: Vector[Milliseconds]): UnbalancedNativeAllocationsTable =
     copy(_.copy(time = value))
   
+  /** Setter for [[$name]] field
+
+    * "weight" is used here rather than "bytes", so that this type will match the
+    * SamplesLikeTableShape.
+    */
   def withWeight(value: Vector[Bytes]): UnbalancedNativeAllocationsTable =
     copy(_.copy(weight = value))
   
@@ -32,6 +49,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object UnbalancedNativeAllocationsTable {
+  /** Construct a [[UnbalancedNativeAllocationsTable]]
+      @param weightType
+      @param length
+    */
   def apply(
     weightType: UnbalancedNativeAllocationsTable_WeightType.type,
     length: Double,

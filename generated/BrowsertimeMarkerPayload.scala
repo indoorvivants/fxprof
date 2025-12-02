@@ -2,7 +2,9 @@ package fxprof
 
 class BrowsertimeMarkerPayload private (private[fxprof] val args: BrowsertimeMarkerPayloadArgs) {
   def `type`: BrowsertimeMarkerPayload_Type.type = args.`type`
+
   def percentage: Double = args.percentage
+
 
   def `withtype`(value: BrowsertimeMarkerPayload_Type.type): BrowsertimeMarkerPayload =
     copy(_.copy(`type` = value))
@@ -20,6 +22,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object BrowsertimeMarkerPayload {
+  /** Construct a [[BrowsertimeMarkerPayload]]
+      @param type
+      @param percentage
+    */
   def apply(
     `type`: BrowsertimeMarkerPayload_Type.type,
     percentage: Double,

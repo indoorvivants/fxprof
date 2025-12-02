@@ -2,7 +2,9 @@ package fxprof
 
 class UrlMarkerPayload private (private[fxprof] val args: UrlMarkerPayloadArgs) {
   def `type`: UrlMarkerPayload_Type.type = args.`type`
+
   def url: String = args.url
+
 
   def `withtype`(value: UrlMarkerPayload_Type.type): UrlMarkerPayload =
     copy(_.copy(`type` = value))
@@ -20,6 +22,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object UrlMarkerPayload {
+  /** Construct a [[UrlMarkerPayload]]
+      @param type
+      @param url
+    */
   def apply(
     `type`: UrlMarkerPayload_Type.type,
     url: String,

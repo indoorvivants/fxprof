@@ -2,9 +2,13 @@ package fxprof
 
 class TextMarkerPayload private (private[fxprof] val args: TextMarkerPayloadArgs) {
   def `type`: TextMarkerPayload_Type.type = args.`type`
+
   def name: String = args.name
+
   def cause: Option[CauseBacktrace] = args.cause
+
   def innerWindowID: Option[Double] = args.innerWindowID
+
 
   def `withtype`(value: TextMarkerPayload_Type.type): TextMarkerPayload =
     copy(_.copy(`type` = value))
@@ -28,6 +32,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object TextMarkerPayload {
+  /** Construct a [[TextMarkerPayload]]
+      @param type
+      @param name
+    */
   def apply(
     `type`: TextMarkerPayload_Type.type,
     name: String,

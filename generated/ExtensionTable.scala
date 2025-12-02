@@ -2,9 +2,13 @@ package fxprof
 
 class ExtensionTable private (private[fxprof] val args: ExtensionTableArgs) {
   def baseURL: Vector[String] = args.baseURL
+
   def id: Vector[String] = args.id
+
   def name: Vector[String] = args.name
+
   def length: Double = args.length
+
 
   def withBaseURL(value: Vector[String]): ExtensionTable =
     copy(_.copy(baseURL = value))
@@ -28,6 +32,9 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object ExtensionTable {
+  /** Construct a [[ExtensionTable]]
+      @param length
+    */
   def apply(
     length: Double,
   ): ExtensionTable = 

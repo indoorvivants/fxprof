@@ -1,15 +1,34 @@
 package fxprof
 
+/**
+  * All of the data for a processed profile.
+  */
 class Profile private (private[fxprof] val args: ProfileArgs) {
   def meta: ProfileMeta = args.meta
+
   def libs: Vector[Lib] = args.libs
+
   def pages: Option[PageList] = args.pages
+
+  /** The counters list is optional only because old profilers may not have them.
+    * An upgrader could be written to make this non-optional.
+    */
   def counters: Option[Vector[RawCounter]] = args.counters
+
+  /** The profilerOverhead list is optional only because old profilers may not
+    * have them. An upgrader could be written to make this non-optional.
+    * This is list because there is a profiler overhead per process.
+    */
   def profilerOverhead: Option[Vector[ProfilerOverhead]] = args.profilerOverhead
+
   def shared: RawProfileSharedData = args.shared
+
   def threads: Vector[RawThread] = args.threads
+
   def profilingLog: Option[ProfilingLog] = args.profilingLog
+
   def profileGatheringLog: Option[ProfilingLog] = args.profileGatheringLog
+
 
   def withMeta(value: ProfileMeta): Profile =
     copy(_.copy(meta = value))
@@ -20,9 +39,20 @@ class Profile private (private[fxprof] val args: ProfileArgs) {
   def withPages(value: Option[PageList]): Profile =
     copy(_.copy(pages = value))
   
+  /** Setter for [[$name]] field
+
+    * The counters list is optional only because old profilers may not have them.
+    * An upgrader could be written to make this non-optional.
+    */
   def withCounters(value: Option[Vector[RawCounter]]): Profile =
     copy(_.copy(counters = value))
   
+  /** Setter for [[$name]] field
+
+    * The profilerOverhead list is optional only because old profilers may not
+    * have them. An upgrader could be written to make this non-optional.
+    * This is list because there is a profiler overhead per process.
+    */
   def withProfilerOverhead(value: Option[Vector[ProfilerOverhead]]): Profile =
     copy(_.copy(profilerOverhead = value))
   
@@ -48,6 +78,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object Profile {
+  /** Construct a [[Profile]]
+      @param meta
+      @param shared
+    */
   def apply(
     meta: ProfileMeta,
     shared: RawProfileSharedData,

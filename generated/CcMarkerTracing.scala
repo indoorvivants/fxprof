@@ -2,10 +2,15 @@ package fxprof
 
 class CcMarkerTracing private (private[fxprof] val args: CcMarkerTracingArgs) {
   def `type`: CcMarkerTracing_Type.type = args.`type`
+
   def category: CcMarkerTracing_Category.type = args.category
+
   def first: Option[String] = args.first
+
   def desc: Option[String] = args.desc
+
   def second: Option[String] = args.second
+
 
   def `withtype`(value: CcMarkerTracing_Type.type): CcMarkerTracing =
     copy(_.copy(`type` = value))
@@ -32,6 +37,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object CcMarkerTracing {
+  /** Construct a [[CcMarkerTracing]]
+      @param type
+      @param category
+    */
   def apply(
     `type`: CcMarkerTracing_Type.type,
     category: CcMarkerTracing_Category.type,

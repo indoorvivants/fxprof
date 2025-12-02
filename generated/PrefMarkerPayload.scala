@@ -2,11 +2,17 @@ package fxprof
 
 class PrefMarkerPayload private (private[fxprof] val args: PrefMarkerPayloadArgs) {
   def `type`: PrefMarkerPayload_Type.type = args.`type`
+
   def prefAccessTime: Milliseconds = args.prefAccessTime
+
   def prefName: String = args.prefName
+
   def prefKind: String = args.prefKind
+
   def prefType: String = args.prefType
+
   def prefValue: String = args.prefValue
+
 
   def `withtype`(value: PrefMarkerPayload_Type.type): PrefMarkerPayload =
     copy(_.copy(`type` = value))
@@ -36,6 +42,14 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object PrefMarkerPayload {
+  /** Construct a [[PrefMarkerPayload]]
+      @param type
+      @param prefAccessTime
+      @param prefName
+      @param prefKind
+      @param prefType
+      @param prefValue
+    */
   def apply(
     `type`: PrefMarkerPayload_Type.type,
     prefAccessTime: Milliseconds,

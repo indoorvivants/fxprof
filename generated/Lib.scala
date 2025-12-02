@@ -1,13 +1,38 @@
 package fxprof
 
+/**
+  * Information about the shared libraries that were loaded into the processes in
+  * the profile. This information is needed during symbolication. Most importantly,
+  * the symbolication API requires a debugName + breakpadId for each set of
+  * unsymbolicated addresses, to know where to obtain symbols for those addresses.
+  */
 class Lib private (private[fxprof] val args: LibArgs) {
   def arch: String = args.arch
+
   def name: String = args.name
+
   def path: String = args.path
+
   def debugName: String = args.debugName
+
   def debugPath: String = args.debugPath
+
   def breakpadId: String = args.breakpadId
+
+  /** The codeId is currently always null.
+    * In the future, it will have the following values:
+    * - On macOS, it will still be null.
+    * - On Linux / Android, it will have the full GNU build id. (The breakpadId
+    * is also based on the build id, but truncates some information.)
+    * This lets us obtain unstripped system libraries on Linux distributions
+    * which have a "debuginfod" server, and we can use those unstripped binaries
+    * for symbolication.
+    * - On Windows, it will be the codeId for the binary (.exe / .dll), as used
+    * by Windows symbol servers. This will allow us to get assembly code for
+    * Windows system libraries for profiles which were captured on another machine.
+    */
   def codeId: Option[String] = args.codeId
+
 
   def withArch(value: String): Lib =
     copy(_.copy(arch = value))
@@ -27,6 +52,20 @@ class Lib private (private[fxprof] val args: LibArgs) {
   def withBreakpadId(value: String): Lib =
     copy(_.copy(breakpadId = value))
   
+  /** Setter for [[$name]] field
+
+    * The codeId is currently always null.
+    * In the future, it will have the following values:
+    * - On macOS, it will still be null.
+    * - On Linux / Android, it will have the full GNU build id. (The breakpadId
+    * is also based on the build id, but truncates some information.)
+    * This lets us obtain unstripped system libraries on Linux distributions
+    * which have a "debuginfod" server, and we can use those unstripped binaries
+    * for symbolication.
+    * - On Windows, it will be the codeId for the binary (.exe / .dll), as used
+    * by Windows symbol servers. This will allow us to get assembly code for
+    * Windows system libraries for profiles which were captured on another machine.
+    */
   def withCodeId(value: Option[String]): Lib =
     copy(_.copy(codeId = value))
   
@@ -40,6 +79,14 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object Lib {
+  /** Construct a [[Lib]]
+      @param arch
+      @param name
+      @param path
+      @param debugName
+      @param debugPath
+      @param breakpadId
+    */
   def apply(
     arch: String,
     name: String,

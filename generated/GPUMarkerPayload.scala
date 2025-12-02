@@ -1,11 +1,19 @@
 package fxprof
 
+/**
+  * Measurement for how long draw calls take for the compositor.
+  */
 class GPUMarkerPayload private (private[fxprof] val args: GPUMarkerPayloadArgs) {
   def `type`: GPUMarkerPayload_Type.type = args.`type`
+
   def cpustart: Milliseconds = args.cpustart
+
   def cpuend: Milliseconds = args.cpuend
+
   def gpustart: Milliseconds = args.gpustart
+
   def gpuend: Milliseconds = args.gpuend
+
 
   def `withtype`(value: GPUMarkerPayload_Type.type): GPUMarkerPayload =
     copy(_.copy(`type` = value))
@@ -32,6 +40,13 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object GPUMarkerPayload {
+  /** Construct a [[GPUMarkerPayload]]
+      @param type
+      @param cpustart
+      @param cpuend
+      @param gpustart
+      @param gpuend
+    */
   def apply(
     `type`: GPUMarkerPayload_Type.type,
     cpustart: Milliseconds,

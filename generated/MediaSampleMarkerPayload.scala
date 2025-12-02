@@ -2,8 +2,11 @@ package fxprof
 
 class MediaSampleMarkerPayload private (private[fxprof] val args: MediaSampleMarkerPayloadArgs) {
   def `type`: MediaSampleMarkerPayload_Type.type = args.`type`
+
   def sampleStartTimeUs: Microseconds = args.sampleStartTimeUs
+
   def sampleEndTimeUs: Microseconds = args.sampleEndTimeUs
+
 
   def `withtype`(value: MediaSampleMarkerPayload_Type.type): MediaSampleMarkerPayload =
     copy(_.copy(`type` = value))
@@ -24,6 +27,11 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object MediaSampleMarkerPayload {
+  /** Construct a [[MediaSampleMarkerPayload]]
+      @param type
+      @param sampleStartTimeUs
+      @param sampleEndTimeUs
+    */
   def apply(
     `type`: MediaSampleMarkerPayload_Type.type,
     sampleStartTimeUs: Microseconds,

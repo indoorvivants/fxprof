@@ -1,15 +1,31 @@
 package fxprof
 
+/**
+  * JS allocations are recorded as a marker payload, but in profile processing they
+  * are moved to the Thread. This allows them to be part of the stack processing pipeline.
+  */
 class JsAllocationsTable private (private[fxprof] val args: JsAllocationsTableArgs) {
   def time: Vector[Milliseconds] = args.time
+
   def className: Vector[String] = args.className
+
   def typeName: Vector[String] = args.typeName
+
   def coarseType: Vector[String] = args.coarseType
+
+  /** "weight" is used here rather than "bytes", so that this type will match the
+    * SamplesLikeTableShape.
+    */
   def weight: Vector[Bytes] = args.weight
+
   def weightType: JsAllocationsTable_WeightType.type = args.weightType
+
   def inNursery: Vector[Boolean] = args.inNursery
+
   def stack: Vector[Option[IndexIntoStackTable]] = args.stack
+
   def length: Double = args.length
+
 
   def withTime(value: Vector[Milliseconds]): JsAllocationsTable =
     copy(_.copy(time = value))
@@ -23,6 +39,11 @@ class JsAllocationsTable private (private[fxprof] val args: JsAllocationsTableAr
   def withCoarseType(value: Vector[String]): JsAllocationsTable =
     copy(_.copy(coarseType = value))
   
+  /** Setter for [[$name]] field
+
+    * "weight" is used here rather than "bytes", so that this type will match the
+    * SamplesLikeTableShape.
+    */
   def withWeight(value: Vector[Bytes]): JsAllocationsTable =
     copy(_.copy(weight = value))
   
@@ -48,6 +69,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object JsAllocationsTable {
+  /** Construct a [[JsAllocationsTable]]
+      @param weightType
+      @param length
+    */
   def apply(
     weightType: JsAllocationsTable_WeightType.type,
     length: Double,

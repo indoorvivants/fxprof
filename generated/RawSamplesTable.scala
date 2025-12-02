@@ -1,14 +1,51 @@
 package fxprof
 
+/**
+  * The Gecko Profiler records samples of what function was currently being executed, and
+  * the callstack that is associated with it. This is done at a fixed but configurable
+  * rate, e.g. every 1 millisecond. This table represents the minimal amount of
+  * information that is needed to represent that sampled function. Most of the entries
+  * are indices into other tables.
+*/
 class RawSamplesTable private (private[fxprof] val args: RawSamplesTableArgs) {
+  /**
+    * Responsiveness is the older version of eventDelay. It injects events every 16ms.
+    * This is optional because newer profiles don't have that field anymore.
+  */
   def responsiveness: Option[Vector[Option[Milliseconds]]] = args.responsiveness
+  /**
+    * Event delay is the newer version of responsiveness. It allow us to get a finer-grained
+    * view of jank by inferring what would be the delay of a hypothetical input event at
+    * any point in time. It requires a pre-processing to be able to visualize properly.
+    * This is optional because older profiles didn't have that field.
+  */
   def eventDelay: Option[Vector[Option[Milliseconds]]] = args.eventDelay
   def stack: Vector[Option[IndexIntoStackTable]] = args.stack
   def time: Option[Vector[Milliseconds]] = args.time
+  /**
+    * If the `time` column is not present, then the `timeDeltas` column must be present.
+  */
   def timeDeltas: Option[Vector[Milliseconds]] = args.timeDeltas
+  /**
+    * An optional weight array. If not present, then the weight is assumed to be 1.
+    * See the WeightType type for more information.
+  */
   def weight: Vector[Option[Double]] = args.weight
   def weightType: WeightType = args.weightType
+  /**
+    * CPU usage value of the current thread. Its values are null only if the back-end
+    * fails to get the CPU usage from operating system.
+    * It's landed in Firefox 86, and it is optional because older profile
+    * versions may not have it or that feature could be disabled. No upgrader was
+    * written for this change because it's a completely new data source.
+    * The first value is ignored - it's not meaningful because there is no previous
+    * sample.
+  */
   def threadCPUDelta: Option[Vector[Option[Double]]] = args.threadCPUDelta
+  /**
+    * This property isn't present in normal threads. However it's present for
+    * merged threads, so that we know the origin thread for these samples.
+  */
   def threadId: Option[Vector[Tid]] = args.threadId
   def length: Double = args.length
 

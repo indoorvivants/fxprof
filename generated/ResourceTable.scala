@@ -1,11 +1,20 @@
 package fxprof
 
+/**
+  * The ResourceTable holds additional information about functions. It tends to contain
+  * sparse arrays. Multiple functions can point to the same resource.
+  */
 class ResourceTable private (private[fxprof] val args: ResourceTableArgs) {
   def length: Double = args.length
+
   def lib: Vector[Option[IndexIntoLibs]] = args.lib
+
   def name: Vector[IndexIntoStringTable] = args.name
+
   def host: Vector[Option[IndexIntoStringTable]] = args.host
+
   def `type`: Vector[ResourceTypeEnum] = args.`type`
+
 
   def withLength(value: Double): ResourceTable =
     copy(_.copy(length = value))
@@ -32,6 +41,9 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object ResourceTable {
+  /** Construct a [[ResourceTable]]
+      @param length
+    */
   def apply(
     length: Double,
   ): ResourceTable = 

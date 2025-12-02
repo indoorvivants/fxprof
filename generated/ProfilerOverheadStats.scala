@@ -1,28 +1,54 @@
 package fxprof
 
+/**
+  * The statistics about profiler overhead. It includes max/min/mean values of
+  * individual and overall overhead timings.
+  */
 class ProfilerOverheadStats private (private[fxprof] val args: ProfilerOverheadStatsArgs) {
   def maxCleaning: Microseconds = args.maxCleaning
+
   def maxCounter: Microseconds = args.maxCounter
+
   def maxInterval: Microseconds = args.maxInterval
+
   def maxLockings: Microseconds = args.maxLockings
+
   def maxOverhead: Microseconds = args.maxOverhead
+
   def maxThread: Microseconds = args.maxThread
+
   def meanCleaning: Microseconds = args.meanCleaning
+
   def meanCounter: Microseconds = args.meanCounter
+
   def meanInterval: Microseconds = args.meanInterval
+
   def meanLockings: Microseconds = args.meanLockings
+
   def meanOverhead: Microseconds = args.meanOverhead
+
   def meanThread: Microseconds = args.meanThread
+
   def minCleaning: Microseconds = args.minCleaning
+
   def minCounter: Microseconds = args.minCounter
+
   def minInterval: Microseconds = args.minInterval
+
   def minLockings: Microseconds = args.minLockings
+
   def minOverhead: Microseconds = args.minOverhead
+
   def minThread: Microseconds = args.minThread
+
   def overheadDurations: Microseconds = args.overheadDurations
+
   def overheadPercentage: Microseconds = args.overheadPercentage
+
   def profiledDuration: Microseconds = args.profiledDuration
+
   def samplingCount: Microseconds = args.samplingCount
+
 
   def withMaxCleaning(value: Microseconds): ProfilerOverheadStats =
     copy(_.copy(maxCleaning = value))
@@ -100,6 +126,30 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object ProfilerOverheadStats {
+  /** Construct a [[ProfilerOverheadStats]]
+      @param maxCleaning
+      @param maxCounter
+      @param maxInterval
+      @param maxLockings
+      @param maxOverhead
+      @param maxThread
+      @param meanCleaning
+      @param meanCounter
+      @param meanInterval
+      @param meanLockings
+      @param meanOverhead
+      @param meanThread
+      @param minCleaning
+      @param minCounter
+      @param minInterval
+      @param minLockings
+      @param minOverhead
+      @param minThread
+      @param overheadDurations
+      @param overheadPercentage
+      @param profiledDuration
+      @param samplingCount
+    */
   def apply(
     maxCleaning: Microseconds,
     maxCounter: Microseconds,

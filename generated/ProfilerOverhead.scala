@@ -1,14 +1,29 @@
 package fxprof
 
+/**
+  * Information about profiler overhead. It includes overhead timings for
+  * counters, expired marker cleanings, mutex locking and threads. Also it
+  * includes statistics about those individual and overall overhead.
+  */
 class ProfilerOverhead private (private[fxprof] val args: ProfilerOverheadArgs) {
   def samples: ProfilerOverheadSamplesTable = args.samples
+
+  /** There is no statistics object if there is no sample.
+    */
   def statistics: Option[ProfilerOverheadStats] = args.statistics
+
   def pid: Pid = args.pid
+
   def mainThreadIndex: ThreadIndex = args.mainThreadIndex
+
 
   def withSamples(value: ProfilerOverheadSamplesTable): ProfilerOverhead =
     copy(_.copy(samples = value))
   
+  /** Setter for [[$name]] field
+
+    * There is no statistics object if there is no sample.
+    */
   def withStatistics(value: Option[ProfilerOverheadStats]): ProfilerOverhead =
     copy(_.copy(statistics = value))
   
@@ -28,6 +43,11 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object ProfilerOverhead {
+  /** Construct a [[ProfilerOverhead]]
+      @param samples
+      @param pid
+      @param mainThreadIndex
+    */
   def apply(
     samples: ProfilerOverheadSamplesTable,
     pid: Pid,

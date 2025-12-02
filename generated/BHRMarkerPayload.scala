@@ -3,6 +3,7 @@ package fxprof
 class BHRMarkerPayload private (private[fxprof] val args: BHRMarkerPayloadArgs) {
   def `type`: BHRMarkerPayload_Type.type = args.`type`
 
+
   def `withtype`(value: BHRMarkerPayload_Type.type): BHRMarkerPayload =
     copy(_.copy(`type` = value))
   
@@ -16,6 +17,9 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object BHRMarkerPayload {
+  /** Construct a [[BHRMarkerPayload]]
+      @param type
+    */
   def apply(
     `type`: BHRMarkerPayload_Type.type,
   ): BHRMarkerPayload = 

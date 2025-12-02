@@ -2,13 +2,23 @@ package fxprof
 
 class StyleMarkerPayload private (private[fxprof] val args: StyleMarkerPayloadArgs) {
   def `type`: StyleMarkerPayload_Type.type = args.`type`
+
   def category: StyleMarkerPayload_Category.type = args.category
+
   def cause: Option[CauseBacktrace] = args.cause
+
+  /** Counts
+    */
   def elementsTraversed: Double = args.elementsTraversed
+
   def elementsStyled: Double = args.elementsStyled
+
   def elementsMatched: Double = args.elementsMatched
+
   def stylesShared: Double = args.stylesShared
+
   def stylesReused: Double = args.stylesReused
+
 
   def `withtype`(value: StyleMarkerPayload_Type.type): StyleMarkerPayload =
     copy(_.copy(`type` = value))
@@ -19,6 +29,10 @@ class StyleMarkerPayload private (private[fxprof] val args: StyleMarkerPayloadAr
   def withCause(value: Option[CauseBacktrace]): StyleMarkerPayload =
     copy(_.copy(cause = value))
   
+  /** Setter for [[$name]] field
+
+    * Counts
+    */
   def withElementsTraversed(value: Double): StyleMarkerPayload =
     copy(_.copy(elementsTraversed = value))
   
@@ -44,6 +58,15 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object StyleMarkerPayload {
+  /** Construct a [[StyleMarkerPayload]]
+      @param type
+      @param category
+      @param elementsTraversedCounts
+      @param elementsStyled
+      @param elementsMatched
+      @param stylesShared
+      @param stylesReused
+    */
   def apply(
     `type`: StyleMarkerPayload_Type.type,
     category: StyleMarkerPayload_Category.type,

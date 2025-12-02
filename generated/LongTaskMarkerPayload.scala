@@ -2,7 +2,9 @@ package fxprof
 
 class LongTaskMarkerPayload private (private[fxprof] val args: LongTaskMarkerPayloadArgs) {
   def `type`: LongTaskMarkerPayload_Type.type = args.`type`
+
   def category: LongTaskMarkerPayload_Category.type = args.category
+
 
   def `withtype`(value: LongTaskMarkerPayload_Type.type): LongTaskMarkerPayload =
     copy(_.copy(`type` = value))
@@ -20,6 +22,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object LongTaskMarkerPayload {
+  /** Construct a [[LongTaskMarkerPayload]]
+      @param type
+      @param category
+    */
   def apply(
     `type`: LongTaskMarkerPayload_Type.type,
     category: LongTaskMarkerPayload_Category.type,

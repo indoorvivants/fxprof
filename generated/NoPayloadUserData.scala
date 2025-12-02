@@ -2,7 +2,9 @@ package fxprof
 
 class NoPayloadUserData private (private[fxprof] val args: NoPayloadUserDataArgs) {
   def `type`: NoPayloadUserData_Type.type = args.`type`
+
   def innerWindowID: Option[Double] = args.innerWindowID
+
 
   def `withtype`(value: NoPayloadUserData_Type.type): NoPayloadUserData =
     copy(_.copy(`type` = value))
@@ -20,6 +22,9 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object NoPayloadUserData {
+  /** Construct a [[NoPayloadUserData]]
+      @param type
+    */
   def apply(
     `type`: NoPayloadUserData_Type.type,
   ): NoPayloadUserData = 

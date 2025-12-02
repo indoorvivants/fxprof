@@ -2,9 +2,13 @@ package fxprof
 
 class HostResolverPayload private (private[fxprof] val args: HostResolverPayloadArgs) {
   def `type`: HostResolverPayload_Type.type = args.`type`
+
   def host: String = args.host
+
   def originSuffix: String = args.originSuffix
+
   def flags: String = args.flags
+
 
   def `withtype`(value: HostResolverPayload_Type.type): HostResolverPayload =
     copy(_.copy(`type` = value))
@@ -28,6 +32,12 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object HostResolverPayload {
+  /** Construct a [[HostResolverPayload]]
+      @param type
+      @param host
+      @param originSuffix
+      @param flags
+    */
   def apply(
     `type`: HostResolverPayload_Type.type,
     host: String,

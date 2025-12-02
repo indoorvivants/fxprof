@@ -2,9 +2,13 @@ package fxprof
 
 class NavigationMarkerPayload private (private[fxprof] val args: NavigationMarkerPayloadArgs) {
   def `type`: NavigationMarkerPayload_Type.type = args.`type`
+
   def category: NavigationMarkerPayload_Category.type = args.category
+
   def eventType: Option[String] = args.eventType
+
   def innerWindowID: Option[Double] = args.innerWindowID
+
 
   def `withtype`(value: NavigationMarkerPayload_Type.type): NavigationMarkerPayload =
     copy(_.copy(`type` = value))
@@ -28,6 +32,10 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object NavigationMarkerPayload {
+  /** Construct a [[NavigationMarkerPayload]]
+      @param type
+      @param category
+    */
   def apply(
     `type`: NavigationMarkerPayload_Type.type,
     category: NavigationMarkerPayload_Category.type,

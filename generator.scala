@@ -1,12 +1,16 @@
 //> using toolkit default
 //> using dep com.indoorvivants::rendition::0.0.4
 //
+import rendition.RenderingContext
 
 enum ExtraDef:
   case LiteralStr(name: String, value: String)
   case LiteralStrings(name: String, values: List[(String, String)])
   case LiteralNum(name: String, value: Double)
   case Other(hint: String)
+
+case class Record(name: String, comment: List[String])
+case class Field(name: String, comment: List[String])
 
 enum Type:
   case Optional(t: Type)
@@ -174,60 +178,91 @@ def parseType(str: String, name: String): Type =
   ).withDefaultValue(Set.empty)
 
   val extraDefs = List.newBuilder[ExtraDef]
-  allowed.foreach: (prof, list) =>
-    println(s"Processing $prof")
-    val lines = os.read.lines(os.pwd / os.RelPath(prof))
+  allowed.foreach:
+    (prof, list) =>
+      println(s"Processing $prof")
+      val lines = os.read.lines(os.pwd / os.RelPath(prof)).toArray
 
-    enum State:
-      case Start, CollectingFields
+      enum State:
+        case Start, CollectingFields
 
-    val m = collection.mutable.Map.empty[String, List[(String, Type)]]
+      val m = collection.mutable.Map.empty[Record, List[(Field, Type)]]
+      var state = State.Start
+      var recordName = ""
+      var recordComment = List.empty[String]
+      var fields = List.newBuilder[(Field, Type)]
 
-    var state = State.Start
-    var recordName = ""
-    var fields = List.newBuilder[(String, Type)]
+      def walkBackForDocComment(from: Int) =
+        val commentLines = List.newBuilder[String]
+        if from > 0 && lines(from).trim == "*/" then
+          var idx = from - 1
+          def continue = idx > 0 && lines(idx).trim != "/**"
+          while continue do
+            commentLines += lines(idx).trim.stripPrefix("* ")
+            idx -= 1
+          commentLines.result().reverse
+        else Nil
 
-    lines.foreach: line =>
-      (state, line.trim()) match
-        case (_, s"//$anything")                          =>
-        case (State.Start, s"export type $something = {") =>
-          state = State.CollectingFields
-          recordName = something.trim
+      def walkBackForLineComments(from: Int) =
+        val commentLines = List.newBuilder[String]
+        if from > 0 && lines(from).trim.startsWith("//") then
+          var idx = from
+          def continue = idx > 0 && lines(idx).trim.startsWith("//")
+          while continue do
+            commentLines += lines(idx).trim.stripPrefix("//").trim
+            idx -= 1
+          commentLines.result().reverse
+        else Nil
 
-        case (State.CollectingFields, "};") =>
-          state = State.Start
-          m.addOne(recordName -> fields.result())
-          recordName = ""
-          fields.clear()
+      lines.zipWithIndex.foreach: (line, index) =>
+        (state, line.trim()) match
+          case (_, s"//$anything")                          =>
+          case (State.Start, s"export type $something = {") =>
+            state = State.CollectingFields
+            recordName = something.trim
+            recordComment = walkBackForDocComment(index - 1)
 
-        case (State.CollectingFields, s"$name: $tpe;$anything") =>
-          // println(s"Analysing ${recordName}.$name")
-          def parsedType(name: String) =
-            parseType(tpe, s"${recordName}_${name.capitalize}")
+          case (State.CollectingFields, "};") =>
+            state = State.Start
+            m.addOne(Record(recordName, recordComment) -> fields.result())
+            recordName = ""
+            recordComment = Nil
+            fields.clear()
 
-          name match
-            case s"'$lit'?" =>
-              fields += s"$lit" -> Type.Optional(parsedType(lit))
-            case s"$value?" =>
-              if !forbiddenFields(recordName)(value) then
-                fields += value -> Type.Optional(parsedType(value))
-            case _ =>
-              if !forbiddenFields(recordName)(name) then
-                fields += name -> parsedType(name)
+          case (State.CollectingFields, s"$name: $tpe;$anything") =>
+            def parsedType(name: String) =
+              parseType(tpe, s"${recordName}_${name.capitalize}")
 
-        case other =>
+            val comments = walkBackForLineComments(index - 1)
 
-    list
-      .foreach: name =>
-        val (rend, extra) = render(name, m(name))
-        extraDefs ++= extra
-        os.write.over(
-          os.pwd / "generated" / s"$name.scala",
-          rend,
-          createFolders = true
-        )
+            name match
+              case s"'$lit'?" =>
+                fields += Field(s"$lit", comments) -> Type.Optional(
+                  parsedType(lit)
+                )
+              case s"$value?" =>
+                if !forbiddenFields(recordName)(value) then
+                  fields += Field(value, comments) -> Type.Optional(
+                    parsedType(value)
+                  )
+              case _ =>
+                if !forbiddenFields(recordName)(name) then
+                  fields += Field(name, comments) -> parsedType(name)
 
-    val remaining = m.keySet -- list
+          case other =>
+
+        val s = list.toSet
+
+        m.foreach: (record, fields) =>
+          if s.contains(record.name) then
+            val (rend, extra) = render(record, fields)
+            extraDefs ++= extra
+            os.write.over(
+              os.pwd / "generated" / s"${record.name}.scala",
+              rend,
+              createFolders = true
+            )
+      // val remaining = m.keySet -- list
   import rendition.*
   val strings = LineBuilder()
   strings.use:
@@ -269,13 +304,16 @@ def makeSetter(n: String) =
   if san.startsWith("`") then s"`with${san.stripPrefix("`")}"
   else s"with${n.capitalize}"
 
-def render(struct: String, params: List[(String, Type)]) =
+def render(struct: Record, params: List[(Field, Type)]) =
   import rendition.*
   val lb = LineBuilder()
 
+  val structName = struct.name
+  val structArgsName = struct.name + "Args"
+
   val (types, extra) =
     params.foldLeft(Map.empty[String, String] -> List.empty[ExtraDef]):
-      case (acc, (name, tpe)) =>
+      case (acc, (Field(name, _), tpe)) =>
         val rend = tpe.renderAsScala
         acc._1.updated(name, rend.tpe) -> (acc._2 ++ rend.extraDefs)
 
@@ -286,78 +324,105 @@ def render(struct: String, params: List[(String, Type)]) =
   lb.use:
     line("package fxprof")
     emptyLine()
+    if struct.comment.nonEmpty then
+      block("/**", "  */"):
+        struct.comment.foreach(l => line("* " + l))
     curlyBlock(
-      s"class $struct private (private[fxprof] val args: ${struct}Args)"
+      s"class ${structName} private (private[fxprof] val args: ${structArgsName})"
     ):
-      params.foreach: (name, tpe) =>
-        line(
-          s"def ${sanitiseFieldName(name)}: ${types(name)} = args.${sanitiseFieldName(name)}"
-        )
+      params.foreach:
+        case (Field(name, comments), tpe) =>
+          if comments.nonEmpty then
+            block("/** " + comments.head, "  */"):
+              comments.tail.foreach(l => line("* " + l))
+          line(
+            s"def ${sanitiseFieldName(name)}: ${types(name)} = args.${sanitiseFieldName(name)}"
+          )
+          emptyLine()
       emptyLine()
-      params.foreach: (name, tpe) =>
-        block(
-          s"def ${{ makeSetter(name) }}(value: ${types(name)}): $struct =",
-          ""
-        ):
-          line(s"copy(_.copy(${sanitiseFieldName(name)} = value))")
+      params.foreach:
+        case (Field(name, comments), tpe) =>
+          if comments.nonEmpty then
+            block("/** Setter for [[$name]] field", "  */"):
+              emptyLine()
+              comments.foreach(l => line("* " + l))
+          end if
+          block(
+            s"def ${{ makeSetter(name) }}(value: ${types(name)}): $structName =",
+            ""
+          ):
+            line(s"copy(_.copy(${sanitiseFieldName(name)} = value))")
 
       emptyLine()
-      block(s"private def copy(f: ${struct}Args => ${struct}Args) = ", ""):
-        line(s"new $struct(f(args))")
+      block(
+        s"private def copy(f: ${structArgsName} => ${structArgsName}) = ",
+        ""
+      ):
+        line(s"new $structName(f(args))")
 
     emptyLine()
 
     line("import com.github.plokhotnyuk.jsoniter_scala.macros._")
     line("import com.github.plokhotnyuk.jsoniter_scala.core._")
     emptyLine()
-    block(s"object $struct {", "}"):
-      // block("def apply(", s"): $struct = "):
+    block(s"object $structName {", "}"):
+      block(s"/** Construct a [[$structName]]", "  */"):
+        params.foreach:
+          case (Field(name, comments), tpe) =>
+            val hasDefault = defaultScalaValue(tpe).nonEmpty
+            if !hasDefault then
+              gutterBlock(s"  @param ${name}", comments)
+              // line(s"${sanitiseFieldName(name)}: ${types(name)},")
+
       line("def apply(")
       nest:
-        params.foreach: (name, tpe) =>
-          val hasDefault = defaultScalaValue(tpe).nonEmpty
-          if !hasDefault then
-            line(s"${sanitiseFieldName(name)}: ${types(name)},")
-      line(s"): $struct = ")
+        params.foreach:
+          case (Field(name, comments), tpe) =>
+            val hasDefault = defaultScalaValue(tpe).nonEmpty
+            if !hasDefault then
+              line(s"${sanitiseFieldName(name)}: ${types(name)},")
+      line(s"): $structName = ")
       nest:
-        block(s"new $struct(${struct}Args(", "))"):
-          params.foreach: (name, tpe) =>
-            defaultScalaValue(tpe) match
-              case None =>
-                line(
-                  s"${sanitiseFieldName(name)} = ${sanitiseFieldName(name)},"
-                )
-              case Some(value) =>
-                line(
-                  s"${sanitiseFieldName(name)} = ${value},"
-                )
+        block(s"new $structName(${structArgsName}(", "))"):
+          params.foreach:
+            case (Field(name, comments), tpe) =>
+              defaultScalaValue(tpe) match
+                case None =>
+                  line(
+                    s"${sanitiseFieldName(name)} = ${sanitiseFieldName(name)},"
+                  )
+                case Some(value) =>
+                  line(
+                    s"${sanitiseFieldName(name)} = ${value},"
+                  )
 
-      block(s"given JsonValueCodec[$struct] = ", ""):
+      block(s"given JsonValueCodec[$structName] = ", ""):
         block("new JsonValueCodec {", "}"):
           block(
-            s"def decodeValue(in: JsonReader, default: $struct) = ",
+            s"def decodeValue(in: JsonReader, default: $structName) = ",
             ""
           ):
             line(
-              s"new $struct(summon[JsonValueCodec[${struct}Args]].decodeValue(in, default.args))"
+              s"new $structName(summon[JsonValueCodec[${structArgsName}]].decodeValue(in, default.args))"
             )
 
           block(
-            s"def encodeValue(x: $struct, out: JsonWriter) = ",
+            s"def encodeValue(x: $structName, out: JsonWriter) = ",
             ""
           ):
             line(
-              s"summon[JsonValueCodec[${struct}Args]].encodeValue(x.args, out)"
+              s"summon[JsonValueCodec[${structArgsName}]].encodeValue(x.args, out)"
             )
 
-          line(s"def nullValue: $struct = null")
+          line(s"def nullValue: $structName = null")
 
-    block(s"private[fxprof] case class ${struct}Args(", ")"):
-      params.map: (name, tpe) =>
-        line(s"${sanitiseFieldName(name)}: ${types(name)},")
+    block(s"private[fxprof] case class ${structArgsName}(", ")"):
+      params.foreach:
+        case (Field(name, comments), tpe) =>
+          line(s"${sanitiseFieldName(name)}: ${types(name)},")
 
-    block(s"private[fxprof] object ${struct}Args {", "}"):
-      line(s"given JsonValueCodec[${struct}Args] = JsonCodecMaker.make")
+    block(s"private[fxprof] object ${structArgsName} {", "}"):
+      line(s"given JsonValueCodec[${structArgsName}] = JsonCodecMaker.make")
 
     lb.result -> extra
 
@@ -366,3 +431,13 @@ def defaultScalaValue(tpe: Type) =
     case Type.Optional(t) => Some("None")
     case Type.ArrayOf(t)  => Some("Vector.empty")
     case _                => None
+
+def gutterBlock(gutter: String, lines: List[String])(using RenderingContext) =
+  import rendition.*
+  lines match
+    case head :: next =>
+      val gutterLength = gutter.length
+      line(gutter + head)
+      next.foreach: l =>
+        line(" " * gutterLength + l)
+    case Nil => line(gutter)

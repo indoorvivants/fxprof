@@ -1,12 +1,25 @@
 package fxprof
 
+/**
+  * Gecko Profiler records profiler overhead samples of specific tasks that take time.
+  * counters: Time spent during collecting counter samples.
+  * expiredMarkerCleaning: Time spent during expired marker cleanup
+  * lockings: Time spent during acquiring locks.
+  * threads: Time spent during threads sampling and marker collection.
+  */
 class ProfilerOverheadSamplesTable private (private[fxprof] val args: ProfilerOverheadSamplesTableArgs) {
   def counters: Vector[Microseconds] = args.counters
+
   def expiredMarkerCleaning: Vector[Microseconds] = args.expiredMarkerCleaning
+
   def locking: Vector[Microseconds] = args.locking
+
   def threads: Vector[Microseconds] = args.threads
+
   def time: Vector[Milliseconds] = args.time
+
   def length: Double = args.length
+
 
   def withCounters(value: Vector[Microseconds]): ProfilerOverheadSamplesTable =
     copy(_.copy(counters = value))
@@ -36,6 +49,9 @@ import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object ProfilerOverheadSamplesTable {
+  /** Construct a [[ProfilerOverheadSamplesTable]]
+      @param length
+    */
   def apply(
     length: Double,
   ): ProfilerOverheadSamplesTable = 

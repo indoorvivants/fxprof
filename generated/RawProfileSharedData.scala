@@ -1,47 +1,78 @@
 package fxprof
 
-class RawProfileSharedData private (private[fxprof] val args: RawProfileSharedDataArgs) {
+class RawProfileSharedData private (
+    private[fxprof] val args: RawProfileSharedDataArgs
+) {
+
+  /** Strings for profiles are collected into a single table, and are referred
+    * to by their index by other tables.
+    */
   def stringArray: Vector[String] = args.stringArray
+
+  /** Optional sources table for JS source UUID to URL mapping. Added for
+    * UUID-based source fetching.
+    */
   def sources: SourceTable = args.sources
 
+  /** Setter for [[$name]] field
+    *
+    * Strings for profiles are collected into a single table, and are referred
+    * to by their index by other tables.
+    */
   def withStringArray(value: Vector[String]): RawProfileSharedData =
     copy(_.copy(stringArray = value))
-  
+
+  /** Setter for [[$name]] field
+    *
+    * Optional sources table for JS source UUID to URL mapping. Added for
+    * UUID-based source fetching.
+    */
   def withSources(value: SourceTable): RawProfileSharedData =
     copy(_.copy(sources = value))
-  
 
-  private def copy(f: RawProfileSharedDataArgs => RawProfileSharedDataArgs) = 
+  private def copy(f: RawProfileSharedDataArgs => RawProfileSharedDataArgs) =
     new RawProfileSharedData(f(args))
-  
+
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object RawProfileSharedData {
+
+  /** Construct a [[RawProfileSharedData]]
+    * @param sourcesOptional
+    *   sources table for JS source UUID to URL mapping. Added for UUID-based
+    *   source fetching.
+    */
   def apply(
-    sources: SourceTable,
-  ): RawProfileSharedData = 
-    new RawProfileSharedData(RawProfileSharedDataArgs(
-      stringArray = Vector.empty,
-      sources = sources,
-    ))
-  given JsonValueCodec[RawProfileSharedData] = 
+      sources: SourceTable
+  ): RawProfileSharedData =
+    new RawProfileSharedData(
+      RawProfileSharedDataArgs(
+        stringArray = Vector.empty,
+        sources = sources
+      )
+    )
+  given JsonValueCodec[RawProfileSharedData] =
     new JsonValueCodec {
-      def decodeValue(in: JsonReader, default: RawProfileSharedData) = 
-        new RawProfileSharedData(summon[JsonValueCodec[RawProfileSharedDataArgs]].decodeValue(in, default.args))
-      
-      def encodeValue(x: RawProfileSharedData, out: JsonWriter) = 
-        summon[JsonValueCodec[RawProfileSharedDataArgs]].encodeValue(x.args, out)
-      
+      def decodeValue(in: JsonReader, default: RawProfileSharedData) =
+        new RawProfileSharedData(
+          summon[JsonValueCodec[RawProfileSharedDataArgs]]
+            .decodeValue(in, default.args)
+        )
+
+      def encodeValue(x: RawProfileSharedData, out: JsonWriter) =
+        summon[JsonValueCodec[RawProfileSharedDataArgs]]
+          .encodeValue(x.args, out)
+
       def nullValue: RawProfileSharedData = null
     }
-  
+
 }
 private[fxprof] case class RawProfileSharedDataArgs(
-  stringArray: Vector[String],
-  sources: SourceTable,
+    stringArray: Vector[String],
+    sources: SourceTable
 )
 private[fxprof] object RawProfileSharedDataArgs {
   given JsonValueCodec[RawProfileSharedDataArgs] = JsonCodecMaker.make
