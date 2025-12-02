@@ -1,6 +1,7 @@
 //> using toolkit default
+//> using scala 3.7
 //> using dep com.indoorvivants::rendition::0.0.4
-//
+
 import rendition.RenderingContext
 
 enum ExtraDef:
@@ -103,7 +104,8 @@ def parseType(str: String, name: String): Type =
     case s"$something<$tpe>"                                   =>
       Type.GenericRef(something, tpe)
 
-@main def run =
+@main def run(outDir: String) =
+  val outDir = os.Path(outDir, os.pwd)
   val allowed = Map(
     "firefox-profiler/src/types/markers.ts" ->
       List(
@@ -267,7 +269,7 @@ def parseType(str: String, name: String): Type =
             val (rend, extra) = render(record, fields)
             extraDefs ++= extra
             os.write.over(
-              os.pwd / "generated" / s"${record.name}.scala",
+              outDir / s"${record.name}.scala",
               rend,
               createFolders = true
             )
@@ -298,7 +300,7 @@ def parseType(str: String, name: String): Type =
           emptyLine()
 
   os.write.over(
-    os.pwd / "generated" / "strings.scala",
+    outDir / "strings.scala",
     strings.result,
     createFolders = true
   )

@@ -50,11 +50,25 @@ package object fxprof {
   type TabID = Double;
   type InnerWindowID = Double;
 
-  sealed trait WeightType extends Product with Serializable
+  sealed abstract class WeightType(value: String)
+      extends StringLiteral(value)
+      with Product
+      with Serializable
   object WeightType {
-    case object Samples extends WeightType
-    case object TracingMS extends WeightType
-    case object Bytes extends WeightType
+    case object Samples extends WeightType("samples")
+    case object TracingMS extends WeightType("tracing-ms")
+    case object Bytes extends WeightType("bytes")
+
+    given JsonValueCodec[WeightType] = new JsonValueCodec[WeightType] {
+      override def encodeValue(x: WeightType, out: JsonWriter): Unit =
+        out.writeVal(x.value)
+
+      override def decodeValue(
+          in: JsonReader,
+          default: WeightType
+      ): WeightType = ???
+      override def nullValue: WeightType = ???
+    }
   }
 
   sealed trait GraphColor extends Product with Serializable
@@ -168,11 +182,25 @@ package object fxprof {
   type CategoryList = Array[Category]
 
   sealed abstract class ProfileMeta_Product(value: String)
-      extends Product
+      extends StringLiteral(value)
+      with Product
       with Serializable
   object ProfileMeta_Product {
     case object Firefox extends ProfileMeta_Product("firefox")
-    case class Other(value: String) extends ProfileMeta_Product(value)
+    case class Other(v: String) extends ProfileMeta_Product(v)
+
+    given JsonValueCodec[ProfileMeta_Product] =
+      new JsonValueCodec[ProfileMeta_Product] {
+        def decodeValue(
+            in: JsonReader,
+            default: ProfileMeta_Product
+        ): ProfileMeta_Product = ???
+
+        def encodeValue(x: ProfileMeta_Product, out: JsonWriter): Unit =
+          out.writeVal(x.value)
+
+        override def nullValue: ProfileMeta_Product = null
+      }
   }
 
   sealed abstract class ProfileMeta_Stackwalk(value: Int)
@@ -210,6 +238,25 @@ package object fxprof {
     case object None extends FuncTable_Resource(-1)
     case class Table(address: IndexIntoResourceTable)
         extends FuncTable_Resource(address)
+
+    given JsonValueCodec[FuncTable_Resource] =
+      new JsonValueCodec[FuncTable_Resource] {
+        override def encodeValue(x: FuncTable_Resource, out: JsonWriter): Unit =
+          x match
+            case None           => out.writeVal(-1)
+            case Table(address) => out.writeVal(address)
+
+        override def decodeValue(
+            in: JsonReader,
+            default: FuncTable_Resource
+        ): FuncTable_Resource =
+          in.readInt() match
+            case -1      => None
+            case address => Table(address)
+
+        override def nullValue: FuncTable_Resource = ???
+      }
+
   }
 
   // export type NetworkHttpVersion = 'h3' | 'h2' | 'http/1.1' | 'http/1.0';

@@ -1,6 +1,9 @@
+//> using toolkit default
+//> using dep com.indoorvivants::decline-derive::0.3.2
 import fxprof.*
 import com.github.plokhotnyuk.jsoniter_scala.core._
 import java.time.Instant
+import decline_derive.CommandApplication
 
 val profile = Profile(
   meta = ProfileMeta(
@@ -19,7 +22,7 @@ val profile = Profile(
     )
   ),
   shared = RawProfileSharedData(SourceTable(0)).withStringArray(
-    Vector("hello", "hello-func")
+    Vector("hello", "hello-func", "hello-native-symbol")
   )
 ).withThreads(
   Vector(
@@ -31,9 +34,9 @@ val profile = Profile(
       isMainThread = true,
       pid = "1",
       tid = Tid.Str("thread-1"),
-      samples = RawSamplesTable(WeightType.Samples, 0)
+      samples = RawSamplesTable(WeightType.Samples, 1)
         .withStack(Vector(Some(0)))
-        .withTime(Some(Vector(5))),
+        .withTime(Some(Vector(500))),
       markers = RawMarkerTable(1)
         .withStartTime(Vector(Some(Instant.now().toEpochMilli() - 400)))
         .withEndTime(Vector(Some(Instant.now().toEpochMilli())))
@@ -56,7 +59,7 @@ val profile = Profile(
       stackTable =
         RawStackTable(1).withFrame(Vector(0)).withPrefix(Vector(None)),
       frameTable = FrameTable(1)
-        .withCategory(Vector(None))
+        .withCategory(Vector(Some(0)))
         .withSubcategory(Vector(None))
         .withFunc(Vector(0))
         .withNativeSymbol(Vector(Some(0)))
@@ -70,14 +73,17 @@ val profile = Profile(
         .withSource(Vector(None))
         .withLineNumber(Vector(None))
         .withColumnNumber(Vector(None)),
-      resourceTable = ResourceTable(0),
-      nativeSymbols = NativeSymbolTable(1).withName(Vector(1))
+      resourceTable = ResourceTable(1).withtype(Vector(1)).withName(Vector(1)),
+      nativeSymbols = NativeSymbolTable(1).withName(Vector(2))
     )
   )
 )
 
-@main def sampleGenerate(out: String) =
-  val path = os.Path(out, os.pwd)
+case class Config(out: String) derives CommandApplication
+
+@main def sampleGenerate(args: String*) =
+  val config = CommandApplication.parseOrExit[Config](args)
+  val path = os.Path(config.out, os.pwd)
   val json = writeToString(profile, WriterConfig.withIndentionStep(2))
   println(json)
   os.write.over(path, json)
