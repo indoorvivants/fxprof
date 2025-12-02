@@ -133,7 +133,11 @@ def parseType(str: String, name: String): Type =
         "BrowsertimeMarkerPayload",
         "NoPayloadUserData",
         "UrlMarkerPayload",
-        "HostResolverPayload"
+        "HostResolverPayload",
+        "MarkerSchema",
+        "MarkerGraph",
+        "MarkerSchemaField",
+        "TableColumnFormat"
       ),
     "firefox-profiler/src/types/profile.ts" ->
       List(
@@ -172,7 +176,7 @@ def parseType(str: String, name: String): Type =
 
   val forbiddenFields = Map(
     "RawThread" -> Set("nativeAllocations"),
-    "ProfileMeta" -> Set("markerSchema", "sampleUnits", "extra"),
+    "ProfileMeta" -> Set("sampleUnits", "extra"),
     // these use `string | void`, no idea what they mean
     "IPCMarkerPayload" -> Set("sendThreadName", "recvThreadName")
   ).withDefaultValue(Set.empty)
@@ -218,6 +222,11 @@ def parseType(str: String, name: String): Type =
         (state, line.trim()) match
           case (_, s"//$anything")                          =>
           case (State.Start, s"export type $something = {") =>
+            state = State.CollectingFields
+            recordName = something.trim
+            recordComment = walkBackForDocComment(index - 1)
+
+          case (State.Start, s"type $something = {") =>
             state = State.CollectingFields
             recordName = something.trim
             recordComment = walkBackForDocComment(index - 1)
@@ -343,7 +352,7 @@ def render(struct: Record, params: List[(Field, Type)]) =
       params.foreach:
         case (Field(name, comments), tpe) =>
           if comments.nonEmpty then
-            block("/** Setter for [[$name]] field", "  */"):
+            block(s"/** Setter for [[$name]] field", "  */"):
               emptyLine()
               comments.foreach(l => line("* " + l))
           end if
@@ -370,9 +379,7 @@ def render(struct: Record, params: List[(Field, Type)]) =
         params.foreach:
           case (Field(name, comments), tpe) =>
             val hasDefault = defaultScalaValue(tpe).nonEmpty
-            if !hasDefault then
-              gutterBlock(s"  @param ${name}", comments)
-              // line(s"${sanitiseFieldName(name)}: ${types(name)},")
+            if !hasDefault then gutterBlock(s"  @param ${name}", comments)
 
       line("def apply(")
       nest:

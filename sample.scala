@@ -11,8 +11,16 @@ val profile = Profile(
     stackwalk = ProfileMeta_Stackwalk.False,
     version = 1.0,
     preprocessedProfileVersion = 58
+  ).withMarkerSchema(
+    Vector(
+      MarkerSchema("test-marker").withDisplay(
+        Vector(MarkerDisplayLocation.MarkerChart)
+      )
+    )
   ),
-  shared = RawProfileSharedData(SourceTable(1)).withStringArray(Vector("hello"))
+  shared = RawProfileSharedData(SourceTable(0)).withStringArray(
+    Vector("hello", "hello-func")
+  )
 ).withThreads(
   Vector(
     fxprof.RawThread(
@@ -23,11 +31,14 @@ val profile = Profile(
       isMainThread = true,
       pid = "1",
       tid = Tid.Str("thread-1"),
-      samples = RawSamplesTable(WeightType.Samples, 0),
+      samples = RawSamplesTable(WeightType.Samples, 0)
+        .withStack(Vector(Some(0)))
+        .withTime(Some(Vector(5))),
       markers = RawMarkerTable(1)
         .withStartTime(Vector(Some(Instant.now().toEpochMilli() - 400)))
         .withEndTime(Vector(Some(Instant.now().toEpochMilli())))
         .withPhase(Vector(MarkerPhase.Instant))
+        .withCategory(Vector(0))
         .withData(
           Vector(
             Some(
@@ -42,11 +53,25 @@ val profile = Profile(
           )
         )
         .withName(Vector(0)),
-      stackTable = RawStackTable(0),
-      frameTable = FrameTable(0.0),
-      funcTable = FuncTable(0),
+      stackTable =
+        RawStackTable(1).withFrame(Vector(0)).withPrefix(Vector(None)),
+      frameTable = FrameTable(1)
+        .withCategory(Vector(None))
+        .withSubcategory(Vector(None))
+        .withFunc(Vector(0))
+        .withNativeSymbol(Vector(Some(0)))
+        .withInlineDepth(Vector(0))
+        .withInnerWindowID(Vector(None)),
+      funcTable = FuncTable(1)
+        .withName(Vector(1))
+        .withIsJS(Vector(false))
+        .withRelevantForJS(Vector(false))
+        .withResource(Vector(FuncTable_Resource.None))
+        .withSource(Vector(None))
+        .withLineNumber(Vector(None))
+        .withColumnNumber(Vector(None)),
       resourceTable = ResourceTable(0),
-      nativeSymbols = NativeSymbolTable(0)
+      nativeSymbols = NativeSymbolTable(1).withName(Vector(1))
     )
   )
 )

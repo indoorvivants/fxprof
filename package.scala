@@ -223,7 +223,8 @@ package object fxprof {
   // export type NetworkRedirectType = 'Permanent' | 'Temporary' | 'Internal';
 
   sealed abstract class NetworkStatus(value: String)
-      extends Product
+      extends StringLiteral(value)
+      with Product
       with Serializable
   object NetworkStatus {
     case object Start extends NetworkStatus("STATUS_START")
@@ -233,7 +234,8 @@ package object fxprof {
   }
 
   sealed abstract class NetworkRedirectType(value: String)
-      extends Product
+      extends StringLiteral(value)
+      with Product
       with Serializable
   object NetworkRedirectType {
     case object Permanent extends NetworkRedirectType("Permanent")
@@ -242,13 +244,109 @@ package object fxprof {
   }
 
   sealed abstract class NetworkHttpVersion(value: String)
-      extends Product
+      extends StringLiteral(value)
+      with Product
       with Serializable
   object NetworkHttpVersion {
     case object H3 extends NetworkHttpVersion("h3")
     case object H2 extends NetworkHttpVersion("h2")
     case object Http11 extends NetworkHttpVersion("http/1.1")
     case object Http10 extends NetworkHttpVersion("http/1.0")
+  }
+
+  sealed abstract class MarkerDisplayLocation(value: String)
+      extends StringLiteral(value)
+      with Product
+      with Serializable
+  object MarkerDisplayLocation {
+    case object MarkerChart extends MarkerDisplayLocation("marker-chart")
+    case object MarkerTable extends MarkerDisplayLocation("marker-table")
+    case object TimelineOverview
+        extends MarkerDisplayLocation("timeline-overview")
+    case object TimelineIPC extends MarkerDisplayLocation("timeline-ipc")
+    case object TimelineFileIO extends MarkerDisplayLocation("timeline-fileio")
+    case object StackChart extends MarkerDisplayLocation("stack-chart")
+  }
+
+  sealed abstract class MarkerGraphType(value: String)
+      extends StringLiteral(value)
+      with Product
+      with Serializable
+  object MarkerGraphType {
+    case object Bar extends MarkerGraphType("bar")
+    case object Line extends MarkerGraphType("line")
+    case object LineFilled extends MarkerGraphType("line-filled")
+  }
+
+  /**  export type MarkerFormatType =
+    *    // ----------------------------------------------------
+    *    // String types.
+    *
+    *    // Show the URL, and handle PII sanitization
+    *    | 'url'
+    *    // Show the file path, and handle PII sanitization.
+    *    | 'file-path'
+    *    // Show regular string, and handle PII sanitization.
+    *    | 'sanitized-string'
+    *    // Important, do not put URL or file path information here, as it will not be
+    *    // sanitized. Please be careful with including other types of PII here as well.
+    *    // e.g. "Label: Some String"
+    *    | 'string'
+    *    /// An index into a (currently) thread-local string table, aka StringTable
+    *    /// This is effectively an integer, so wherever we need to display this value, we
+    *    /// must first perform a lookup into the appropriate string table.
+    *    | 'unique-string'
+    *
+    *    // ----------------------------------------------------
+    *    // Flow types.
+    *    // A flow ID is a u64 identifier that's unique across processes. In the current
+    *    // implementation, we represent them as hex strings, as string table indexes.
+    *    // A terminating flow ID is a flow ID that, when used in a marker with timestamp T,
+    *    // makes it so that if the same flow ID is used in a marker whose timestamp is
+    *    // after T, that flow ID is considered to refer to a different flow.
+    *    | 'flow-id'
+    *    | 'terminating-flow-id'
+    */
+
+  sealed trait MarkerFormatType extends Product with Serializable
+  object MarkerFormatType {
+    case class Str(value: MarkerFormatTypeString) extends MarkerFormatType
+    // case class Table(
+    //     `type`: MarkerFormatType
+    //     // columns: Vector[TableColumnFormat] // TODO: fix this
+    // ) extends MarkerFormatType
+
+  }
+
+  sealed abstract class MarkerFormatTypeString(value: String)
+      extends StringLiteral(value)
+      with Product
+      with Serializable
+  object MarkerFormatTypeString {
+    case object FlowId extends MarkerFormatTypeString("flow-id")
+    case object TerminatingFlowId
+        extends MarkerFormatTypeString("terminating-flow-id")
+    case object Url extends MarkerFormatTypeString("url")
+    case object FilePath extends MarkerFormatTypeString("file-path")
+    case object SanitizedString
+        extends MarkerFormatTypeString("sanitized-string")
+    case object String extends MarkerFormatTypeString("string")
+    case object UniqueString extends MarkerFormatTypeString("unique-string")
+    case object Duration extends MarkerFormatTypeString("duration")
+    case object Time extends MarkerFormatTypeString("time")
+    case object Seconds extends MarkerFormatTypeString("seconds")
+    case object Milliseconds extends MarkerFormatTypeString("milliseconds")
+    case object Microseconds extends MarkerFormatTypeString("microseconds")
+    case object Nanoseconds extends MarkerFormatTypeString("nanoseconds")
+
+    case object Bytes extends MarkerFormatTypeString("bytes")
+    case object Percentage extends MarkerFormatTypeString("percentage")
+    case object Integer extends MarkerFormatTypeString("integer")
+    case object Decimal extends MarkerFormatTypeString("decimal")
+    case object Pid extends MarkerFormatTypeString("pid")
+    case object Tid extends MarkerFormatTypeString("tid")
+    case object List extends MarkerFormatTypeString("list")
+
   }
 
   sealed trait MarkerPayload extends Product with Serializable
@@ -291,6 +389,7 @@ package object fxprof {
 
       override def encodeValue(x: MarkerPayload, out: JsonWriter): Unit =
         x match {
+          // TODO: add all cases
           case UserTiming(payload) =>
             summon[JsonValueCodec[UserTimingMarkerPayload]]
               .encodeValue(payload, out)
@@ -305,6 +404,20 @@ package object fxprof {
 
   }
 
-  class StringLiteral(value: String)
+  class StringLiteral(val value: String)
+  object StringLiteral {
+    given JsonValueCodec[StringLiteral] =
+      new JsonValueCodec[StringLiteral] {
+        override def encodeValue(x: StringLiteral, out: JsonWriter): Unit =
+          out.writeVal(x.value)
+
+        override def decodeValue(
+            in: JsonReader,
+            default: StringLiteral
+        ): StringLiteral = new StringLiteral(in.readString(default.value))
+
+        override def nullValue: StringLiteral = null
+      }
+  }
 
 }
