@@ -104,8 +104,8 @@ def parseType(str: String, name: String): Type =
     case s"$something<$tpe>"                                   =>
       Type.GenericRef(something, tpe)
 
-@main def run(outDir: String) =
-  val outDir = os.Path(outDir, os.pwd)
+@main def run(out: String) =
+  val outDir = os.Path(out, os.pwd)
   val allowed = Map(
     "firefox-profiler/src/types/markers.ts" ->
       List(
@@ -431,7 +431,10 @@ def render(struct: Record, params: List[(Field, Type)]) =
           line(s"${sanitiseFieldName(name)}: ${types(name)},")
 
     block(s"private[fxprof] object ${structArgsName} {", "}"):
-      line(s"given JsonValueCodec[${structArgsName}] = JsonCodecMaker.make")
+      block(s"given ConfiguredJsonValueCodec[${structArgsName}] = ", ""):
+        line(
+          "ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))"
+        )
 
     lb.result -> extra
 

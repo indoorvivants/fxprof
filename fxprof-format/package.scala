@@ -71,37 +71,66 @@ package object fxprof {
     }
   }
 
-  sealed trait GraphColor extends Product with Serializable
+  sealed abstract class GraphColor(value: String)
+      extends StringLiteral(value)
+      with Product
+      with Serializable
   object GraphColor {
-    case object Blue extends GraphColor
-    case object Green extends GraphColor
-    case object Grey extends GraphColor
-    case object Ink extends GraphColor
-    case object Magenta extends GraphColor
-    case object Orange extends GraphColor
-    case object Purple extends GraphColor
-    case object Red extends GraphColor
-    case object Teal extends GraphColor
-    case object Yellow extends GraphColor
+    case object Blue extends GraphColor("blue")
+    case object Green extends GraphColor("green")
+    case object Grey extends GraphColor("grey")
+    case object Ink extends GraphColor("ink")
+    case object Magenta extends GraphColor("magenta")
+    case object Orange extends GraphColor("orange")
+    case object Purple extends GraphColor("purple")
+    case object Red extends GraphColor("red")
+    case object Teal extends GraphColor("teal")
+    case object Yellow extends GraphColor("yellow")
+
+    given JsonValueCodec[GraphColor] = new JsonValueCodec[GraphColor] {
+      override def encodeValue(x: GraphColor, out: JsonWriter): Unit =
+        out.writeVal(x.value)
+
+      override def decodeValue(
+          in: JsonReader,
+          default: GraphColor
+      ): GraphColor = ???
+
+      override def nullValue: GraphColor = ???
+    }
 
   }
 
-  sealed trait CategoryColor extends Product with Serializable
+  sealed abstract class CategoryColor(value: String)
+      extends StringLiteral(value)
+      with Product
+      with Serializable
   object CategoryColor {
-    case object Transparent extends CategoryColor
-    case object Purple extends CategoryColor
-    case object Green extends CategoryColor
-    case object Orange extends CategoryColor
-    case object Yellow extends CategoryColor
-    case object LightBlue extends CategoryColor
-    case object Blue extends CategoryColor
-    case object Brown extends CategoryColor
-    case object Magenta extends CategoryColor
-    case object Red extends CategoryColor
-    case object LightRed extends CategoryColor
-    case object DarkGrey extends CategoryColor
-    case object Grey extends CategoryColor
+    case object Transparent extends CategoryColor("transparent")
+    case object Purple extends CategoryColor("purple")
+    case object Green extends CategoryColor("")
+    case object Orange extends CategoryColor("orange")
+    case object Yellow extends CategoryColor("yellow")
+    case object LightBlue extends CategoryColor("lightblue")
+    case object Blue extends CategoryColor("blue")
+    case object Brown extends CategoryColor("brown")
+    case object Magenta extends CategoryColor("magenta")
+    case object Red extends CategoryColor("red")
+    case object LightRed extends CategoryColor("lightred")
+    case object DarkGrey extends CategoryColor("darkgrey")
+    case object Grey extends CategoryColor("grey")
+
+    given JsonValueCodec[CategoryColor] = new JsonValueCodec {
+      override def encodeValue(x: CategoryColor, out: JsonWriter): Unit =
+        out.writeVal(x.value)
+      override def decodeValue(
+          in: JsonReader,
+          default: CategoryColor
+      ): CategoryColor = ???
+      override def nullValue: CategoryColor = ???
+    }
   }
+
   sealed abstract class MarkerPhase(val value: Int)
       extends Product
       with Serializable
@@ -178,8 +207,8 @@ package object fxprof {
       }
   }
 
-  type PageList = Array[Page]
-  type CategoryList = Array[Category]
+  type PageList = Vector[Page]
+  type CategoryList = Vector[Category]
 
   sealed abstract class ProfileMeta_Product(value: String)
       extends StringLiteral(value)
@@ -203,12 +232,28 @@ package object fxprof {
       }
   }
 
-  sealed abstract class ProfileMeta_Stackwalk(value: Int)
+  sealed abstract class ProfileMeta_Stackwalk(val value: Int)
       extends Product
       with Serializable
   object ProfileMeta_Stackwalk {
     case object True extends ProfileMeta_Stackwalk(1)
     case object False extends ProfileMeta_Stackwalk(0)
+
+    given JsonValueCodec[ProfileMeta_Stackwalk] = new JsonValueCodec {
+
+      override def encodeValue(
+          x: ProfileMeta_Stackwalk,
+          out: JsonWriter
+      ): Unit =
+        out.writeVal(x.value)
+
+      override def decodeValue(
+          in: JsonReader,
+          default: ProfileMeta_Stackwalk
+      ): ProfileMeta_Stackwalk = ???
+
+      override def nullValue: ProfileMeta_Stackwalk = ???
+    }
   }
 
   // sealed abstract class ProfileMeta_Toolkit(value: String)
@@ -301,6 +346,14 @@ package object fxprof {
     case object Http10 extends NetworkHttpVersion("http/1.0")
   }
 
+  def stringLiteralCodec[T <: StringLiteral] =
+    new JsonValueCodec[T] {
+      override def decodeValue(in: JsonReader, default: T): T = ???
+      override def encodeValue(x: T, out: JsonWriter): Unit =
+        out.writeVal(x.value)
+      override def nullValue: T = ???
+    }
+
   sealed abstract class MarkerDisplayLocation(value: String)
       extends StringLiteral(value)
       with Product
@@ -313,6 +366,9 @@ package object fxprof {
     case object TimelineIPC extends MarkerDisplayLocation("timeline-ipc")
     case object TimelineFileIO extends MarkerDisplayLocation("timeline-fileio")
     case object StackChart extends MarkerDisplayLocation("stack-chart")
+
+    given JsonValueCodec[MarkerDisplayLocation] =
+      stringLiteralCodec[MarkerDisplayLocation]
   }
 
   sealed abstract class MarkerGraphType(value: String)

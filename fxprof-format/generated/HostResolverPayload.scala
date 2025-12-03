@@ -1,8 +1,6 @@
 package fxprof
 
-class HostResolverPayload private (
-    private[fxprof] val args: HostResolverPayloadArgs
-) {
+class HostResolverPayload private (private[fxprof] val args: HostResolverPayloadArgs) {
   def `type`: HostResolverPayload_Type.type = args.`type`
 
   def host: String = args.host
@@ -11,69 +9,67 @@ class HostResolverPayload private (
 
   def flags: String = args.flags
 
+
   def `withtype`(value: HostResolverPayload_Type.type): HostResolverPayload =
     copy(_.copy(`type` = value))
-
+  
   def withHost(value: String): HostResolverPayload =
     copy(_.copy(host = value))
-
+  
   def withOriginSuffix(value: String): HostResolverPayload =
     copy(_.copy(originSuffix = value))
-
+  
   def withFlags(value: String): HostResolverPayload =
     copy(_.copy(flags = value))
+  
 
-  private def copy(f: HostResolverPayloadArgs => HostResolverPayloadArgs) =
+  private def copy(f: HostResolverPayloadArgs => HostResolverPayloadArgs) = 
     new HostResolverPayload(f(args))
-
+  
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
 
 object HostResolverPayload {
-
   /** Construct a [[HostResolverPayload]]
-    * @param type
-    * @param host
-    * @param originSuffix
-    * @param flags
+      @param type
+      @param host
+      @param originSuffix
+      @param flags
     */
   def apply(
-      `type`: HostResolverPayload_Type.type,
-      host: String,
-      originSuffix: String,
-      flags: String
-  ): HostResolverPayload =
-    new HostResolverPayload(
-      HostResolverPayloadArgs(
-        `type` = `type`,
-        host = host,
-        originSuffix = originSuffix,
-        flags = flags
-      )
-    )
-  given JsonValueCodec[HostResolverPayload] =
-    new JsonValueCodec {
-      def decodeValue(in: JsonReader, default: HostResolverPayload) =
-        new HostResolverPayload(
-          summon[JsonValueCodec[HostResolverPayloadArgs]]
-            .decodeValue(in, default.args)
-        )
-
-      def encodeValue(x: HostResolverPayload, out: JsonWriter) =
-        summon[JsonValueCodec[HostResolverPayloadArgs]].encodeValue(x.args, out)
-
-      def nullValue: HostResolverPayload = null
-    }
-
-}
-private[fxprof] case class HostResolverPayloadArgs(
     `type`: HostResolverPayload_Type.type,
     host: String,
     originSuffix: String,
-    flags: String
+    flags: String,
+  ): HostResolverPayload = 
+    new HostResolverPayload(HostResolverPayloadArgs(
+      `type` = `type`,
+      host = host,
+      originSuffix = originSuffix,
+      flags = flags,
+    ))
+  given JsonValueCodec[HostResolverPayload] = 
+    new JsonValueCodec {
+      def decodeValue(in: JsonReader, default: HostResolverPayload) = 
+        new HostResolverPayload(summon[JsonValueCodec[HostResolverPayloadArgs]].decodeValue(in, default.args))
+      
+      def encodeValue(x: HostResolverPayload, out: JsonWriter) = 
+        summon[JsonValueCodec[HostResolverPayloadArgs]].encodeValue(x.args, out)
+      
+      def nullValue: HostResolverPayload = null
+    }
+  
+}
+private[fxprof] case class HostResolverPayloadArgs(
+  `type`: HostResolverPayload_Type.type,
+  host: String,
+  originSuffix: String,
+  flags: String,
 )
 private[fxprof] object HostResolverPayloadArgs {
-  given JsonValueCodec[HostResolverPayloadArgs] = JsonCodecMaker.make
+  given ConfiguredJsonValueCodec[HostResolverPayloadArgs] = 
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+  
 }
