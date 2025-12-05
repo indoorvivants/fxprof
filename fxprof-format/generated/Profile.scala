@@ -122,6 +122,6 @@ private[fxprof] case class ProfileArgs(
 )
 private[fxprof] object ProfileArgs {
   given ConfiguredJsonValueCodec[ProfileArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

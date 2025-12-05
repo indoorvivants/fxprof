@@ -175,6 +175,6 @@ private[fxprof] case class RawSamplesTableArgs(
 )
 private[fxprof] object RawSamplesTableArgs {
   given ConfiguredJsonValueCodec[RawSamplesTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

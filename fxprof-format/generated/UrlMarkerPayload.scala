@@ -52,6 +52,6 @@ private[fxprof] case class UrlMarkerPayloadArgs(
 )
 private[fxprof] object UrlMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[UrlMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

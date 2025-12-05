@@ -254,6 +254,6 @@ private[fxprof] case class FrameTableArgs(
 )
 private[fxprof] object FrameTableArgs {
   given ConfiguredJsonValueCodec[FrameTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

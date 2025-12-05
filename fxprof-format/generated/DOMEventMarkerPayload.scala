@@ -66,6 +66,6 @@ private[fxprof] case class DOMEventMarkerPayloadArgs(
 )
 private[fxprof] object DOMEventMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[DOMEventMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

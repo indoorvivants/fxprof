@@ -82,6 +82,6 @@ private[fxprof] case class CategoryArgs(
 )
 private[fxprof] object CategoryArgs {
   given ConfiguredJsonValueCodec[CategoryArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

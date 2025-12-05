@@ -52,6 +52,6 @@ private[fxprof] case class LongTaskMarkerPayloadArgs(
 )
 private[fxprof] object LongTaskMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[LongTaskMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

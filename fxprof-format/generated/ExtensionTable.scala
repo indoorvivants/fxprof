@@ -64,6 +64,6 @@ private[fxprof] case class ExtensionTableArgs(
 )
 private[fxprof] object ExtensionTableArgs {
   given ConfiguredJsonValueCodec[ExtensionTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

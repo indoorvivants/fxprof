@@ -1,10 +1,16 @@
 //> using toolkit default
-//> using dep com.indoorvivants::decline-derive::0.3.2
+//> using dep com.indoorvivants::decline-derive::0.3.3
+//> using dep org.scala-lang.modules::scala-parallel-collections::1.2.0
+
 import fxprof.*
 import com.github.plokhotnyuk.jsoniter_scala.core._
 import java.time.Instant
 import decline_derive.CommandApplication
 import java.util.concurrent.atomic.AtomicInteger
+import scala.collection.parallel.CollectionConverters.*
+import scala.reflect.ClassTag
+import java.util.concurrent.ConcurrentLinkedDeque
+import java.util.concurrent.ConcurrentLinkedQueue
 
 val profile = Profile(
   meta = ProfileMeta(
@@ -15,21 +21,23 @@ val profile = Profile(
     stackwalk = ProfileMeta_Stackwalk.False,
     version = 1.0,
     preprocessedProfileVersion = 58
-  ).withMarkerSchema(
-    Vector(
-      MarkerSchema("test-marker").withDisplay(
-        Vector(MarkerDisplayLocation.MarkerChart)
-      )
-    )
-  ).withCategories(
-    Some(
+  ).withInitialVisibleThreads(Some(Vector(0)))
+    .withMarkerSchema(
       Vector(
-        Category("interflow", CategoryColor.Blue),
-        Category("lower", CategoryColor.Green),
-        Category("emitLLVM", CategoryColor.Red)
+        MarkerSchema("test-marker").withDisplay(
+          Vector(MarkerDisplayLocation.MarkerChart)
+        )
       )
     )
-  ),
+    .withCategories(
+      Some(
+        Vector(
+          Category("interflow", CategoryColor.Blue),
+          Category("lower", CategoryColor.Green),
+          Category("emitLLVM", CategoryColor.Red)
+        )
+      )
+    ),
   shared = RawProfileSharedData(SourceTable(0)).withStringArray(
     Vector("hello", "hello-func", "hello-native-symbol")
   )
@@ -48,25 +56,25 @@ val profile = Profile(
           .withStack(Vector(Some(0)))
           .withTime(Some(Vector(200)))
           .withWeight(Vector(Some(1))),
-        markers = RawMarkerTable(0),
-        // .withStartTime(Vector(Some(Instant.now().toEpochMilli() - 400)))
-        // .withEndTime(Vector(Some(Instant.now().toEpochMilli())))
-        // .withPhase(Vector(MarkerPhase.Instant))
-        // .withCategory(Vector(0))
-        // .withData(
-        //   Vector(
-        //     Some(
-        //       MarkerPayload.UserTiming(
-        //         UserTimingMarkerPayload(
-        //           `type` = UserTimingMarkerPayload_Type,
-        //           "hello",
-        //           entryType = UserTimingMarkerPayload_EntryType.MEASURE
-        //         )
-        //       )
-        //     )
-        //   )
-        // )
-        // .withName(Vector(0)),
+        markers = RawMarkerTable(1)
+          .withStartTime(Vector(Some(Instant.now().toEpochMilli() - 400)))
+          .withEndTime(Vector(Some(Instant.now().toEpochMilli())))
+          .withPhase(Vector(MarkerPhase.Instant))
+          .withCategory(Vector(0))
+          .withData(
+            Vector(
+              Some(
+                MarkerPayload.UserTiming(
+                  UserTimingMarkerPayload(
+                    `type` = UserTimingMarkerPayload_Type,
+                    "hello",
+                    entryType = UserTimingMarkerPayload_EntryType.MEASURE
+                  )
+                )
+              )
+            )
+          )
+          .withName(Vector(0)),
         stackTable =
           RawStackTable(1).withFrame(Vector(0)).withPrefix(Vector(None)),
         frameTable = FrameTable(1)
@@ -95,22 +103,205 @@ val profile = Profile(
 case class Config(out: String) derives CommandApplication
 
 class Tracer private (meta: ProfileMeta) {
-  private val strings = java.util.concurrent.ConcurrentHashMap[String, Int]
-  private val stringsCount = AtomicInteger(0)
-  private val threads = java.util.concurrent.ConcurrentHashMap[String, Int]
-  private val threadsCount = AtomicInteger(0)
+  type ThreadID = Int
+  type StringID = Int
+  type FunctionId = Int
+  type StackID = Int
+  type FunctionNameID = Int
 
-  private def stringID(s: String) =
-    strings.computeIfAbsent(s, _ => stringsCount.incrementAndGet())
+  class Interner[K] {
+    private val values = java.util.concurrent.ConcurrentHashMap[K, Int]
+    private val count = AtomicInteger(0)
 
-  private def threadID(s: Thread) =
-    threads.computeIfAbsent(s.getName, _ => threadsCount.incrementAndGet())
+    def all(implicit ev: ClassTag[K]) =
+      val lb = Array.ofDim[K](values.size())
+      values.forEach { (k, id) =>
+        lb(id) = k
+      }
+      lb
+
+    def id(k: K): Int =
+      values.computeIfAbsent(k, _ => count.incrementAndGet() - 1)
+
+    // def by[S](f: K => S): Interner[K] =
+    //   new Interner[K] {
+    //     private val values = java.util.concurrent.ConcurrentHashMap[S, Int]
+    //     private val count = AtomicInteger(0)
+
+    //     override def id(k: K): Int =
+    //       values.computeIfAbsent(f(k), _ => count.incrementAndGet())
+    //   }
+  }
+
+  val strings = new Interner[String]
+
+  case class Function(nameID: FunctionNameID)
+  val functions = new Interner[Function]
+
+  val threadIds = new Interner[String]
+  val categories = new Interner[String]
+
+  case class Frame(stackID: Option[Int], functionID: Int, categoryID: Int)
+  val frames = new Interner[Frame]
+
+  case class Sample(stackID: StackID, duration: Long)
+  val samples = new Interner[Sample]
+
+  case class Stack(frameID: Int, prefix: Option[StackID])
+  val stacks = new Interner[Stack]
+
+  private val currentThread =
+    ThreadLocal.withInitial[ThreadID](() =>
+      threadIds.id(Thread.currentThread().getName())
+    )
+
+  private val currentStackPrefix =
+    ThreadLocal.withInitial[Option[StackID]](() => None)
+
+  def build() = this.synchronized {
+    val sources = SourceTable(0)
+    val stringArray = strings.all.toVector
+    val cats = categories.all.toVector.map(
+      Category(_, CategoryColor.Blue).withSubcategories(Vector("Other"))
+    )
+
+    val framesTable = {
+      val (categories, functions) =
+        frames.all.toVector
+          .map(f => (f.categoryID.toDouble, f.functionID.toDouble))
+          .unzip
+
+      FrameTable(categories.length)
+        .withCategory(categories.map(Some(_)))
+        .withSubcategory(Vector.fill(categories.length)(None))
+        .withFunc(functions)
+        .withNativeSymbol(Vector.fill(categories.length)(None))
+        .withInlineDepth(Vector.fill(categories.length)(0))
+        .withInnerWindowID(Vector.fill(categories.length)(None))
+        .withLine(Vector.fill(categories.length)(None))
+        .withColumn(Vector.fill(categories.length)(None))
+    }
+
+    val functionsTable = {
+      val funcs = functions.all
+      FuncTable(funcs.length)
+        .withName(funcs.toVector.map(_.nameID.toDouble))
+        .withIsJS(Vector.fill(funcs.length)(false))
+        .withRelevantForJS(Vector.fill(funcs.length)(false))
+        .withResource(Vector.fill(funcs.length)(FuncTable_Resource.None))
+        .withSource(Vector.fill(funcs.length)(None))
+        .withLineNumber(Vector.fill(funcs.length)(None))
+        .withColumnNumber(Vector.fill(funcs.length)(None))
+    }
+
+    val stacksTable = {
+      val stack = stacks.all
+      RawStackTable(stack.length)
+        .withFrame(stack.map(_.frameID.toDouble).toVector)
+        .withPrefix(stack.map(_.prefix.map(_.toDouble)).toVector)
+    }
+
+    val samplesTable = {
+      val sampl = samples.all
+      RawSamplesTable(WeightType.Samples, sampl.length)
+        .withStack(sampl.map(s => Some(s.stackID.toDouble)).toVector)
+        .withTime(Some(sampl.map(_.duration.toDouble).toVector))
+        .withWeight(Vector.fill(sampl.length)(Some(1)))
+    }
+
+    Profile(
+      meta = this.meta.withCategories(Some(cats)),
+      shared = RawProfileSharedData(sources).withStringArray(stringArray)
+    ).withThreads(
+      Vector(
+        fxprof
+          .RawThread(
+            processType = ProcessType.Default,
+            processStartupTime = 185,
+            registerTime = 0,
+            name = "thread-1",
+            isMainThread = true,
+            pid = "1",
+            tid = Tid.Str("thread-1"),
+            samples = samplesTable,
+            markers = RawMarkerTable(1)
+              .withStartTime(Vector(Some(Instant.now().toEpochMilli() - 400)))
+              .withEndTime(Vector(Some(Instant.now().toEpochMilli())))
+              .withPhase(Vector(MarkerPhase.Instant))
+              .withCategory(Vector(0))
+              .withData(
+                Vector(
+                  Some(
+                    MarkerPayload.UserTiming(
+                      UserTimingMarkerPayload(
+                        `type` = UserTimingMarkerPayload_Type,
+                        "hello",
+                        entryType = UserTimingMarkerPayload_EntryType.MEASURE
+                      )
+                    )
+                  )
+                )
+              )
+              .withName(Vector(0)),
+            stackTable = stacksTable,
+            frameTable = framesTable,
+            funcTable = functionsTable,
+            resourceTable =
+              ResourceTable(1).withtype(Vector(1)).withName(Vector(1)),
+            nativeSymbols = NativeSymbolTable(1).withName(Vector(2))
+          )
+          .withProcessShutdownTime(Some(450))
+      )
+    )
+  }
+
+  def span[A](name: String, category: String)(f: => A) = {
+    val functionNameID = strings.id(name)
+    val func = Function(functionNameID)
+    val funcID = functions.id(func)
+    val categoryID = categories.id(category)
+    val prefix = currentStackPrefix.get()
+    val frame = Frame(prefix, funcID, categoryID)
+    val frameID = frames.id(frame)
+    val stackID = stacks.id(Stack(frameID, prefix))
+    println(s"$name -- $frame, $prefix – creating new stackID $stackID")
+    currentStackPrefix.set(Some(stackID))
+    val start = System.nanoTime() / 1000
+    val result = f
+    val duration = System.nanoTime() / 1000 - start
+    currentStackPrefix.set(prefix)
+
+    val sampleID = samples.id(Sample(stackID = stackID, duration = duration))
+
+  }
 
 }
 
+object Tracer {
+  def apply(meta: ProfileMeta) = new Tracer(meta)
+}
+
 @main def sampleGenerate(args: String*) =
+  val t = Tracer(profile.meta)
+  t.span("lowering: bla ", "bla") {
+    t.span("lowering: bla.constants", "what") {
+      Thread.sleep(200)
+      // t.span("optimising: bla ", "bla") {
+
+      //   Thread.sleep(200)
+      // }
+
+    }
+  }
+
+  val prof = t.build()
+  println(prof.shared.stringArray)
+  println(writeToString(prof.threads(0).funcTable))
+  println(writeToString(prof.threads(0).frameTable))
+  println(writeToString(prof.threads(0).stackTable))
+  println(writeToString(prof.threads(0).samples))
+
   val config = CommandApplication.parseOrExit[Config](args)
   val path = os.Path(config.out, os.pwd)
-  val json = writeToString(profile, WriterConfig.withIndentionStep(2))
-  println(json)
+  val json = writeToString(prof, WriterConfig.withIndentionStep(2))
   os.write.over(path, json)

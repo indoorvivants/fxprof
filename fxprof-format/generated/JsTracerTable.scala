@@ -78,6 +78,6 @@ private[fxprof] case class JsTracerTableArgs(
 )
 private[fxprof] object JsTracerTableArgs {
   given ConfiguredJsonValueCodec[JsTracerTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -110,6 +110,6 @@ private[fxprof] case class StyleMarkerPayloadArgs(
 )
 private[fxprof] object StyleMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[StyleMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

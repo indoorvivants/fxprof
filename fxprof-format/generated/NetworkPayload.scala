@@ -437,6 +437,6 @@ private[fxprof] case class NetworkPayloadArgs(
 )
 private[fxprof] object NetworkPayloadArgs {
   given ConfiguredJsonValueCodec[NetworkPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

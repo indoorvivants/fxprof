@@ -52,6 +52,6 @@ private[fxprof] case class BrowsertimeMarkerPayloadArgs(
 )
 private[fxprof] object BrowsertimeMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[BrowsertimeMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

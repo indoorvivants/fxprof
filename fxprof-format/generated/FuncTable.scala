@@ -153,6 +153,6 @@ private[fxprof] case class FuncTableArgs(
 )
 private[fxprof] object FuncTableArgs {
   given ConfiguredJsonValueCodec[FuncTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

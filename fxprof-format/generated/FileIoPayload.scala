@@ -100,6 +100,6 @@ private[fxprof] case class FileIoPayloadArgs(
 )
 private[fxprof] object FileIoPayloadArgs {
   given ConfiguredJsonValueCodec[FileIoPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

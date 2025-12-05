@@ -236,6 +236,6 @@ private[fxprof] case class ProfilerOverheadStatsArgs(
 )
 private[fxprof] object ProfilerOverheadStatsArgs {
   given ConfiguredJsonValueCodec[ProfilerOverheadStatsArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

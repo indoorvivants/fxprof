@@ -105,6 +105,6 @@ private[fxprof] case class NativeSymbolTableArgs(
 )
 private[fxprof] object NativeSymbolTableArgs {
   given ConfiguredJsonValueCodec[NativeSymbolTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

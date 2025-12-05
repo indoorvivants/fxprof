@@ -50,6 +50,6 @@ private[fxprof] case class NoPayloadUserDataArgs(
 )
 private[fxprof] object NoPayloadUserDataArgs {
   given ConfiguredJsonValueCodec[NoPayloadUserDataArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

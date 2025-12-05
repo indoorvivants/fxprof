@@ -74,6 +74,6 @@ private[fxprof] case class PausedRangeArgs(
 )
 private[fxprof] object PausedRangeArgs {
   given ConfiguredJsonValueCodec[PausedRangeArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

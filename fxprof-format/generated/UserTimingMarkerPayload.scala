@@ -65,6 +65,6 @@ private[fxprof] case class UserTimingMarkerPayloadArgs(
 )
 private[fxprof] object UserTimingMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[UserTimingMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

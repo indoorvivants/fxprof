@@ -69,6 +69,6 @@ private[fxprof] case class CauseBacktraceArgs(
 )
 private[fxprof] object CauseBacktraceArgs {
   given ConfiguredJsonValueCodec[CauseBacktraceArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

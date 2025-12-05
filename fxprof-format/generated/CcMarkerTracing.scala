@@ -73,6 +73,6 @@ private[fxprof] case class CcMarkerTracingArgs(
 )
 private[fxprof] object CcMarkerTracingArgs {
   given ConfiguredJsonValueCodec[CcMarkerTracingArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

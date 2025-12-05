@@ -43,6 +43,6 @@ private[fxprof] case class BHRMarkerPayloadArgs(
 )
 private[fxprof] object BHRMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[BHRMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

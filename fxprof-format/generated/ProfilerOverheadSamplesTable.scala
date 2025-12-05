@@ -85,6 +85,6 @@ private[fxprof] case class ProfilerOverheadSamplesTableArgs(
 )
 private[fxprof] object ProfilerOverheadSamplesTableArgs {
   given ConfiguredJsonValueCodec[ProfilerOverheadSamplesTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

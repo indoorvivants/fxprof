@@ -215,6 +215,6 @@ private[fxprof] case class IPCMarkerPayloadArgs(
 )
 private[fxprof] object IPCMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[IPCMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

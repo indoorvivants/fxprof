@@ -90,6 +90,6 @@ private[fxprof] case class ProfilerConfigurationArgs(
 )
 private[fxprof] object ProfilerConfigurationArgs {
   given ConfiguredJsonValueCodec[ProfilerConfigurationArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

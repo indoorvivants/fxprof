@@ -433,7 +433,7 @@ def render(struct: Record, params: List[(Field, Type)]) =
     block(s"private[fxprof] object ${structArgsName} {", "}"):
       block(s"given ConfiguredJsonValueCodec[${structArgsName}] = ", ""):
         line(
-          "ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))"
+          "ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))"
         )
 
     lb.result -> extra

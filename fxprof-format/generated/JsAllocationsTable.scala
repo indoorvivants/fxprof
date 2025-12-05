@@ -113,6 +113,6 @@ private[fxprof] case class JsAllocationsTableArgs(
 )
 private[fxprof] object JsAllocationsTableArgs {
   given ConfiguredJsonValueCodec[JsAllocationsTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

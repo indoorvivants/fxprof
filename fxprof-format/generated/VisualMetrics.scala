@@ -168,6 +168,6 @@ private[fxprof] case class VisualMetricsArgs(
 )
 private[fxprof] object VisualMetricsArgs {
   given ConfiguredJsonValueCodec[VisualMetricsArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

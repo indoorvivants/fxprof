@@ -61,6 +61,6 @@ private[fxprof] case class MediaSampleMarkerPayloadArgs(
 )
 private[fxprof] object MediaSampleMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[MediaSampleMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

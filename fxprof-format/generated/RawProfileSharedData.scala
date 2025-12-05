@@ -67,6 +67,6 @@ private[fxprof] case class RawProfileSharedDataArgs(
 )
 private[fxprof] object RawProfileSharedDataArgs {
   given ConfiguredJsonValueCodec[RawProfileSharedDataArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

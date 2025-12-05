@@ -59,6 +59,6 @@ private[fxprof] case class MarkerGraphArgs(
 )
 private[fxprof] object MarkerGraphArgs {
   given ConfiguredJsonValueCodec[MarkerGraphArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

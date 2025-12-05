@@ -99,6 +99,6 @@ private[fxprof] case class MarkerSchemaFieldArgs(
 )
 private[fxprof] object MarkerSchemaFieldArgs {
   given ConfiguredJsonValueCodec[MarkerSchemaFieldArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

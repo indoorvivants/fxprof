@@ -66,6 +66,6 @@ private[fxprof] case class NavigationMarkerPayloadArgs(
 )
 private[fxprof] object NavigationMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[NavigationMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

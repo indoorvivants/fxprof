@@ -127,6 +127,6 @@ private[fxprof] case class LibArgs(
 )
 private[fxprof] object LibArgs {
   given ConfiguredJsonValueCodec[LibArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

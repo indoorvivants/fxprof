@@ -59,6 +59,6 @@ private[fxprof] case class PaintProfilerMarkerTracingArgs(
 )
 private[fxprof] object PaintProfilerMarkerTracingArgs {
   given ConfiguredJsonValueCodec[PaintProfilerMarkerTracingArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

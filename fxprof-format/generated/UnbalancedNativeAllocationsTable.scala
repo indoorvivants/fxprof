@@ -85,6 +85,6 @@ private[fxprof] case class UnbalancedNativeAllocationsTableArgs(
 )
 private[fxprof] object UnbalancedNativeAllocationsTableArgs {
   given ConfiguredJsonValueCodec[UnbalancedNativeAllocationsTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -287,6 +287,6 @@ private[fxprof] case class RawThreadArgs(
 )
 private[fxprof] object RawThreadArgs {
   given ConfiguredJsonValueCodec[RawThreadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

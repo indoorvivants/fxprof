@@ -60,6 +60,6 @@ private[fxprof] case class TableColumnFormatArgs(
 )
 private[fxprof] object TableColumnFormatArgs {
   given ConfiguredJsonValueCodec[TableColumnFormatArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

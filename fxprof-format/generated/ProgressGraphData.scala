@@ -68,6 +68,6 @@ private[fxprof] case class ProgressGraphDataArgs(
 )
 private[fxprof] object ProgressGraphDataArgs {
   given ConfiguredJsonValueCodec[ProgressGraphDataArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

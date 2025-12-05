@@ -82,6 +82,6 @@ private[fxprof] case class GPUMarkerPayloadArgs(
 )
 private[fxprof] object GPUMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[GPUMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

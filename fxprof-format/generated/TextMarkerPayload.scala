@@ -66,6 +66,6 @@ private[fxprof] case class TextMarkerPayloadArgs(
 )
 private[fxprof] object TextMarkerPayloadArgs {
   given ConfiguredJsonValueCodec[TextMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

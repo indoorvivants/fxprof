@@ -70,6 +70,6 @@ private[fxprof] case class HostResolverPayloadArgs(
 )
 private[fxprof] object HostResolverPayloadArgs {
   given ConfiguredJsonValueCodec[HostResolverPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

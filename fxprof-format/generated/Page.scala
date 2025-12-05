@@ -156,6 +156,6 @@ private[fxprof] case class PageArgs(
 )
 private[fxprof] object PageArgs {
   given ConfiguredJsonValueCodec[PageArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(false).withTransientNone(false))
+    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }
