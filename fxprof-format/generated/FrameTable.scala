@@ -204,6 +204,8 @@ class FrameTable private (private[fxprof] val args: FrameTableArgs) {
   private def copy(f: FrameTableArgs => FrameTableArgs) = 
     new FrameTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[FrameTable] && o.asInstanceOf[FrameTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -229,9 +231,9 @@ object FrameTable {
       length = length,
     ))
   implicit val codec: JsonValueCodec[FrameTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[FrameTable] {
       def decodeValue(in: JsonReader, default: FrameTable) = 
-        new FrameTable(summon[JsonValueCodec[FrameTableArgs]].decodeValue(in, default.args))
+        new FrameTable(implicitly[JsonValueCodec[FrameTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: FrameTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[FrameTableArgs]].encodeValue(x.args, out)
@@ -253,7 +255,7 @@ private[fxprof] case class FrameTableArgs(
   length: Double,
 )
 private[fxprof] object FrameTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[FrameTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[FrameTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

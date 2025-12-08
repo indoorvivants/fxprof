@@ -35,6 +35,8 @@ class ResourceTable private (private[fxprof] val args: ResourceTableArgs) {
   private def copy(f: ResourceTableArgs => ResourceTableArgs) = 
     new ResourceTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[ResourceTable] && o.asInstanceOf[ResourceTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -55,9 +57,9 @@ object ResourceTable {
       `type` = Vector.empty,
     ))
   implicit val codec: JsonValueCodec[ResourceTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[ResourceTable] {
       def decodeValue(in: JsonReader, default: ResourceTable) = 
-        new ResourceTable(summon[JsonValueCodec[ResourceTableArgs]].decodeValue(in, default.args))
+        new ResourceTable(implicitly[JsonValueCodec[ResourceTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ResourceTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[ResourceTableArgs]].encodeValue(x.args, out)
@@ -74,7 +76,7 @@ private[fxprof] case class ResourceTableArgs(
   `type`: Vector[ResourceTypeEnum],
 )
 private[fxprof] object ResourceTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[ResourceTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[ResourceTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

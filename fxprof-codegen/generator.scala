@@ -371,6 +371,11 @@ def render(struct: Record, params: List[(Field, Type)]) =
       ):
         line(s"new $structName(f(args))")
 
+      emptyLine()
+      line(
+        s"override def equals(o: Any) = o.isInstanceOf[$structName] && o.asInstanceOf[$structName].args.equals(this.args)"
+      )
+
     emptyLine()
 
     line("import com.github.plokhotnyuk.jsoniter_scala.macros._")
@@ -406,13 +411,13 @@ def render(struct: Record, params: List[(Field, Type)]) =
                   )
 
       block(s"implicit val codec: JsonValueCodec[$structName] = ", ""):
-        block("new JsonValueCodec {", "}"):
+        block(s"new JsonValueCodec[$structName] {", "}"):
           block(
             s"def decodeValue(in: JsonReader, default: $structName) = ",
             ""
           ):
             line(
-              s"new $structName(summon[JsonValueCodec[${structArgsName}]].decodeValue(in, default.args))"
+              s"new $structName(implicitly[JsonValueCodec[${structArgsName}]].decodeValue(in, default.args))"
             )
 
           block(
@@ -432,12 +437,13 @@ def render(struct: Record, params: List[(Field, Type)]) =
 
     block(s"private[fxprof] object ${structArgsName} {", "}"):
       block(
-        s"implicit val codec: ConfiguredJsonValueCodec[${structArgsName}] = ",
+        s"implicit val codec: JsonValueCodec[${structArgsName}] = ",
         ""
       ):
-        line(
-          "ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))"
-        )
+        line("JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))")
+        // line(
+        //   "ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))"
+        // )
 
     lb.result -> extra
 

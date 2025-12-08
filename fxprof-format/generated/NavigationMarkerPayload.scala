@@ -26,6 +26,8 @@ class NavigationMarkerPayload private (private[fxprof] val args: NavigationMarke
   private def copy(f: NavigationMarkerPayloadArgs => NavigationMarkerPayloadArgs) = 
     new NavigationMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[NavigationMarkerPayload] && o.asInstanceOf[NavigationMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -47,9 +49,9 @@ object NavigationMarkerPayload {
       innerWindowID = None,
     ))
   implicit val codec: JsonValueCodec[NavigationMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[NavigationMarkerPayload] {
       def decodeValue(in: JsonReader, default: NavigationMarkerPayload) = 
-        new NavigationMarkerPayload(summon[JsonValueCodec[NavigationMarkerPayloadArgs]].decodeValue(in, default.args))
+        new NavigationMarkerPayload(implicitly[JsonValueCodec[NavigationMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: NavigationMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[NavigationMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -65,7 +67,7 @@ private[fxprof] case class NavigationMarkerPayloadArgs(
   innerWindowID: Option[Double],
 )
 private[fxprof] object NavigationMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[NavigationMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[NavigationMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

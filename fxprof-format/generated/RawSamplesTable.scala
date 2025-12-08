@@ -123,6 +123,8 @@ class RawSamplesTable private (private[fxprof] val args: RawSamplesTableArgs) {
   private def copy(f: RawSamplesTableArgs => RawSamplesTableArgs) = 
     new RawSamplesTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[RawSamplesTable] && o.asInstanceOf[RawSamplesTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -150,9 +152,9 @@ object RawSamplesTable {
       length = length,
     ))
   implicit val codec: JsonValueCodec[RawSamplesTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[RawSamplesTable] {
       def decodeValue(in: JsonReader, default: RawSamplesTable) = 
-        new RawSamplesTable(summon[JsonValueCodec[RawSamplesTableArgs]].decodeValue(in, default.args))
+        new RawSamplesTable(implicitly[JsonValueCodec[RawSamplesTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: RawSamplesTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[RawSamplesTableArgs]].encodeValue(x.args, out)
@@ -174,7 +176,7 @@ private[fxprof] case class RawSamplesTableArgs(
   length: Double,
 )
 private[fxprof] object RawSamplesTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[RawSamplesTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[RawSamplesTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

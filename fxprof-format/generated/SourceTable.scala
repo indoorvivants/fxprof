@@ -29,6 +29,8 @@ class SourceTable private (private[fxprof] val args: SourceTableArgs) {
   private def copy(f: SourceTableArgs => SourceTableArgs) = 
     new SourceTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[SourceTable] && o.asInstanceOf[SourceTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -47,9 +49,9 @@ object SourceTable {
       filename = Vector.empty,
     ))
   implicit val codec: JsonValueCodec[SourceTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[SourceTable] {
       def decodeValue(in: JsonReader, default: SourceTable) = 
-        new SourceTable(summon[JsonValueCodec[SourceTableArgs]].decodeValue(in, default.args))
+        new SourceTable(implicitly[JsonValueCodec[SourceTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: SourceTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[SourceTableArgs]].encodeValue(x.args, out)
@@ -64,7 +66,7 @@ private[fxprof] case class SourceTableArgs(
   filename: Vector[IndexIntoStringTable],
 )
 private[fxprof] object SourceTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[SourceTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[SourceTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

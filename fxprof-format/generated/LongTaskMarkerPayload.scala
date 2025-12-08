@@ -16,6 +16,8 @@ class LongTaskMarkerPayload private (private[fxprof] val args: LongTaskMarkerPay
   private def copy(f: LongTaskMarkerPayloadArgs => LongTaskMarkerPayloadArgs) = 
     new LongTaskMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[LongTaskMarkerPayload] && o.asInstanceOf[LongTaskMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -35,9 +37,9 @@ object LongTaskMarkerPayload {
       category = category,
     ))
   implicit val codec: JsonValueCodec[LongTaskMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[LongTaskMarkerPayload] {
       def decodeValue(in: JsonReader, default: LongTaskMarkerPayload) = 
-        new LongTaskMarkerPayload(summon[JsonValueCodec[LongTaskMarkerPayloadArgs]].decodeValue(in, default.args))
+        new LongTaskMarkerPayload(implicitly[JsonValueCodec[LongTaskMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: LongTaskMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[LongTaskMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -51,7 +53,7 @@ private[fxprof] case class LongTaskMarkerPayloadArgs(
   category: LongTaskMarkerPayload_Category.type,
 )
 private[fxprof] object LongTaskMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[LongTaskMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[LongTaskMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

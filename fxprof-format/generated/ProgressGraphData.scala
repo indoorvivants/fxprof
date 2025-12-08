@@ -34,6 +34,8 @@ class ProgressGraphData private (private[fxprof] val args: ProgressGraphDataArgs
   private def copy(f: ProgressGraphDataArgs => ProgressGraphDataArgs) = 
     new ProgressGraphData(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[ProgressGraphData] && o.asInstanceOf[ProgressGraphData].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -51,9 +53,9 @@ object ProgressGraphData {
       timestamp = None,
     ))
   implicit val codec: JsonValueCodec[ProgressGraphData] = 
-    new JsonValueCodec {
+    new JsonValueCodec[ProgressGraphData] {
       def decodeValue(in: JsonReader, default: ProgressGraphData) = 
-        new ProgressGraphData(summon[JsonValueCodec[ProgressGraphDataArgs]].decodeValue(in, default.args))
+        new ProgressGraphData(implicitly[JsonValueCodec[ProgressGraphDataArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProgressGraphData, out: JsonWriter) = 
         implicitly[JsonValueCodec[ProgressGraphDataArgs]].encodeValue(x.args, out)
@@ -67,7 +69,7 @@ private[fxprof] case class ProgressGraphDataArgs(
   timestamp: Option[Milliseconds],
 )
 private[fxprof] object ProgressGraphDataArgs {
-  implicit val codec: ConfiguredJsonValueCodec[ProgressGraphDataArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[ProgressGraphDataArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -36,6 +36,8 @@ class JsTracerTable private (private[fxprof] val args: JsTracerTableArgs) {
   private def copy(f: JsTracerTableArgs => JsTracerTableArgs) = 
     new JsTracerTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[JsTracerTable] && o.asInstanceOf[JsTracerTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -57,9 +59,9 @@ object JsTracerTable {
       length = length,
     ))
   implicit val codec: JsonValueCodec[JsTracerTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[JsTracerTable] {
       def decodeValue(in: JsonReader, default: JsTracerTable) = 
-        new JsTracerTable(summon[JsonValueCodec[JsTracerTableArgs]].decodeValue(in, default.args))
+        new JsTracerTable(implicitly[JsonValueCodec[JsTracerTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: JsTracerTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[JsTracerTableArgs]].encodeValue(x.args, out)
@@ -77,7 +79,7 @@ private[fxprof] case class JsTracerTableArgs(
   length: Double,
 )
 private[fxprof] object JsTracerTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[JsTracerTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[JsTracerTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

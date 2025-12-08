@@ -107,6 +107,8 @@ class FuncTable private (private[fxprof] val args: FuncTableArgs) {
   private def copy(f: FuncTableArgs => FuncTableArgs) = 
     new FuncTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[FuncTable] && o.asInstanceOf[FuncTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -130,9 +132,9 @@ object FuncTable {
       length = length,
     ))
   implicit val codec: JsonValueCodec[FuncTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[FuncTable] {
       def decodeValue(in: JsonReader, default: FuncTable) = 
-        new FuncTable(summon[JsonValueCodec[FuncTableArgs]].decodeValue(in, default.args))
+        new FuncTable(implicitly[JsonValueCodec[FuncTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: FuncTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[FuncTableArgs]].encodeValue(x.args, out)
@@ -152,7 +154,7 @@ private[fxprof] case class FuncTableArgs(
   length: Double,
 )
 private[fxprof] object FuncTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[FuncTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[FuncTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

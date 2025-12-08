@@ -21,6 +21,8 @@ class PaintProfilerMarkerTracing private (private[fxprof] val args: PaintProfile
   private def copy(f: PaintProfilerMarkerTracingArgs => PaintProfilerMarkerTracingArgs) = 
     new PaintProfilerMarkerTracing(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[PaintProfilerMarkerTracing] && o.asInstanceOf[PaintProfilerMarkerTracing].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -41,9 +43,9 @@ object PaintProfilerMarkerTracing {
       cause = None,
     ))
   implicit val codec: JsonValueCodec[PaintProfilerMarkerTracing] = 
-    new JsonValueCodec {
+    new JsonValueCodec[PaintProfilerMarkerTracing] {
       def decodeValue(in: JsonReader, default: PaintProfilerMarkerTracing) = 
-        new PaintProfilerMarkerTracing(summon[JsonValueCodec[PaintProfilerMarkerTracingArgs]].decodeValue(in, default.args))
+        new PaintProfilerMarkerTracing(implicitly[JsonValueCodec[PaintProfilerMarkerTracingArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: PaintProfilerMarkerTracing, out: JsonWriter) = 
         implicitly[JsonValueCodec[PaintProfilerMarkerTracingArgs]].encodeValue(x.args, out)
@@ -58,7 +60,7 @@ private[fxprof] case class PaintProfilerMarkerTracingArgs(
   cause: Option[CauseBacktrace],
 )
 private[fxprof] object PaintProfilerMarkerTracingArgs {
-  implicit val codec: ConfiguredJsonValueCodec[PaintProfilerMarkerTracingArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[PaintProfilerMarkerTracingArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -36,6 +36,8 @@ class PrefMarkerPayload private (private[fxprof] val args: PrefMarkerPayloadArgs
   private def copy(f: PrefMarkerPayloadArgs => PrefMarkerPayloadArgs) = 
     new PrefMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[PrefMarkerPayload] && o.asInstanceOf[PrefMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -67,9 +69,9 @@ object PrefMarkerPayload {
       prefValue = prefValue,
     ))
   implicit val codec: JsonValueCodec[PrefMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[PrefMarkerPayload] {
       def decodeValue(in: JsonReader, default: PrefMarkerPayload) = 
-        new PrefMarkerPayload(summon[JsonValueCodec[PrefMarkerPayloadArgs]].decodeValue(in, default.args))
+        new PrefMarkerPayload(implicitly[JsonValueCodec[PrefMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: PrefMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[PrefMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -87,7 +89,7 @@ private[fxprof] case class PrefMarkerPayloadArgs(
   prefValue: String,
 )
 private[fxprof] object PrefMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[PrefMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[PrefMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

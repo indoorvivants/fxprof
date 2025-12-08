@@ -35,6 +35,8 @@ class CauseBacktrace private (private[fxprof] val args: CauseBacktraceArgs) {
   private def copy(f: CauseBacktraceArgs => CauseBacktraceArgs) = 
     new CauseBacktrace(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[CauseBacktrace] && o.asInstanceOf[CauseBacktrace].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -51,9 +53,9 @@ object CauseBacktrace {
       stack = None,
     ))
   implicit val codec: JsonValueCodec[CauseBacktrace] = 
-    new JsonValueCodec {
+    new JsonValueCodec[CauseBacktrace] {
       def decodeValue(in: JsonReader, default: CauseBacktrace) = 
-        new CauseBacktrace(summon[JsonValueCodec[CauseBacktraceArgs]].decodeValue(in, default.args))
+        new CauseBacktrace(implicitly[JsonValueCodec[CauseBacktraceArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: CauseBacktrace, out: JsonWriter) = 
         implicitly[JsonValueCodec[CauseBacktraceArgs]].encodeValue(x.args, out)
@@ -68,7 +70,7 @@ private[fxprof] case class CauseBacktraceArgs(
   stack: Option[IndexIntoStackTable],
 )
 private[fxprof] object CauseBacktraceArgs {
-  implicit val codec: ConfiguredJsonValueCodec[CauseBacktraceArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[CauseBacktraceArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

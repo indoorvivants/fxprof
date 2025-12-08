@@ -31,6 +31,8 @@ class CcMarkerTracing private (private[fxprof] val args: CcMarkerTracingArgs) {
   private def copy(f: CcMarkerTracingArgs => CcMarkerTracingArgs) = 
     new CcMarkerTracing(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[CcMarkerTracing] && o.asInstanceOf[CcMarkerTracing].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -53,9 +55,9 @@ object CcMarkerTracing {
       second = None,
     ))
   implicit val codec: JsonValueCodec[CcMarkerTracing] = 
-    new JsonValueCodec {
+    new JsonValueCodec[CcMarkerTracing] {
       def decodeValue(in: JsonReader, default: CcMarkerTracing) = 
-        new CcMarkerTracing(summon[JsonValueCodec[CcMarkerTracingArgs]].decodeValue(in, default.args))
+        new CcMarkerTracing(implicitly[JsonValueCodec[CcMarkerTracingArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: CcMarkerTracing, out: JsonWriter) = 
         implicitly[JsonValueCodec[CcMarkerTracingArgs]].encodeValue(x.args, out)
@@ -72,7 +74,7 @@ private[fxprof] case class CcMarkerTracingArgs(
   second: Option[String],
 )
 private[fxprof] object CcMarkerTracingArgs {
-  implicit val codec: ConfiguredJsonValueCodec[CcMarkerTracingArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[CcMarkerTracingArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

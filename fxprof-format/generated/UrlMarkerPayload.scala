@@ -16,6 +16,8 @@ class UrlMarkerPayload private (private[fxprof] val args: UrlMarkerPayloadArgs) 
   private def copy(f: UrlMarkerPayloadArgs => UrlMarkerPayloadArgs) = 
     new UrlMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[UrlMarkerPayload] && o.asInstanceOf[UrlMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -35,9 +37,9 @@ object UrlMarkerPayload {
       url = url,
     ))
   implicit val codec: JsonValueCodec[UrlMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[UrlMarkerPayload] {
       def decodeValue(in: JsonReader, default: UrlMarkerPayload) = 
-        new UrlMarkerPayload(summon[JsonValueCodec[UrlMarkerPayloadArgs]].decodeValue(in, default.args))
+        new UrlMarkerPayload(implicitly[JsonValueCodec[UrlMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: UrlMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[UrlMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -51,7 +53,7 @@ private[fxprof] case class UrlMarkerPayloadArgs(
   url: String,
 )
 private[fxprof] object UrlMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[UrlMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[UrlMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

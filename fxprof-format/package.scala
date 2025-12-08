@@ -34,11 +34,12 @@ package object fxprof {
     case class Number(value: Double) extends Tid
     case class Str(value: String) extends Tid
 
-    given JsonValueCodec[Tid] = new JsonValueCodec[Tid] {
+    implicit val codec: JsonValueCodec[Tid] = new JsonValueCodec[Tid] {
       override def encodeValue(x: Tid, out: JsonWriter): Unit =
-        x match
+        x match {
           case Number(value) => out.writeVal(value)
           case Str(value)    => out.writeVal(value)
+        }
 
       override def decodeValue(in: JsonReader, default: Tid): Tid = ???
       override def nullValue: Tid = ???
@@ -59,16 +60,17 @@ package object fxprof {
     case object TracingMS extends WeightType("tracing-ms")
     case object Bytes extends WeightType("bytes")
 
-    given JsonValueCodec[WeightType] = new JsonValueCodec[WeightType] {
-      override def encodeValue(x: WeightType, out: JsonWriter): Unit =
-        out.writeVal(x.value)
+    implicit val codec: JsonValueCodec[WeightType] =
+      new JsonValueCodec[WeightType] {
+        override def encodeValue(x: WeightType, out: JsonWriter): Unit =
+          out.writeVal(x.value)
 
-      override def decodeValue(
-          in: JsonReader,
-          default: WeightType
-      ): WeightType = ???
-      override def nullValue: WeightType = ???
-    }
+        override def decodeValue(
+            in: JsonReader,
+            default: WeightType
+        ): WeightType = ???
+        override def nullValue: WeightType = ???
+      }
   }
 
   sealed abstract class GraphColor(value: String)
@@ -87,17 +89,18 @@ package object fxprof {
     case object Teal extends GraphColor("teal")
     case object Yellow extends GraphColor("yellow")
 
-    given JsonValueCodec[GraphColor] = new JsonValueCodec[GraphColor] {
-      override def encodeValue(x: GraphColor, out: JsonWriter): Unit =
-        out.writeVal(x.value)
+    implicit val codec: JsonValueCodec[GraphColor] =
+      new JsonValueCodec[GraphColor] {
+        override def encodeValue(x: GraphColor, out: JsonWriter): Unit =
+          out.writeVal(x.value)
 
-      override def decodeValue(
-          in: JsonReader,
-          default: GraphColor
-      ): GraphColor = ???
+        override def decodeValue(
+            in: JsonReader,
+            default: GraphColor
+        ): GraphColor = ???
 
-      override def nullValue: GraphColor = ???
-    }
+        override def nullValue: GraphColor = ???
+      }
 
   }
 
@@ -120,15 +123,16 @@ package object fxprof {
     case object DarkGrey extends CategoryColor("darkgrey")
     case object Grey extends CategoryColor("grey")
 
-    given JsonValueCodec[CategoryColor] = new JsonValueCodec {
-      override def encodeValue(x: CategoryColor, out: JsonWriter): Unit =
-        out.writeVal(x.value)
-      override def decodeValue(
-          in: JsonReader,
-          default: CategoryColor
-      ): CategoryColor = ???
-      override def nullValue: CategoryColor = ???
-    }
+    implicit val codec: JsonValueCodec[CategoryColor] =
+      new JsonValueCodec[CategoryColor] {
+        override def encodeValue(x: CategoryColor, out: JsonWriter): Unit =
+          out.writeVal(x.value)
+        override def decodeValue(
+            in: JsonReader,
+            default: CategoryColor
+        ): CategoryColor = ???
+        override def nullValue: CategoryColor = ???
+      }
   }
 
   sealed abstract class MarkerPhase(val value: Int)
@@ -140,39 +144,42 @@ package object fxprof {
     case object IntervalStart extends MarkerPhase(2)
     case object IntervalEnd extends MarkerPhase(3)
 
-    given JsonValueCodec[MarkerPhase] = new JsonValueCodec[MarkerPhase] {
-      override def encodeValue(x: MarkerPhase, out: JsonWriter): Unit =
-        out.writeVal(x.value)
+    implicit val codec: JsonValueCodec[MarkerPhase] =
+      new JsonValueCodec[MarkerPhase] {
+        override def encodeValue(x: MarkerPhase, out: JsonWriter): Unit =
+          out.writeVal(x.value)
 
-      override def decodeValue(
-          in: JsonReader,
-          default: MarkerPhase
-      ): MarkerPhase = ???
-      override def nullValue: MarkerPhase = ???
+        override def decodeValue(
+            in: JsonReader,
+            default: MarkerPhase
+        ): MarkerPhase = ???
+        override def nullValue: MarkerPhase = ???
 
-    }
+      }
   }
 
   import com.github.plokhotnyuk.jsoniter_scala.core._
 
   // figure out how to deal with this
-  case class ProcessProfilingLog(m: Map[String, Array[Byte]]):
+  case class ProcessProfilingLog(m: Map[String, Array[Byte]]) {
     def add[T: JsonValueCodec](key: String, t: T) =
       copy(m = m.updated(key, writeToArray(t)))
+  }
 
   object ProcessProfilingLog {
     def empty: ProcessProfilingLog = ProcessProfilingLog(Map.empty)
 
-    given JsonValueCodec[ProcessProfilingLog] =
+    implicit val codec: JsonValueCodec[ProcessProfilingLog] =
       new JsonValueCodec[ProcessProfilingLog] {
         override def decodeValue(
             in: JsonReader,
             default: ProcessProfilingLog
-        ): ProcessProfilingLog =
+        ): ProcessProfilingLog = {
           in.objectStartOrNullError()
           // TODO: do this
 
           in.objectEndOrCommaError()
+        }
         override def encodeValue(
             x: ProcessProfilingLog,
             out: JsonWriter
@@ -196,7 +203,7 @@ package object fxprof {
     case object Vr extends ProcessType("vr")
     case object Invalid extends ProcessType("invalid")
 
-    given JsonValueCodec[ProcessType] =
+    implicit val codec: JsonValueCodec[ProcessType] =
       new JsonValueCodec[ProcessType] {
         def decodeValue(in: JsonReader, default: ProcessType): ProcessType = ???
 
@@ -218,7 +225,7 @@ package object fxprof {
     case object Firefox extends ProfileMeta_Product("firefox")
     case class Other(v: String) extends ProfileMeta_Product(v)
 
-    given JsonValueCodec[ProfileMeta_Product] =
+    implicit val codec: JsonValueCodec[ProfileMeta_Product] =
       new JsonValueCodec[ProfileMeta_Product] {
         def decodeValue(
             in: JsonReader,
@@ -239,21 +246,22 @@ package object fxprof {
     case object True extends ProfileMeta_Stackwalk(1)
     case object False extends ProfileMeta_Stackwalk(0)
 
-    given JsonValueCodec[ProfileMeta_Stackwalk] = new JsonValueCodec {
+    implicit val codec: JsonValueCodec[ProfileMeta_Stackwalk] =
+      new JsonValueCodec[ProfileMeta_Stackwalk] {
 
-      override def encodeValue(
-          x: ProfileMeta_Stackwalk,
-          out: JsonWriter
-      ): Unit =
-        out.writeVal(x.value)
+        override def encodeValue(
+            x: ProfileMeta_Stackwalk,
+            out: JsonWriter
+        ): Unit =
+          out.writeVal(x.value)
 
-      override def decodeValue(
-          in: JsonReader,
-          default: ProfileMeta_Stackwalk
-      ): ProfileMeta_Stackwalk = ???
+        override def decodeValue(
+            in: JsonReader,
+            default: ProfileMeta_Stackwalk
+        ): ProfileMeta_Stackwalk = ???
 
-      override def nullValue: ProfileMeta_Stackwalk = ???
-    }
+        override def nullValue: ProfileMeta_Stackwalk = ???
+      }
   }
 
   // sealed abstract class ProfileMeta_Toolkit(value: String)
@@ -275,7 +283,9 @@ package object fxprof {
     case object None extends FrameTable_Address(-1)
     case class Addr(address: Address) extends FrameTable_Address(address)
 
-    given JsonValueCodec[FrameTable_Address] = intLiteralCodec(_.value.toInt)
+    implicit val codec: JsonValueCodec[FrameTable_Address] = intLiteralCodec(
+      _.value.toInt
+    )
   }
 
   sealed abstract class FuncTable_Resource(value: Double)
@@ -286,20 +296,22 @@ package object fxprof {
     case class Table(address: IndexIntoResourceTable)
         extends FuncTable_Resource(address)
 
-    given JsonValueCodec[FuncTable_Resource] =
+    implicit val codec: JsonValueCodec[FuncTable_Resource] =
       new JsonValueCodec[FuncTable_Resource] {
         override def encodeValue(x: FuncTable_Resource, out: JsonWriter): Unit =
-          x match
+          x match {
             case None           => out.writeVal(-1)
             case Table(address) => out.writeVal(address)
+          }
 
         override def decodeValue(
             in: JsonReader,
             default: FuncTable_Resource
         ): FuncTable_Resource =
-          in.readInt() match
+          in.readInt() match {
             case -1      => None
             case address => Table(address)
+          }
 
         override def nullValue: FuncTable_Resource = ???
       }
@@ -377,7 +389,7 @@ package object fxprof {
     case object TimelineFileIO extends MarkerDisplayLocation("timeline-fileio")
     case object StackChart extends MarkerDisplayLocation("stack-chart")
 
-    given JsonValueCodec[MarkerDisplayLocation] =
+    implicit val codec: JsonValueCodec[MarkerDisplayLocation] =
       stringLiteralCodec[MarkerDisplayLocation]
   }
 
@@ -498,28 +510,29 @@ package object fxprof {
     case class Url(payload: UrlMarkerPayload) extends MarkerPayload
     case class HostResolver(payload: HostResolverPayload) extends MarkerPayload
 
-    given JsonValueCodec[MarkerPayload] = new JsonValueCodec[MarkerPayload] {
+    implicit val codec: JsonValueCodec[MarkerPayload] =
+      new JsonValueCodec[MarkerPayload] {
 
-      override def encodeValue(x: MarkerPayload, out: JsonWriter): Unit =
-        x match {
-          // TODO: add all cases
-          case UserTiming(payload) =>
-            summon[JsonValueCodec[UserTimingMarkerPayload]]
-              .encodeValue(payload, out)
-        }
+        override def encodeValue(x: MarkerPayload, out: JsonWriter): Unit =
+          x match {
+            // TODO: add all cases
+            case UserTiming(payload) =>
+              implicitly[JsonValueCodec[UserTimingMarkerPayload]]
+                .encodeValue(payload, out)
+          }
 
-      override def decodeValue(
-          in: JsonReader,
-          default: MarkerPayload
-      ): MarkerPayload = ???
-      override def nullValue: MarkerPayload = null
-    }
+        override def decodeValue(
+            in: JsonReader,
+            default: MarkerPayload
+        ): MarkerPayload = ???
+        override def nullValue: MarkerPayload = null
+      }
 
   }
 
   class StringLiteral(val value: String)
   object StringLiteral {
-    given JsonValueCodec[StringLiteral] =
+    implicit val codec: JsonValueCodec[StringLiteral] =
       new JsonValueCodec[StringLiteral] {
         override def encodeValue(x: StringLiteral, out: JsonWriter): Unit =
           out.writeVal(x.value)

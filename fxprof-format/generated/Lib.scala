@@ -73,6 +73,8 @@ class Lib private (private[fxprof] val args: LibArgs) {
   private def copy(f: LibArgs => LibArgs) = 
     new Lib(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[Lib] && o.asInstanceOf[Lib].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -105,9 +107,9 @@ object Lib {
       codeId = None,
     ))
   implicit val codec: JsonValueCodec[Lib] = 
-    new JsonValueCodec {
+    new JsonValueCodec[Lib] {
       def decodeValue(in: JsonReader, default: Lib) = 
-        new Lib(summon[JsonValueCodec[LibArgs]].decodeValue(in, default.args))
+        new Lib(implicitly[JsonValueCodec[LibArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: Lib, out: JsonWriter) = 
         implicitly[JsonValueCodec[LibArgs]].encodeValue(x.args, out)
@@ -126,7 +128,7 @@ private[fxprof] case class LibArgs(
   codeId: Option[String],
 )
 private[fxprof] object LibArgs {
-  implicit val codec: ConfiguredJsonValueCodec[LibArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[LibArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

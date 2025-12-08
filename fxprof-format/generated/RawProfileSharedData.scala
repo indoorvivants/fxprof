@@ -32,6 +32,8 @@ class RawProfileSharedData private (private[fxprof] val args: RawProfileSharedDa
   private def copy(f: RawProfileSharedDataArgs => RawProfileSharedDataArgs) = 
     new RawProfileSharedData(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[RawProfileSharedData] && o.asInstanceOf[RawProfileSharedData].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -50,9 +52,9 @@ object RawProfileSharedData {
       sources = sources,
     ))
   implicit val codec: JsonValueCodec[RawProfileSharedData] = 
-    new JsonValueCodec {
+    new JsonValueCodec[RawProfileSharedData] {
       def decodeValue(in: JsonReader, default: RawProfileSharedData) = 
-        new RawProfileSharedData(summon[JsonValueCodec[RawProfileSharedDataArgs]].decodeValue(in, default.args))
+        new RawProfileSharedData(implicitly[JsonValueCodec[RawProfileSharedDataArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: RawProfileSharedData, out: JsonWriter) = 
         implicitly[JsonValueCodec[RawProfileSharedDataArgs]].encodeValue(x.args, out)
@@ -66,7 +68,7 @@ private[fxprof] case class RawProfileSharedDataArgs(
   sources: SourceTable,
 )
 private[fxprof] object RawProfileSharedDataArgs {
-  implicit val codec: ConfiguredJsonValueCodec[RawProfileSharedDataArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[RawProfileSharedDataArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -43,6 +43,8 @@ class UnbalancedNativeAllocationsTable private (private[fxprof] val args: Unbala
   private def copy(f: UnbalancedNativeAllocationsTableArgs => UnbalancedNativeAllocationsTableArgs) = 
     new UnbalancedNativeAllocationsTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[UnbalancedNativeAllocationsTable] && o.asInstanceOf[UnbalancedNativeAllocationsTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -65,9 +67,9 @@ object UnbalancedNativeAllocationsTable {
       length = length,
     ))
   implicit val codec: JsonValueCodec[UnbalancedNativeAllocationsTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[UnbalancedNativeAllocationsTable] {
       def decodeValue(in: JsonReader, default: UnbalancedNativeAllocationsTable) = 
-        new UnbalancedNativeAllocationsTable(summon[JsonValueCodec[UnbalancedNativeAllocationsTableArgs]].decodeValue(in, default.args))
+        new UnbalancedNativeAllocationsTable(implicitly[JsonValueCodec[UnbalancedNativeAllocationsTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: UnbalancedNativeAllocationsTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[UnbalancedNativeAllocationsTableArgs]].encodeValue(x.args, out)
@@ -84,7 +86,7 @@ private[fxprof] case class UnbalancedNativeAllocationsTableArgs(
   length: Double,
 )
 private[fxprof] object UnbalancedNativeAllocationsTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[UnbalancedNativeAllocationsTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[UnbalancedNativeAllocationsTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -16,6 +16,8 @@ class BrowsertimeMarkerPayload private (private[fxprof] val args: BrowsertimeMar
   private def copy(f: BrowsertimeMarkerPayloadArgs => BrowsertimeMarkerPayloadArgs) = 
     new BrowsertimeMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[BrowsertimeMarkerPayload] && o.asInstanceOf[BrowsertimeMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -35,9 +37,9 @@ object BrowsertimeMarkerPayload {
       percentage = percentage,
     ))
   implicit val codec: JsonValueCodec[BrowsertimeMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[BrowsertimeMarkerPayload] {
       def decodeValue(in: JsonReader, default: BrowsertimeMarkerPayload) = 
-        new BrowsertimeMarkerPayload(summon[JsonValueCodec[BrowsertimeMarkerPayloadArgs]].decodeValue(in, default.args))
+        new BrowsertimeMarkerPayload(implicitly[JsonValueCodec[BrowsertimeMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: BrowsertimeMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[BrowsertimeMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -51,7 +53,7 @@ private[fxprof] case class BrowsertimeMarkerPayloadArgs(
   percentage: Double,
 )
 private[fxprof] object BrowsertimeMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[BrowsertimeMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[BrowsertimeMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

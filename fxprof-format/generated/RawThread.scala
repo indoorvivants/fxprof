@@ -181,6 +181,8 @@ class RawThread private (private[fxprof] val args: RawThreadArgs) {
   private def copy(f: RawThreadArgs => RawThreadArgs) = 
     new RawThread(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[RawThread] && o.asInstanceOf[RawThread].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -247,9 +249,9 @@ object RawThread {
       userContextId = None,
     ))
   implicit val codec: JsonValueCodec[RawThread] = 
-    new JsonValueCodec {
+    new JsonValueCodec[RawThread] {
       def decodeValue(in: JsonReader, default: RawThread) = 
-        new RawThread(summon[JsonValueCodec[RawThreadArgs]].decodeValue(in, default.args))
+        new RawThread(implicitly[JsonValueCodec[RawThreadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: RawThread, out: JsonWriter) = 
         implicitly[JsonValueCodec[RawThreadArgs]].encodeValue(x.args, out)
@@ -286,7 +288,7 @@ private[fxprof] case class RawThreadArgs(
   userContextId: Option[Double],
 )
 private[fxprof] object RawThreadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[RawThreadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[RawThreadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

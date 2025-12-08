@@ -11,6 +11,8 @@ class BHRMarkerPayload private (private[fxprof] val args: BHRMarkerPayloadArgs) 
   private def copy(f: BHRMarkerPayloadArgs => BHRMarkerPayloadArgs) = 
     new BHRMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[BHRMarkerPayload] && o.asInstanceOf[BHRMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -27,9 +29,9 @@ object BHRMarkerPayload {
       `type` = `type`,
     ))
   implicit val codec: JsonValueCodec[BHRMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[BHRMarkerPayload] {
       def decodeValue(in: JsonReader, default: BHRMarkerPayload) = 
-        new BHRMarkerPayload(summon[JsonValueCodec[BHRMarkerPayloadArgs]].decodeValue(in, default.args))
+        new BHRMarkerPayload(implicitly[JsonValueCodec[BHRMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: BHRMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[BHRMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -42,7 +44,7 @@ private[fxprof] case class BHRMarkerPayloadArgs(
   `type`: BHRMarkerPayload_Type.type,
 )
 private[fxprof] object BHRMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[BHRMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[BHRMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

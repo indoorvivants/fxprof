@@ -537,6 +537,8 @@ class ProfileMeta private (private[fxprof] val args: ProfileMetaArgs) {
   private def copy(f: ProfileMetaArgs => ProfileMetaArgs) = 
     new ProfileMeta(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[ProfileMeta] && o.asInstanceOf[ProfileMeta].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -612,9 +614,9 @@ object ProfileMeta {
       gramsOfCO2ePerKWh = None,
     ))
   implicit val codec: JsonValueCodec[ProfileMeta] = 
-    new JsonValueCodec {
+    new JsonValueCodec[ProfileMeta] {
       def decodeValue(in: JsonReader, default: ProfileMeta) = 
-        new ProfileMeta(summon[JsonValueCodec[ProfileMetaArgs]].decodeValue(in, default.args))
+        new ProfileMeta(implicitly[JsonValueCodec[ProfileMetaArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProfileMeta, out: JsonWriter) = 
         implicitly[JsonValueCodec[ProfileMetaArgs]].encodeValue(x.args, out)
@@ -668,7 +670,7 @@ private[fxprof] case class ProfileMetaArgs(
   gramsOfCO2ePerKWh: Option[Double],
 )
 private[fxprof] object ProfileMetaArgs {
-  implicit val codec: ConfiguredJsonValueCodec[ProfileMetaArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[ProfileMetaArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

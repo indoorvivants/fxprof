@@ -50,6 +50,8 @@ class ProfilerConfiguration private (private[fxprof] val args: ProfilerConfigura
   private def copy(f: ProfilerConfigurationArgs => ProfilerConfigurationArgs) = 
     new ProfilerConfiguration(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[ProfilerConfiguration] && o.asInstanceOf[ProfilerConfiguration].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -70,9 +72,9 @@ object ProfilerConfiguration {
       activeTabID = None,
     ))
   implicit val codec: JsonValueCodec[ProfilerConfiguration] = 
-    new JsonValueCodec {
+    new JsonValueCodec[ProfilerConfiguration] {
       def decodeValue(in: JsonReader, default: ProfilerConfiguration) = 
-        new ProfilerConfiguration(summon[JsonValueCodec[ProfilerConfigurationArgs]].decodeValue(in, default.args))
+        new ProfilerConfiguration(implicitly[JsonValueCodec[ProfilerConfigurationArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProfilerConfiguration, out: JsonWriter) = 
         implicitly[JsonValueCodec[ProfilerConfigurationArgs]].encodeValue(x.args, out)
@@ -89,7 +91,7 @@ private[fxprof] case class ProfilerConfigurationArgs(
   activeTabID: Option[TabID],
 )
 private[fxprof] object ProfilerConfigurationArgs {
-  implicit val codec: ConfiguredJsonValueCodec[ProfilerConfigurationArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[ProfilerConfigurationArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

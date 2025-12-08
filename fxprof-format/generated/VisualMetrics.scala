@@ -101,6 +101,8 @@ class VisualMetrics private (private[fxprof] val args: VisualMetricsArgs) {
   private def copy(f: VisualMetricsArgs => VisualMetricsArgs) = 
     new VisualMetrics(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[VisualMetrics] && o.asInstanceOf[VisualMetrics].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -141,9 +143,9 @@ object VisualMetrics {
       VisualComplete99 = VisualComplete99,
     ))
   implicit val codec: JsonValueCodec[VisualMetrics] = 
-    new JsonValueCodec {
+    new JsonValueCodec[VisualMetrics] {
       def decodeValue(in: JsonReader, default: VisualMetrics) = 
-        new VisualMetrics(summon[JsonValueCodec[VisualMetricsArgs]].decodeValue(in, default.args))
+        new VisualMetrics(implicitly[JsonValueCodec[VisualMetricsArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: VisualMetrics, out: JsonWriter) = 
         implicitly[JsonValueCodec[VisualMetricsArgs]].encodeValue(x.args, out)
@@ -167,7 +169,7 @@ private[fxprof] case class VisualMetricsArgs(
   VisualComplete99: Double,
 )
 private[fxprof] object VisualMetricsArgs {
-  implicit val codec: ConfiguredJsonValueCodec[VisualMetricsArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[VisualMetricsArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

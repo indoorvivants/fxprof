@@ -148,6 +148,8 @@ class MarkerSchema private (private[fxprof] val args: MarkerSchemaArgs) {
   private def copy(f: MarkerSchemaArgs => MarkerSchemaArgs) = 
     new MarkerSchema(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[MarkerSchema] && o.asInstanceOf[MarkerSchema].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -173,9 +175,9 @@ object MarkerSchema {
       isStackBased = None,
     ))
   implicit val codec: JsonValueCodec[MarkerSchema] = 
-    new JsonValueCodec {
+    new JsonValueCodec[MarkerSchema] {
       def decodeValue(in: JsonReader, default: MarkerSchema) = 
-        new MarkerSchema(summon[JsonValueCodec[MarkerSchemaArgs]].decodeValue(in, default.args))
+        new MarkerSchema(implicitly[JsonValueCodec[MarkerSchemaArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: MarkerSchema, out: JsonWriter) = 
         implicitly[JsonValueCodec[MarkerSchemaArgs]].encodeValue(x.args, out)
@@ -197,7 +199,7 @@ private[fxprof] case class MarkerSchemaArgs(
   isStackBased: Option[Boolean],
 )
 private[fxprof] object MarkerSchemaArgs {
-  implicit val codec: ConfiguredJsonValueCodec[MarkerSchemaArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[MarkerSchemaArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

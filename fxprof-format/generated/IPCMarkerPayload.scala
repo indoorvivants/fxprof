@@ -135,6 +135,8 @@ class IPCMarkerPayload private (private[fxprof] val args: IPCMarkerPayloadArgs) 
   private def copy(f: IPCMarkerPayloadArgs => IPCMarkerPayloadArgs) = 
     new IPCMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[IPCMarkerPayload] && o.asInstanceOf[IPCMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -183,9 +185,9 @@ object IPCMarkerPayload {
       niceDirection = None,
     ))
   implicit val codec: JsonValueCodec[IPCMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[IPCMarkerPayload] {
       def decodeValue(in: JsonReader, default: IPCMarkerPayload) = 
-        new IPCMarkerPayload(summon[JsonValueCodec[IPCMarkerPayloadArgs]].decodeValue(in, default.args))
+        new IPCMarkerPayload(implicitly[JsonValueCodec[IPCMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: IPCMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[IPCMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -214,7 +216,7 @@ private[fxprof] case class IPCMarkerPayloadArgs(
   niceDirection: Option[String],
 )
 private[fxprof] object IPCMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[IPCMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[IPCMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

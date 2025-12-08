@@ -63,6 +63,8 @@ class JsAllocationsTable private (private[fxprof] val args: JsAllocationsTableAr
   private def copy(f: JsAllocationsTableArgs => JsAllocationsTableArgs) = 
     new JsAllocationsTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[JsAllocationsTable] && o.asInstanceOf[JsAllocationsTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -89,9 +91,9 @@ object JsAllocationsTable {
       length = length,
     ))
   implicit val codec: JsonValueCodec[JsAllocationsTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[JsAllocationsTable] {
       def decodeValue(in: JsonReader, default: JsAllocationsTable) = 
-        new JsAllocationsTable(summon[JsonValueCodec[JsAllocationsTableArgs]].decodeValue(in, default.args))
+        new JsAllocationsTable(implicitly[JsonValueCodec[JsAllocationsTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: JsAllocationsTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[JsAllocationsTableArgs]].encodeValue(x.args, out)
@@ -112,7 +114,7 @@ private[fxprof] case class JsAllocationsTableArgs(
   length: Double,
 )
 private[fxprof] object JsAllocationsTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[JsAllocationsTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[JsAllocationsTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

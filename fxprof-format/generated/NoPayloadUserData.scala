@@ -16,6 +16,8 @@ class NoPayloadUserData private (private[fxprof] val args: NoPayloadUserDataArgs
   private def copy(f: NoPayloadUserDataArgs => NoPayloadUserDataArgs) = 
     new NoPayloadUserData(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[NoPayloadUserData] && o.asInstanceOf[NoPayloadUserData].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -33,9 +35,9 @@ object NoPayloadUserData {
       innerWindowID = None,
     ))
   implicit val codec: JsonValueCodec[NoPayloadUserData] = 
-    new JsonValueCodec {
+    new JsonValueCodec[NoPayloadUserData] {
       def decodeValue(in: JsonReader, default: NoPayloadUserData) = 
-        new NoPayloadUserData(summon[JsonValueCodec[NoPayloadUserDataArgs]].decodeValue(in, default.args))
+        new NoPayloadUserData(implicitly[JsonValueCodec[NoPayloadUserDataArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: NoPayloadUserData, out: JsonWriter) = 
         implicitly[JsonValueCodec[NoPayloadUserDataArgs]].encodeValue(x.args, out)
@@ -49,7 +51,7 @@ private[fxprof] case class NoPayloadUserDataArgs(
   innerWindowID: Option[Double],
 )
 private[fxprof] object NoPayloadUserDataArgs {
-  implicit val codec: ConfiguredJsonValueCodec[NoPayloadUserDataArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[NoPayloadUserDataArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

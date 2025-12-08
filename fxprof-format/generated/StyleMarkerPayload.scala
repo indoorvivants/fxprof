@@ -52,6 +52,8 @@ class StyleMarkerPayload private (private[fxprof] val args: StyleMarkerPayloadAr
   private def copy(f: StyleMarkerPayloadArgs => StyleMarkerPayloadArgs) = 
     new StyleMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[StyleMarkerPayload] && o.asInstanceOf[StyleMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -87,9 +89,9 @@ object StyleMarkerPayload {
       stylesReused = stylesReused,
     ))
   implicit val codec: JsonValueCodec[StyleMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[StyleMarkerPayload] {
       def decodeValue(in: JsonReader, default: StyleMarkerPayload) = 
-        new StyleMarkerPayload(summon[JsonValueCodec[StyleMarkerPayloadArgs]].decodeValue(in, default.args))
+        new StyleMarkerPayload(implicitly[JsonValueCodec[StyleMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: StyleMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[StyleMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -109,7 +111,7 @@ private[fxprof] case class StyleMarkerPayloadArgs(
   stylesReused: Double,
 )
 private[fxprof] object StyleMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[StyleMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[StyleMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -103,6 +103,8 @@ class Page private (private[fxprof] val args: PageArgs) {
   private def copy(f: PageArgs => PageArgs) = 
     new Page(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[Page] && o.asInstanceOf[Page].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -135,9 +137,9 @@ object Page {
       favicon = None,
     ))
   implicit val codec: JsonValueCodec[Page] = 
-    new JsonValueCodec {
+    new JsonValueCodec[Page] {
       def decodeValue(in: JsonReader, default: Page) = 
-        new Page(summon[JsonValueCodec[PageArgs]].decodeValue(in, default.args))
+        new Page(implicitly[JsonValueCodec[PageArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: Page, out: JsonWriter) = 
         implicitly[JsonValueCodec[PageArgs]].encodeValue(x.args, out)
@@ -155,7 +157,7 @@ private[fxprof] case class PageArgs(
   favicon: Option[Option[String]],
 )
 private[fxprof] object PageArgs {
-  implicit val codec: ConfiguredJsonValueCodec[PageArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[PageArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

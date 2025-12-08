@@ -26,6 +26,8 @@ class HostResolverPayload private (private[fxprof] val args: HostResolverPayload
   private def copy(f: HostResolverPayloadArgs => HostResolverPayloadArgs) = 
     new HostResolverPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[HostResolverPayload] && o.asInstanceOf[HostResolverPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -51,9 +53,9 @@ object HostResolverPayload {
       flags = flags,
     ))
   implicit val codec: JsonValueCodec[HostResolverPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[HostResolverPayload] {
       def decodeValue(in: JsonReader, default: HostResolverPayload) = 
-        new HostResolverPayload(summon[JsonValueCodec[HostResolverPayloadArgs]].decodeValue(in, default.args))
+        new HostResolverPayload(implicitly[JsonValueCodec[HostResolverPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: HostResolverPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[HostResolverPayloadArgs]].encodeValue(x.args, out)
@@ -69,7 +71,7 @@ private[fxprof] case class HostResolverPayloadArgs(
   flags: String,
 )
 private[fxprof] object HostResolverPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[HostResolverPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[HostResolverPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

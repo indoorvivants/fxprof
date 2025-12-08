@@ -331,6 +331,8 @@ class NetworkPayload private (private[fxprof] val args: NetworkPayloadArgs) {
   private def copy(f: NetworkPayloadArgs => NetworkPayloadArgs) = 
     new NetworkPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[NetworkPayload] && o.asInstanceOf[NetworkPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -391,9 +393,9 @@ object NetworkPayload {
       responseEnd = None,
     ))
   implicit val codec: JsonValueCodec[NetworkPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[NetworkPayload] {
       def decodeValue(in: JsonReader, default: NetworkPayload) = 
-        new NetworkPayload(summon[JsonValueCodec[NetworkPayloadArgs]].decodeValue(in, default.args))
+        new NetworkPayload(implicitly[JsonValueCodec[NetworkPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: NetworkPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[NetworkPayloadArgs]].encodeValue(x.args, out)
@@ -436,7 +438,7 @@ private[fxprof] case class NetworkPayloadArgs(
   responseEnd: Option[Milliseconds],
 )
 private[fxprof] object NetworkPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[NetworkPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[NetworkPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

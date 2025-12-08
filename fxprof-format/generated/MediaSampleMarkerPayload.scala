@@ -21,6 +21,8 @@ class MediaSampleMarkerPayload private (private[fxprof] val args: MediaSampleMar
   private def copy(f: MediaSampleMarkerPayloadArgs => MediaSampleMarkerPayloadArgs) = 
     new MediaSampleMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[MediaSampleMarkerPayload] && o.asInstanceOf[MediaSampleMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -43,9 +45,9 @@ object MediaSampleMarkerPayload {
       sampleEndTimeUs = sampleEndTimeUs,
     ))
   implicit val codec: JsonValueCodec[MediaSampleMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[MediaSampleMarkerPayload] {
       def decodeValue(in: JsonReader, default: MediaSampleMarkerPayload) = 
-        new MediaSampleMarkerPayload(summon[JsonValueCodec[MediaSampleMarkerPayloadArgs]].decodeValue(in, default.args))
+        new MediaSampleMarkerPayload(implicitly[JsonValueCodec[MediaSampleMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: MediaSampleMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[MediaSampleMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -60,7 +62,7 @@ private[fxprof] case class MediaSampleMarkerPayloadArgs(
   sampleEndTimeUs: Microseconds,
 )
 private[fxprof] object MediaSampleMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[MediaSampleMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[MediaSampleMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

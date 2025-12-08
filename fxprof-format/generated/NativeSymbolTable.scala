@@ -65,6 +65,8 @@ class NativeSymbolTable private (private[fxprof] val args: NativeSymbolTableArgs
   private def copy(f: NativeSymbolTableArgs => NativeSymbolTableArgs) = 
     new NativeSymbolTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[NativeSymbolTable] && o.asInstanceOf[NativeSymbolTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -85,9 +87,9 @@ object NativeSymbolTable {
       length = length,
     ))
   implicit val codec: JsonValueCodec[NativeSymbolTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[NativeSymbolTable] {
       def decodeValue(in: JsonReader, default: NativeSymbolTable) = 
-        new NativeSymbolTable(summon[JsonValueCodec[NativeSymbolTableArgs]].decodeValue(in, default.args))
+        new NativeSymbolTable(implicitly[JsonValueCodec[NativeSymbolTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: NativeSymbolTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[NativeSymbolTableArgs]].encodeValue(x.args, out)
@@ -104,7 +106,7 @@ private[fxprof] case class NativeSymbolTableArgs(
   length: Double,
 )
 private[fxprof] object NativeSymbolTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[NativeSymbolTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[NativeSymbolTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

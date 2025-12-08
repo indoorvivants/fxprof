@@ -26,6 +26,8 @@ class DOMEventMarkerPayload private (private[fxprof] val args: DOMEventMarkerPay
   private def copy(f: DOMEventMarkerPayloadArgs => DOMEventMarkerPayloadArgs) = 
     new DOMEventMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[DOMEventMarkerPayload] && o.asInstanceOf[DOMEventMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -47,9 +49,9 @@ object DOMEventMarkerPayload {
       innerWindowID = None,
     ))
   implicit val codec: JsonValueCodec[DOMEventMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[DOMEventMarkerPayload] {
       def decodeValue(in: JsonReader, default: DOMEventMarkerPayload) = 
-        new DOMEventMarkerPayload(summon[JsonValueCodec[DOMEventMarkerPayloadArgs]].decodeValue(in, default.args))
+        new DOMEventMarkerPayload(implicitly[JsonValueCodec[DOMEventMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: DOMEventMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[DOMEventMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -65,7 +67,7 @@ private[fxprof] case class DOMEventMarkerPayloadArgs(
   innerWindowID: Option[Double],
 )
 private[fxprof] object DOMEventMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[DOMEventMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[DOMEventMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

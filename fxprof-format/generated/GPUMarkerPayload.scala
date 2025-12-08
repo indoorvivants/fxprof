@@ -34,6 +34,8 @@ class GPUMarkerPayload private (private[fxprof] val args: GPUMarkerPayloadArgs) 
   private def copy(f: GPUMarkerPayloadArgs => GPUMarkerPayloadArgs) = 
     new GPUMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[GPUMarkerPayload] && o.asInstanceOf[GPUMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -62,9 +64,9 @@ object GPUMarkerPayload {
       gpuend = gpuend,
     ))
   implicit val codec: JsonValueCodec[GPUMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[GPUMarkerPayload] {
       def decodeValue(in: JsonReader, default: GPUMarkerPayload) = 
-        new GPUMarkerPayload(summon[JsonValueCodec[GPUMarkerPayloadArgs]].decodeValue(in, default.args))
+        new GPUMarkerPayload(implicitly[JsonValueCodec[GPUMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: GPUMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[GPUMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -81,7 +83,7 @@ private[fxprof] case class GPUMarkerPayloadArgs(
   gpuend: Milliseconds,
 )
 private[fxprof] object GPUMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[GPUMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[GPUMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

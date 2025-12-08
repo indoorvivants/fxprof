@@ -26,6 +26,8 @@ class TextMarkerPayload private (private[fxprof] val args: TextMarkerPayloadArgs
   private def copy(f: TextMarkerPayloadArgs => TextMarkerPayloadArgs) = 
     new TextMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[TextMarkerPayload] && o.asInstanceOf[TextMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -47,9 +49,9 @@ object TextMarkerPayload {
       innerWindowID = None,
     ))
   implicit val codec: JsonValueCodec[TextMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[TextMarkerPayload] {
       def decodeValue(in: JsonReader, default: TextMarkerPayload) = 
-        new TextMarkerPayload(summon[JsonValueCodec[TextMarkerPayloadArgs]].decodeValue(in, default.args))
+        new TextMarkerPayload(implicitly[JsonValueCodec[TextMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: TextMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[TextMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -65,7 +67,7 @@ private[fxprof] case class TextMarkerPayloadArgs(
   innerWindowID: Option[Double],
 )
 private[fxprof] object TextMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[TextMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[TextMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -26,6 +26,8 @@ class ExtensionTable private (private[fxprof] val args: ExtensionTableArgs) {
   private def copy(f: ExtensionTableArgs => ExtensionTableArgs) = 
     new ExtensionTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[ExtensionTable] && o.asInstanceOf[ExtensionTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -45,9 +47,9 @@ object ExtensionTable {
       length = length,
     ))
   implicit val codec: JsonValueCodec[ExtensionTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[ExtensionTable] {
       def decodeValue(in: JsonReader, default: ExtensionTable) = 
-        new ExtensionTable(summon[JsonValueCodec[ExtensionTableArgs]].decodeValue(in, default.args))
+        new ExtensionTable(implicitly[JsonValueCodec[ExtensionTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ExtensionTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[ExtensionTableArgs]].encodeValue(x.args, out)
@@ -63,7 +65,7 @@ private[fxprof] case class ExtensionTableArgs(
   length: Double,
 )
 private[fxprof] object ExtensionTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[ExtensionTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[ExtensionTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -43,6 +43,8 @@ class ProfilerOverheadSamplesTable private (private[fxprof] val args: ProfilerOv
   private def copy(f: ProfilerOverheadSamplesTableArgs => ProfilerOverheadSamplesTableArgs) = 
     new ProfilerOverheadSamplesTable(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[ProfilerOverheadSamplesTable] && o.asInstanceOf[ProfilerOverheadSamplesTable].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -64,9 +66,9 @@ object ProfilerOverheadSamplesTable {
       length = length,
     ))
   implicit val codec: JsonValueCodec[ProfilerOverheadSamplesTable] = 
-    new JsonValueCodec {
+    new JsonValueCodec[ProfilerOverheadSamplesTable] {
       def decodeValue(in: JsonReader, default: ProfilerOverheadSamplesTable) = 
-        new ProfilerOverheadSamplesTable(summon[JsonValueCodec[ProfilerOverheadSamplesTableArgs]].decodeValue(in, default.args))
+        new ProfilerOverheadSamplesTable(implicitly[JsonValueCodec[ProfilerOverheadSamplesTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProfilerOverheadSamplesTable, out: JsonWriter) = 
         implicitly[JsonValueCodec[ProfilerOverheadSamplesTableArgs]].encodeValue(x.args, out)
@@ -84,7 +86,7 @@ private[fxprof] case class ProfilerOverheadSamplesTableArgs(
   length: Double,
 )
 private[fxprof] object ProfilerOverheadSamplesTableArgs {
-  implicit val codec: ConfiguredJsonValueCodec[ProfilerOverheadSamplesTableArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[ProfilerOverheadSamplesTableArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

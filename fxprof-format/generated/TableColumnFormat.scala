@@ -28,6 +28,8 @@ class TableColumnFormat private (private[fxprof] val args: TableColumnFormatArgs
   private def copy(f: TableColumnFormatArgs => TableColumnFormatArgs) = 
     new TableColumnFormat(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[TableColumnFormat] && o.asInstanceOf[TableColumnFormat].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -43,9 +45,9 @@ object TableColumnFormat {
       label = None,
     ))
   implicit val codec: JsonValueCodec[TableColumnFormat] = 
-    new JsonValueCodec {
+    new JsonValueCodec[TableColumnFormat] {
       def decodeValue(in: JsonReader, default: TableColumnFormat) = 
-        new TableColumnFormat(summon[JsonValueCodec[TableColumnFormatArgs]].decodeValue(in, default.args))
+        new TableColumnFormat(implicitly[JsonValueCodec[TableColumnFormatArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: TableColumnFormat, out: JsonWriter) = 
         implicitly[JsonValueCodec[TableColumnFormatArgs]].encodeValue(x.args, out)
@@ -59,7 +61,7 @@ private[fxprof] case class TableColumnFormatArgs(
   label: Option[String],
 )
 private[fxprof] object TableColumnFormatArgs {
-  implicit val codec: ConfiguredJsonValueCodec[TableColumnFormatArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[TableColumnFormatArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

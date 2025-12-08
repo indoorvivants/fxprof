@@ -25,6 +25,8 @@ class UserTimingMarkerPayload private (private[fxprof] val args: UserTimingMarke
   private def copy(f: UserTimingMarkerPayloadArgs => UserTimingMarkerPayloadArgs) = 
     new UserTimingMarkerPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[UserTimingMarkerPayload] && o.asInstanceOf[UserTimingMarkerPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -47,9 +49,9 @@ object UserTimingMarkerPayload {
       entryType = entryType,
     ))
   implicit val codec: JsonValueCodec[UserTimingMarkerPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[UserTimingMarkerPayload] {
       def decodeValue(in: JsonReader, default: UserTimingMarkerPayload) = 
-        new UserTimingMarkerPayload(summon[JsonValueCodec[UserTimingMarkerPayloadArgs]].decodeValue(in, default.args))
+        new UserTimingMarkerPayload(implicitly[JsonValueCodec[UserTimingMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: UserTimingMarkerPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[UserTimingMarkerPayloadArgs]].encodeValue(x.args, out)
@@ -64,7 +66,7 @@ private[fxprof] case class UserTimingMarkerPayloadArgs(
   entryType: UserTimingMarkerPayload_EntryType,
 )
 private[fxprof] object UserTimingMarkerPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[UserTimingMarkerPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[UserTimingMarkerPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }

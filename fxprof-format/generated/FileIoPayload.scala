@@ -54,6 +54,8 @@ class FileIoPayload private (private[fxprof] val args: FileIoPayloadArgs) {
   private def copy(f: FileIoPayloadArgs => FileIoPayloadArgs) = 
     new FileIoPayload(f(args))
   
+
+  override def equals(o: Any) = o.isInstanceOf[FileIoPayload] && o.asInstanceOf[FileIoPayload].args.equals(this.args)
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
@@ -79,9 +81,9 @@ object FileIoPayload {
       threadId = None,
     ))
   implicit val codec: JsonValueCodec[FileIoPayload] = 
-    new JsonValueCodec {
+    new JsonValueCodec[FileIoPayload] {
       def decodeValue(in: JsonReader, default: FileIoPayload) = 
-        new FileIoPayload(summon[JsonValueCodec[FileIoPayloadArgs]].decodeValue(in, default.args))
+        new FileIoPayload(implicitly[JsonValueCodec[FileIoPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: FileIoPayload, out: JsonWriter) = 
         implicitly[JsonValueCodec[FileIoPayloadArgs]].encodeValue(x.args, out)
@@ -99,7 +101,7 @@ private[fxprof] case class FileIoPayloadArgs(
   threadId: Option[Double],
 )
 private[fxprof] object FileIoPayloadArgs {
-  implicit val codec: ConfiguredJsonValueCodec[FileIoPayloadArgs] = 
-    ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
+  implicit val codec: JsonValueCodec[FileIoPayloadArgs] = 
+    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
   
 }
