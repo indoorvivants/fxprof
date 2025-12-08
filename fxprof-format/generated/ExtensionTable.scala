@@ -28,6 +28,7 @@ class ExtensionTable private (private[fxprof] val args: ExtensionTableArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[ExtensionTable] && o.asInstanceOf[ExtensionTable].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

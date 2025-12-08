@@ -28,6 +28,7 @@ class TextMarkerPayload private (private[fxprof] val args: TextMarkerPayloadArgs
   
 
   override def equals(o: Any) = o.isInstanceOf[TextMarkerPayload] && o.asInstanceOf[TextMarkerPayload].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

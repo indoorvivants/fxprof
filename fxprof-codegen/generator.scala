@@ -375,6 +375,9 @@ def render(struct: Record, params: List[(Field, Type)]) =
       line(
         s"override def equals(o: Any) = o.isInstanceOf[$structName] && o.asInstanceOf[$structName].args.equals(this.args)"
       )
+      line(
+        s"override def hashCode() = this.args.hashCode()"
+      )
 
     emptyLine()
 

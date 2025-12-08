@@ -56,6 +56,7 @@ class FileIoPayload private (private[fxprof] val args: FileIoPayloadArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[FileIoPayload] && o.asInstanceOf[FileIoPayload].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

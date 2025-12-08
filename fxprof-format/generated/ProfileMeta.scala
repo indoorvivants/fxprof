@@ -539,6 +539,7 @@ class ProfileMeta private (private[fxprof] val args: ProfileMetaArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[ProfileMeta] && o.asInstanceOf[ProfileMeta].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

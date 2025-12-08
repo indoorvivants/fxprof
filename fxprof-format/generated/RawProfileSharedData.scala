@@ -34,6 +34,7 @@ class RawProfileSharedData private (private[fxprof] val args: RawProfileSharedDa
   
 
   override def equals(o: Any) = o.isInstanceOf[RawProfileSharedData] && o.asInstanceOf[RawProfileSharedData].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

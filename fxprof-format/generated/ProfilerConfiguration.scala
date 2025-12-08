@@ -52,6 +52,7 @@ class ProfilerConfiguration private (private[fxprof] val args: ProfilerConfigura
   
 
   override def equals(o: Any) = o.isInstanceOf[ProfilerConfiguration] && o.asInstanceOf[ProfilerConfiguration].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

@@ -37,6 +37,7 @@ class ResourceTable private (private[fxprof] val args: ResourceTableArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[ResourceTable] && o.asInstanceOf[ResourceTable].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

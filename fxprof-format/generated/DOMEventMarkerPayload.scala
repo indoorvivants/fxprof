@@ -28,6 +28,7 @@ class DOMEventMarkerPayload private (private[fxprof] val args: DOMEventMarkerPay
   
 
   override def equals(o: Any) = o.isInstanceOf[DOMEventMarkerPayload] && o.asInstanceOf[DOMEventMarkerPayload].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

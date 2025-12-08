@@ -60,6 +60,7 @@ class MarkerSchemaField private (private[fxprof] val args: MarkerSchemaFieldArgs
   
 
   override def equals(o: Any) = o.isInstanceOf[MarkerSchemaField] && o.asInstanceOf[MarkerSchemaField].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

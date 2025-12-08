@@ -125,6 +125,7 @@ class RawSamplesTable private (private[fxprof] val args: RawSamplesTableArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[RawSamplesTable] && o.asInstanceOf[RawSamplesTable].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

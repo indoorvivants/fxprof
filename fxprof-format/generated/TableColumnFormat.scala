@@ -30,6 +30,7 @@ class TableColumnFormat private (private[fxprof] val args: TableColumnFormatArgs
   
 
   override def equals(o: Any) = o.isInstanceOf[TableColumnFormat] && o.asInstanceOf[TableColumnFormat].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

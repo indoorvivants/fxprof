@@ -105,6 +105,7 @@ class Page private (private[fxprof] val args: PageArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[Page] && o.asInstanceOf[Page].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

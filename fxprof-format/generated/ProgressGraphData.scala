@@ -36,6 +36,7 @@ class ProgressGraphData private (private[fxprof] val args: ProgressGraphDataArgs
   
 
   override def equals(o: Any) = o.isInstanceOf[ProgressGraphData] && o.asInstanceOf[ProgressGraphData].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

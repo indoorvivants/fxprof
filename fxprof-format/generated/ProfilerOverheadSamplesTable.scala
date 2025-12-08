@@ -45,6 +45,7 @@ class ProfilerOverheadSamplesTable private (private[fxprof] val args: ProfilerOv
   
 
   override def equals(o: Any) = o.isInstanceOf[ProfilerOverheadSamplesTable] && o.asInstanceOf[ProfilerOverheadSamplesTable].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

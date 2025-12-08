@@ -18,6 +18,7 @@ class BrowsertimeMarkerPayload private (private[fxprof] val args: BrowsertimeMar
   
 
   override def equals(o: Any) = o.isInstanceOf[BrowsertimeMarkerPayload] && o.asInstanceOf[BrowsertimeMarkerPayload].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

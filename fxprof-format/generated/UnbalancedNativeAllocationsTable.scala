@@ -45,6 +45,7 @@ class UnbalancedNativeAllocationsTable private (private[fxprof] val args: Unbala
   
 
   override def equals(o: Any) = o.isInstanceOf[UnbalancedNativeAllocationsTable] && o.asInstanceOf[UnbalancedNativeAllocationsTable].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

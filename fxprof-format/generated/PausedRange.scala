@@ -40,6 +40,7 @@ class PausedRange private (private[fxprof] val args: PausedRangeArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[PausedRange] && o.asInstanceOf[PausedRange].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

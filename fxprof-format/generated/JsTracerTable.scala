@@ -38,6 +38,7 @@ class JsTracerTable private (private[fxprof] val args: JsTracerTableArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[JsTracerTable] && o.asInstanceOf[JsTracerTable].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

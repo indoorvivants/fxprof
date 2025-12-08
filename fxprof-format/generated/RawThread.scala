@@ -183,6 +183,7 @@ class RawThread private (private[fxprof] val args: RawThreadArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[RawThread] && o.asInstanceOf[RawThread].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

@@ -68,6 +68,7 @@ class RawMarkerTable private (private[fxprof] val args: RawMarkerTableArgs) {
   
 
   override def equals(o: Any) = o.isInstanceOf[RawMarkerTable] && o.asInstanceOf[RawMarkerTable].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

@@ -38,6 +38,7 @@ class PrefMarkerPayload private (private[fxprof] val args: PrefMarkerPayloadArgs
   
 
   override def equals(o: Any) = o.isInstanceOf[PrefMarkerPayload] && o.asInstanceOf[PrefMarkerPayload].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._

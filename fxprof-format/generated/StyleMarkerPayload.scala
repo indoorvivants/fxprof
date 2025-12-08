@@ -54,6 +54,7 @@ class StyleMarkerPayload private (private[fxprof] val args: StyleMarkerPayloadAr
   
 
   override def equals(o: Any) = o.isInstanceOf[StyleMarkerPayload] && o.asInstanceOf[StyleMarkerPayload].args.equals(this.args)
+  override def hashCode() = this.args.hashCode()
 }
 
 import com.github.plokhotnyuk.jsoniter_scala.macros._
