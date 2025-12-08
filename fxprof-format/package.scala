@@ -108,7 +108,7 @@ package object fxprof {
   object CategoryColor {
     case object Transparent extends CategoryColor("transparent")
     case object Purple extends CategoryColor("purple")
-    case object Green extends CategoryColor("")
+    case object Green extends CategoryColor("green")
     case object Orange extends CategoryColor("orange")
     case object Yellow extends CategoryColor("yellow")
     case object LightBlue extends CategoryColor("lightblue")
@@ -363,7 +363,6 @@ package object fxprof {
         out.writeVal(v(x))
       override def nullValue: T = ???
     }
-
 
   sealed abstract class MarkerDisplayLocation(value: String)
       extends StringLiteral(value)

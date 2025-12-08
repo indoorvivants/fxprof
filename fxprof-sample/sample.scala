@@ -133,6 +133,13 @@ class Tracer private (meta: ProfileMeta) {
     //   }
   }
 
+  val defaultCategory =
+    Category("default", CategoryColor.Grey).withSubcategories(Vector("Other"))
+  val categoryMap = meta.categories.toVector.flatten
+    .map(c => c.name -> c)
+    .toMap
+    .updated("default", defaultCategory)
+
   val strings = new Interner[String]
 
   case class Function(nameID: FunctionNameID)
@@ -166,9 +173,9 @@ class Tracer private (meta: ProfileMeta) {
   def build() = this.synchronized {
     val sources = SourceTable(0)
     val stringArray = strings.all.toVector
-    val cats = categories.all.toVector.map(
-      Category(_, CategoryColor.Blue).withSubcategories(Vector("Other"))
-    )
+    val cats = categories.all.toVector
+      .flatMap(categoryMap.get)
+      .map(_.withSubcategories(Vector("Other")))
 
     val framesTable = {
       val (categories, functions) =
@@ -218,9 +225,7 @@ class Tracer private (meta: ProfileMeta) {
     Profile(
       meta = this.meta.withCategories(
         Some(
-          cats :+ Category("default", CategoryColor.Grey).withSubcategories(
-            Vector("Other")
-          )
+          cats
         )
       ),
       shared = RawProfileSharedData(sources).withStringArray(stringArray)
@@ -270,11 +275,12 @@ class Tracer private (meta: ProfileMeta) {
   }
 
   def span[A](name: String, category: String)(f: => A) = {
+    val catName = categoryMap.getOrElse(category, categoryMap("default")).name
     val ts = threadStartupTime.get()
     val functionNameID = strings.id(name)
     val func = Function(functionNameID)
     val funcID = functions.id(func)
-    val categoryID = categories.id(category)
+    val categoryID = categories.id(catName)
     val prefix = currentStackPrefix.get()
     val frame = Frame(prefix, funcID, categoryID)
     val frameID = frames.id(frame)
@@ -298,19 +304,34 @@ object Tracer {
 }
 
 @main def sampleGenerate(args: String*) =
-  val t = Tracer(profile.meta)
-  t.span("lowering: bla ", "bla") {
-    t.span("lowering: bla.constants", "what") {
+  val t = Tracer(
+    profile.meta.withCategories(
+      Some(
+        Vector(
+          Category("lowering", CategoryColor.Yellow),
+          Category("optimising", CategoryColor.Blue),
+          Category("emitting", CategoryColor.Green)
+        )
+      )
+    )
+  )
+
+  t.span("bla ", "lowering") {
+    t.span("bla.constants", "lowering") {
       Thread.sleep(100)
-      t.span("optimising: bla ", "bla") {
+      t.span("bla ", "optimising") {
         Thread.sleep(200)
       }
-
     }
   }
 
-  t.span("emitting: bla", "what") {
-    Thread.sleep(400)
+  t.span("object bla", "emitting") {
+    t.span("bla$lzymap", "emitting") {
+      Thread.sleep(400)
+    }
+    t.span("bla.apply(..)", "emitting") {
+      Thread.sleep(100)
+    }
   }
 
   val prof = t.build()
