@@ -1,3 +1,4 @@
 procs:
   rebuild: "make watch-generate-sample"
   live: "live-server . --cors"
+  codegen: "make watch-codegen"

@@ -59,13 +59,13 @@ object ProfilerOverhead {
       pid = pid,
       mainThreadIndex = mainThreadIndex,
     ))
-  given JsonValueCodec[ProfilerOverhead] = 
+  implicit val codec: JsonValueCodec[ProfilerOverhead] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: ProfilerOverhead) = 
         new ProfilerOverhead(summon[JsonValueCodec[ProfilerOverheadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProfilerOverhead, out: JsonWriter) = 
-        summon[JsonValueCodec[ProfilerOverheadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[ProfilerOverheadArgs]].encodeValue(x.args, out)
       
       def nullValue: ProfilerOverhead = null
     }
@@ -78,7 +78,7 @@ private[fxprof] case class ProfilerOverheadArgs(
   mainThreadIndex: ThreadIndex,
 )
 private[fxprof] object ProfilerOverheadArgs {
-  given ConfiguredJsonValueCodec[ProfilerOverheadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[ProfilerOverheadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

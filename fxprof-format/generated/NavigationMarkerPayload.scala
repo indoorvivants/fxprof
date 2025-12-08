@@ -46,13 +46,13 @@ object NavigationMarkerPayload {
       eventType = None,
       innerWindowID = None,
     ))
-  given JsonValueCodec[NavigationMarkerPayload] = 
+  implicit val codec: JsonValueCodec[NavigationMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: NavigationMarkerPayload) = 
         new NavigationMarkerPayload(summon[JsonValueCodec[NavigationMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: NavigationMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[NavigationMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[NavigationMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: NavigationMarkerPayload = null
     }
@@ -65,7 +65,7 @@ private[fxprof] case class NavigationMarkerPayloadArgs(
   innerWindowID: Option[Double],
 )
 private[fxprof] object NavigationMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[NavigationMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[NavigationMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

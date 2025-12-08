@@ -56,13 +56,13 @@ object JsTracerTable {
       column = Vector.empty,
       length = length,
     ))
-  given JsonValueCodec[JsTracerTable] = 
+  implicit val codec: JsonValueCodec[JsTracerTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: JsTracerTable) = 
         new JsTracerTable(summon[JsonValueCodec[JsTracerTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: JsTracerTable, out: JsonWriter) = 
-        summon[JsonValueCodec[JsTracerTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[JsTracerTableArgs]].encodeValue(x.args, out)
       
       def nullValue: JsTracerTable = null
     }
@@ -77,7 +77,7 @@ private[fxprof] case class JsTracerTableArgs(
   length: Double,
 )
 private[fxprof] object JsTracerTableArgs {
-  given ConfiguredJsonValueCodec[JsTracerTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[JsTracerTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

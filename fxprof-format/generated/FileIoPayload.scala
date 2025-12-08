@@ -78,13 +78,13 @@ object FileIoPayload {
       filename = None,
       threadId = None,
     ))
-  given JsonValueCodec[FileIoPayload] = 
+  implicit val codec: JsonValueCodec[FileIoPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: FileIoPayload) = 
         new FileIoPayload(summon[JsonValueCodec[FileIoPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: FileIoPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[FileIoPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[FileIoPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: FileIoPayload = null
     }
@@ -99,7 +99,7 @@ private[fxprof] case class FileIoPayloadArgs(
   threadId: Option[Double],
 )
 private[fxprof] object FileIoPayloadArgs {
-  given ConfiguredJsonValueCodec[FileIoPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[FileIoPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

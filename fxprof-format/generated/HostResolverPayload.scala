@@ -50,13 +50,13 @@ object HostResolverPayload {
       originSuffix = originSuffix,
       flags = flags,
     ))
-  given JsonValueCodec[HostResolverPayload] = 
+  implicit val codec: JsonValueCodec[HostResolverPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: HostResolverPayload) = 
         new HostResolverPayload(summon[JsonValueCodec[HostResolverPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: HostResolverPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[HostResolverPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[HostResolverPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: HostResolverPayload = null
     }
@@ -69,7 +69,7 @@ private[fxprof] case class HostResolverPayloadArgs(
   flags: String,
 )
 private[fxprof] object HostResolverPayloadArgs {
-  given ConfiguredJsonValueCodec[HostResolverPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[HostResolverPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

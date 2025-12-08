@@ -97,13 +97,13 @@ object Profile {
       profilingLog = None,
       profileGatheringLog = None,
     ))
-  given JsonValueCodec[Profile] = 
+  implicit val codec: JsonValueCodec[Profile] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: Profile) = 
         new Profile(summon[JsonValueCodec[ProfileArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: Profile, out: JsonWriter) = 
-        summon[JsonValueCodec[ProfileArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[ProfileArgs]].encodeValue(x.args, out)
       
       def nullValue: Profile = null
     }
@@ -121,7 +121,7 @@ private[fxprof] case class ProfileArgs(
   profileGatheringLog: Option[ProfilingLog],
 )
 private[fxprof] object ProfileArgs {
-  given ConfiguredJsonValueCodec[ProfileArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[ProfileArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

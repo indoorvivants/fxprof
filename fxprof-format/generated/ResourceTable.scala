@@ -54,13 +54,13 @@ object ResourceTable {
       host = Vector.empty,
       `type` = Vector.empty,
     ))
-  given JsonValueCodec[ResourceTable] = 
+  implicit val codec: JsonValueCodec[ResourceTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: ResourceTable) = 
         new ResourceTable(summon[JsonValueCodec[ResourceTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ResourceTable, out: JsonWriter) = 
-        summon[JsonValueCodec[ResourceTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[ResourceTableArgs]].encodeValue(x.args, out)
       
       def nullValue: ResourceTable = null
     }
@@ -74,7 +74,7 @@ private[fxprof] case class ResourceTableArgs(
   `type`: Vector[ResourceTypeEnum],
 )
 private[fxprof] object ResourceTableArgs {
-  given ConfiguredJsonValueCodec[ResourceTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[ResourceTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

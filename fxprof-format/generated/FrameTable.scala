@@ -228,13 +228,13 @@ object FrameTable {
       column = Vector.empty,
       length = length,
     ))
-  given JsonValueCodec[FrameTable] = 
+  implicit val codec: JsonValueCodec[FrameTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: FrameTable) = 
         new FrameTable(summon[JsonValueCodec[FrameTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: FrameTable, out: JsonWriter) = 
-        summon[JsonValueCodec[FrameTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[FrameTableArgs]].encodeValue(x.args, out)
       
       def nullValue: FrameTable = null
     }
@@ -253,7 +253,7 @@ private[fxprof] case class FrameTableArgs(
   length: Double,
 )
 private[fxprof] object FrameTableArgs {
-  given ConfiguredJsonValueCodec[FrameTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[FrameTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

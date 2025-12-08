@@ -32,13 +32,13 @@ object NoPayloadUserData {
       `type` = `type`,
       innerWindowID = None,
     ))
-  given JsonValueCodec[NoPayloadUserData] = 
+  implicit val codec: JsonValueCodec[NoPayloadUserData] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: NoPayloadUserData) = 
         new NoPayloadUserData(summon[JsonValueCodec[NoPayloadUserDataArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: NoPayloadUserData, out: JsonWriter) = 
-        summon[JsonValueCodec[NoPayloadUserDataArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[NoPayloadUserDataArgs]].encodeValue(x.args, out)
       
       def nullValue: NoPayloadUserData = null
     }
@@ -49,7 +49,7 @@ private[fxprof] case class NoPayloadUserDataArgs(
   innerWindowID: Option[Double],
 )
 private[fxprof] object NoPayloadUserDataArgs {
-  given ConfiguredJsonValueCodec[NoPayloadUserDataArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[NoPayloadUserDataArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -140,13 +140,13 @@ object VisualMetrics {
       VisualComplete95 = VisualComplete95,
       VisualComplete99 = VisualComplete99,
     ))
-  given JsonValueCodec[VisualMetrics] = 
+  implicit val codec: JsonValueCodec[VisualMetrics] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: VisualMetrics) = 
         new VisualMetrics(summon[JsonValueCodec[VisualMetricsArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: VisualMetrics, out: JsonWriter) = 
-        summon[JsonValueCodec[VisualMetricsArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[VisualMetricsArgs]].encodeValue(x.args, out)
       
       def nullValue: VisualMetrics = null
     }
@@ -167,7 +167,7 @@ private[fxprof] case class VisualMetricsArgs(
   VisualComplete99: Double,
 )
 private[fxprof] object VisualMetricsArgs {
-  given ConfiguredJsonValueCodec[VisualMetricsArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[VisualMetricsArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

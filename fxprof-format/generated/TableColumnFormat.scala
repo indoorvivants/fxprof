@@ -42,13 +42,13 @@ object TableColumnFormat {
       `type` = None,
       label = None,
     ))
-  given JsonValueCodec[TableColumnFormat] = 
+  implicit val codec: JsonValueCodec[TableColumnFormat] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: TableColumnFormat) = 
         new TableColumnFormat(summon[JsonValueCodec[TableColumnFormatArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: TableColumnFormat, out: JsonWriter) = 
-        summon[JsonValueCodec[TableColumnFormatArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[TableColumnFormatArgs]].encodeValue(x.args, out)
       
       def nullValue: TableColumnFormat = null
     }
@@ -59,7 +59,7 @@ private[fxprof] case class TableColumnFormatArgs(
   label: Option[String],
 )
 private[fxprof] object TableColumnFormatArgs {
-  given ConfiguredJsonValueCodec[TableColumnFormatArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[TableColumnFormatArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

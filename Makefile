@@ -10,3 +10,6 @@ watch-generate-sample:
 
 codegen:
 	scala-cli run fxprof-codegen -- ./fxprof-format/generated
+
+watch-codegen:
+	scala-cli run -w fxprof-codegen -- ./fxprof-format/generated

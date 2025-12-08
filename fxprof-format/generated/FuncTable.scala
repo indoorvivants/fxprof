@@ -129,13 +129,13 @@ object FuncTable {
       columnNumber = Vector.empty,
       length = length,
     ))
-  given JsonValueCodec[FuncTable] = 
+  implicit val codec: JsonValueCodec[FuncTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: FuncTable) = 
         new FuncTable(summon[JsonValueCodec[FuncTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: FuncTable, out: JsonWriter) = 
-        summon[JsonValueCodec[FuncTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[FuncTableArgs]].encodeValue(x.args, out)
       
       def nullValue: FuncTable = null
     }
@@ -152,7 +152,7 @@ private[fxprof] case class FuncTableArgs(
   length: Double,
 )
 private[fxprof] object FuncTableArgs {
-  given ConfiguredJsonValueCodec[FuncTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[FuncTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

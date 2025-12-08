@@ -72,13 +72,13 @@ object RawCounter {
       mainThreadIndex = mainThreadIndex,
       samples = samples,
     ))
-  given JsonValueCodec[RawCounter] = 
+  implicit val codec: JsonValueCodec[RawCounter] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: RawCounter) = 
         new RawCounter(summon[JsonValueCodec[RawCounterArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: RawCounter, out: JsonWriter) = 
-        summon[JsonValueCodec[RawCounterArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[RawCounterArgs]].encodeValue(x.args, out)
       
       def nullValue: RawCounter = null
     }
@@ -94,7 +94,7 @@ private[fxprof] case class RawCounterArgs(
   samples: RawCounterSamplesTable,
 )
 private[fxprof] object RawCounterArgs {
-  given ConfiguredJsonValueCodec[RawCounterArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[RawCounterArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

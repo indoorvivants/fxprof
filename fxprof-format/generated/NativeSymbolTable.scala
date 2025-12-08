@@ -84,13 +84,13 @@ object NativeSymbolTable {
       functionSize = Vector.empty,
       length = length,
     ))
-  given JsonValueCodec[NativeSymbolTable] = 
+  implicit val codec: JsonValueCodec[NativeSymbolTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: NativeSymbolTable) = 
         new NativeSymbolTable(summon[JsonValueCodec[NativeSymbolTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: NativeSymbolTable, out: JsonWriter) = 
-        summon[JsonValueCodec[NativeSymbolTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[NativeSymbolTableArgs]].encodeValue(x.args, out)
       
       def nullValue: NativeSymbolTable = null
     }
@@ -104,7 +104,7 @@ private[fxprof] case class NativeSymbolTableArgs(
   length: Double,
 )
 private[fxprof] object NativeSymbolTableArgs {
-  given ConfiguredJsonValueCodec[NativeSymbolTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[NativeSymbolTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

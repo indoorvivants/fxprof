@@ -61,13 +61,13 @@ object GPUMarkerPayload {
       gpustart = gpustart,
       gpuend = gpuend,
     ))
-  given JsonValueCodec[GPUMarkerPayload] = 
+  implicit val codec: JsonValueCodec[GPUMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: GPUMarkerPayload) = 
         new GPUMarkerPayload(summon[JsonValueCodec[GPUMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: GPUMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[GPUMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[GPUMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: GPUMarkerPayload = null
     }
@@ -81,7 +81,7 @@ private[fxprof] case class GPUMarkerPayloadArgs(
   gpuend: Milliseconds,
 )
 private[fxprof] object GPUMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[GPUMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[GPUMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -390,13 +390,13 @@ object NetworkPayload {
       responseStart = None,
       responseEnd = None,
     ))
-  given JsonValueCodec[NetworkPayload] = 
+  implicit val codec: JsonValueCodec[NetworkPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: NetworkPayload) = 
         new NetworkPayload(summon[JsonValueCodec[NetworkPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: NetworkPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[NetworkPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[NetworkPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: NetworkPayload = null
     }
@@ -436,7 +436,7 @@ private[fxprof] case class NetworkPayloadArgs(
   responseEnd: Option[Milliseconds],
 )
 private[fxprof] object NetworkPayloadArgs {
-  given ConfiguredJsonValueCodec[NetworkPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[NetworkPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

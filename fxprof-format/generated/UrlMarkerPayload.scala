@@ -34,13 +34,13 @@ object UrlMarkerPayload {
       `type` = `type`,
       url = url,
     ))
-  given JsonValueCodec[UrlMarkerPayload] = 
+  implicit val codec: JsonValueCodec[UrlMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: UrlMarkerPayload) = 
         new UrlMarkerPayload(summon[JsonValueCodec[UrlMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: UrlMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[UrlMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[UrlMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: UrlMarkerPayload = null
     }
@@ -51,7 +51,7 @@ private[fxprof] case class UrlMarkerPayloadArgs(
   url: String,
 )
 private[fxprof] object UrlMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[UrlMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[UrlMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

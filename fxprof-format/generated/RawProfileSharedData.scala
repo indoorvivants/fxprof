@@ -49,13 +49,13 @@ object RawProfileSharedData {
       stringArray = Vector.empty,
       sources = sources,
     ))
-  given JsonValueCodec[RawProfileSharedData] = 
+  implicit val codec: JsonValueCodec[RawProfileSharedData] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: RawProfileSharedData) = 
         new RawProfileSharedData(summon[JsonValueCodec[RawProfileSharedDataArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: RawProfileSharedData, out: JsonWriter) = 
-        summon[JsonValueCodec[RawProfileSharedDataArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[RawProfileSharedDataArgs]].encodeValue(x.args, out)
       
       def nullValue: RawProfileSharedData = null
     }
@@ -66,7 +66,7 @@ private[fxprof] case class RawProfileSharedDataArgs(
   sources: SourceTable,
 )
 private[fxprof] object RawProfileSharedDataArgs {
-  given ConfiguredJsonValueCodec[RawProfileSharedDataArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[RawProfileSharedDataArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

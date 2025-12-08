@@ -88,13 +88,13 @@ object RawMarkerTable {
       threadId = None,
       length = length,
     ))
-  given JsonValueCodec[RawMarkerTable] = 
+  implicit val codec: JsonValueCodec[RawMarkerTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: RawMarkerTable) = 
         new RawMarkerTable(summon[JsonValueCodec[RawMarkerTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: RawMarkerTable, out: JsonWriter) = 
-        summon[JsonValueCodec[RawMarkerTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[RawMarkerTableArgs]].encodeValue(x.args, out)
       
       def nullValue: RawMarkerTable = null
     }
@@ -111,7 +111,7 @@ private[fxprof] case class RawMarkerTableArgs(
   length: Double,
 )
 private[fxprof] object RawMarkerTableArgs {
-  given ConfiguredJsonValueCodec[RawMarkerTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[RawMarkerTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

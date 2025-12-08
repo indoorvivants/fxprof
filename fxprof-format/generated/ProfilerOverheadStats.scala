@@ -198,13 +198,13 @@ object ProfilerOverheadStats {
       profiledDuration = profiledDuration,
       samplingCount = samplingCount,
     ))
-  given JsonValueCodec[ProfilerOverheadStats] = 
+  implicit val codec: JsonValueCodec[ProfilerOverheadStats] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: ProfilerOverheadStats) = 
         new ProfilerOverheadStats(summon[JsonValueCodec[ProfilerOverheadStatsArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProfilerOverheadStats, out: JsonWriter) = 
-        summon[JsonValueCodec[ProfilerOverheadStatsArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[ProfilerOverheadStatsArgs]].encodeValue(x.args, out)
       
       def nullValue: ProfilerOverheadStats = null
     }
@@ -235,7 +235,7 @@ private[fxprof] case class ProfilerOverheadStatsArgs(
   samplingCount: Microseconds,
 )
 private[fxprof] object ProfilerOverheadStatsArgs {
-  given ConfiguredJsonValueCodec[ProfilerOverheadStatsArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[ProfilerOverheadStatsArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

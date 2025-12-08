@@ -46,13 +46,13 @@ object LogMarkerPayload {
       name = name,
       module = module,
     ))
-  given JsonValueCodec[LogMarkerPayload] = 
+  implicit val codec: JsonValueCodec[LogMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: LogMarkerPayload) = 
         new LogMarkerPayload(summon[JsonValueCodec[LogMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: LogMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[LogMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[LogMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: LogMarkerPayload = null
     }
@@ -64,7 +64,7 @@ private[fxprof] case class LogMarkerPayloadArgs(
   module: String,
 )
 private[fxprof] object LogMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[LogMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[LogMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -46,13 +46,13 @@ object UserTimingMarkerPayload {
       name = name,
       entryType = entryType,
     ))
-  given JsonValueCodec[UserTimingMarkerPayload] = 
+  implicit val codec: JsonValueCodec[UserTimingMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: UserTimingMarkerPayload) = 
         new UserTimingMarkerPayload(summon[JsonValueCodec[UserTimingMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: UserTimingMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[UserTimingMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[UserTimingMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: UserTimingMarkerPayload = null
     }
@@ -64,7 +64,7 @@ private[fxprof] case class UserTimingMarkerPayloadArgs(
   entryType: UserTimingMarkerPayload_EntryType,
 )
 private[fxprof] object UserTimingMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[UserTimingMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[UserTimingMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

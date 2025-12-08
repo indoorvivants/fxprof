@@ -34,13 +34,13 @@ object BrowsertimeMarkerPayload {
       `type` = `type`,
       percentage = percentage,
     ))
-  given JsonValueCodec[BrowsertimeMarkerPayload] = 
+  implicit val codec: JsonValueCodec[BrowsertimeMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: BrowsertimeMarkerPayload) = 
         new BrowsertimeMarkerPayload(summon[JsonValueCodec[BrowsertimeMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: BrowsertimeMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[BrowsertimeMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[BrowsertimeMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: BrowsertimeMarkerPayload = null
     }
@@ -51,7 +51,7 @@ private[fxprof] case class BrowsertimeMarkerPayloadArgs(
   percentage: Double,
 )
 private[fxprof] object BrowsertimeMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[BrowsertimeMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[BrowsertimeMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

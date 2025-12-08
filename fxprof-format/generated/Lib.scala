@@ -104,13 +104,13 @@ object Lib {
       breakpadId = breakpadId,
       codeId = None,
     ))
-  given JsonValueCodec[Lib] = 
+  implicit val codec: JsonValueCodec[Lib] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: Lib) = 
         new Lib(summon[JsonValueCodec[LibArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: Lib, out: JsonWriter) = 
-        summon[JsonValueCodec[LibArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[LibArgs]].encodeValue(x.args, out)
       
       def nullValue: Lib = null
     }
@@ -126,7 +126,7 @@ private[fxprof] case class LibArgs(
   codeId: Option[String],
 )
 private[fxprof] object LibArgs {
-  given ConfiguredJsonValueCodec[LibArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[LibArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

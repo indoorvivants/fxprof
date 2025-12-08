@@ -55,13 +55,13 @@ object PausedRange {
       endTime = None,
       reason = reason,
     ))
-  given JsonValueCodec[PausedRange] = 
+  implicit val codec: JsonValueCodec[PausedRange] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: PausedRange) = 
         new PausedRange(summon[JsonValueCodec[PausedRangeArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: PausedRange, out: JsonWriter) = 
-        summon[JsonValueCodec[PausedRangeArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[PausedRangeArgs]].encodeValue(x.args, out)
       
       def nullValue: PausedRange = null
     }
@@ -73,7 +73,7 @@ private[fxprof] case class PausedRangeArgs(
   reason: PausedRange_Reason,
 )
 private[fxprof] object PausedRangeArgs {
-  given ConfiguredJsonValueCodec[PausedRangeArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[PausedRangeArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

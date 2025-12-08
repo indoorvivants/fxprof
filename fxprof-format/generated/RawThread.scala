@@ -246,13 +246,13 @@ object RawThread {
       isPrivateBrowsing = None,
       userContextId = None,
     ))
-  given JsonValueCodec[RawThread] = 
+  implicit val codec: JsonValueCodec[RawThread] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: RawThread) = 
         new RawThread(summon[JsonValueCodec[RawThreadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: RawThread, out: JsonWriter) = 
-        summon[JsonValueCodec[RawThreadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[RawThreadArgs]].encodeValue(x.args, out)
       
       def nullValue: RawThread = null
     }
@@ -286,7 +286,7 @@ private[fxprof] case class RawThreadArgs(
   userContextId: Option[Double],
 )
 private[fxprof] object RawThreadArgs {
-  given ConfiguredJsonValueCodec[RawThreadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[RawThreadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

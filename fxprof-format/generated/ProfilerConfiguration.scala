@@ -69,13 +69,13 @@ object ProfilerConfiguration {
       duration = None,
       activeTabID = None,
     ))
-  given JsonValueCodec[ProfilerConfiguration] = 
+  implicit val codec: JsonValueCodec[ProfilerConfiguration] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: ProfilerConfiguration) = 
         new ProfilerConfiguration(summon[JsonValueCodec[ProfilerConfigurationArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProfilerConfiguration, out: JsonWriter) = 
-        summon[JsonValueCodec[ProfilerConfigurationArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[ProfilerConfigurationArgs]].encodeValue(x.args, out)
       
       def nullValue: ProfilerConfiguration = null
     }
@@ -89,7 +89,7 @@ private[fxprof] case class ProfilerConfigurationArgs(
   activeTabID: Option[TabID],
 )
 private[fxprof] object ProfilerConfigurationArgs {
-  given ConfiguredJsonValueCodec[ProfilerConfigurationArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[ProfilerConfigurationArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

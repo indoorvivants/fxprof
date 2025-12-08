@@ -63,13 +63,13 @@ object Category {
       color = color,
       subcategories = Vector.empty,
     ))
-  given JsonValueCodec[Category] = 
+  implicit val codec: JsonValueCodec[Category] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: Category) = 
         new Category(summon[JsonValueCodec[CategoryArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: Category, out: JsonWriter) = 
-        summon[JsonValueCodec[CategoryArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[CategoryArgs]].encodeValue(x.args, out)
       
       def nullValue: Category = null
     }
@@ -81,7 +81,7 @@ private[fxprof] case class CategoryArgs(
   subcategories: Vector[String],
 )
 private[fxprof] object CategoryArgs {
-  given ConfiguredJsonValueCodec[CategoryArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[CategoryArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

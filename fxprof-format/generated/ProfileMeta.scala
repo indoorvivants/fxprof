@@ -611,13 +611,13 @@ object ProfileMeta {
       keepProfileThreadOrder = None,
       gramsOfCO2ePerKWh = None,
     ))
-  given JsonValueCodec[ProfileMeta] = 
+  implicit val codec: JsonValueCodec[ProfileMeta] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: ProfileMeta) = 
         new ProfileMeta(summon[JsonValueCodec[ProfileMetaArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProfileMeta, out: JsonWriter) = 
-        summon[JsonValueCodec[ProfileMetaArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[ProfileMetaArgs]].encodeValue(x.args, out)
       
       def nullValue: ProfileMeta = null
     }
@@ -668,7 +668,7 @@ private[fxprof] case class ProfileMetaArgs(
   gramsOfCO2ePerKWh: Option[Double],
 )
 private[fxprof] object ProfileMetaArgs {
-  given ConfiguredJsonValueCodec[ProfileMetaArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[ProfileMetaArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

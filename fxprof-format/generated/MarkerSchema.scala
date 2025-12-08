@@ -172,13 +172,13 @@ object MarkerSchema {
       colorField = None,
       isStackBased = None,
     ))
-  given JsonValueCodec[MarkerSchema] = 
+  implicit val codec: JsonValueCodec[MarkerSchema] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: MarkerSchema) = 
         new MarkerSchema(summon[JsonValueCodec[MarkerSchemaArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: MarkerSchema, out: JsonWriter) = 
-        summon[JsonValueCodec[MarkerSchemaArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[MarkerSchemaArgs]].encodeValue(x.args, out)
       
       def nullValue: MarkerSchema = null
     }
@@ -197,7 +197,7 @@ private[fxprof] case class MarkerSchemaArgs(
   isStackBased: Option[Boolean],
 )
 private[fxprof] object MarkerSchemaArgs {
-  given ConfiguredJsonValueCodec[MarkerSchemaArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[MarkerSchemaArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

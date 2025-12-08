@@ -26,13 +26,13 @@ object BHRMarkerPayload {
     new BHRMarkerPayload(BHRMarkerPayloadArgs(
       `type` = `type`,
     ))
-  given JsonValueCodec[BHRMarkerPayload] = 
+  implicit val codec: JsonValueCodec[BHRMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: BHRMarkerPayload) = 
         new BHRMarkerPayload(summon[JsonValueCodec[BHRMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: BHRMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[BHRMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[BHRMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: BHRMarkerPayload = null
     }
@@ -42,7 +42,7 @@ private[fxprof] case class BHRMarkerPayloadArgs(
   `type`: BHRMarkerPayload_Type.type,
 )
 private[fxprof] object BHRMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[BHRMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[BHRMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

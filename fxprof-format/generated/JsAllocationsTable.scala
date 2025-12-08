@@ -88,13 +88,13 @@ object JsAllocationsTable {
       stack = Vector.empty,
       length = length,
     ))
-  given JsonValueCodec[JsAllocationsTable] = 
+  implicit val codec: JsonValueCodec[JsAllocationsTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: JsAllocationsTable) = 
         new JsAllocationsTable(summon[JsonValueCodec[JsAllocationsTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: JsAllocationsTable, out: JsonWriter) = 
-        summon[JsonValueCodec[JsAllocationsTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[JsAllocationsTableArgs]].encodeValue(x.args, out)
       
       def nullValue: JsAllocationsTable = null
     }
@@ -112,7 +112,7 @@ private[fxprof] case class JsAllocationsTableArgs(
   length: Double,
 )
 private[fxprof] object JsAllocationsTableArgs {
-  given ConfiguredJsonValueCodec[JsAllocationsTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[JsAllocationsTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

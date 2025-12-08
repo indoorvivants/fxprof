@@ -40,13 +40,13 @@ object PaintProfilerMarkerTracing {
       category = category,
       cause = None,
     ))
-  given JsonValueCodec[PaintProfilerMarkerTracing] = 
+  implicit val codec: JsonValueCodec[PaintProfilerMarkerTracing] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: PaintProfilerMarkerTracing) = 
         new PaintProfilerMarkerTracing(summon[JsonValueCodec[PaintProfilerMarkerTracingArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: PaintProfilerMarkerTracing, out: JsonWriter) = 
-        summon[JsonValueCodec[PaintProfilerMarkerTracingArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[PaintProfilerMarkerTracingArgs]].encodeValue(x.args, out)
       
       def nullValue: PaintProfilerMarkerTracing = null
     }
@@ -58,7 +58,7 @@ private[fxprof] case class PaintProfilerMarkerTracingArgs(
   cause: Option[CauseBacktrace],
 )
 private[fxprof] object PaintProfilerMarkerTracingArgs {
-  given ConfiguredJsonValueCodec[PaintProfilerMarkerTracingArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[PaintProfilerMarkerTracingArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

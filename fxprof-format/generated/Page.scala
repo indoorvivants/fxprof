@@ -134,13 +134,13 @@ object Page {
       isPrivateBrowsing = None,
       favicon = None,
     ))
-  given JsonValueCodec[Page] = 
+  implicit val codec: JsonValueCodec[Page] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: Page) = 
         new Page(summon[JsonValueCodec[PageArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: Page, out: JsonWriter) = 
-        summon[JsonValueCodec[PageArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[PageArgs]].encodeValue(x.args, out)
       
       def nullValue: Page = null
     }
@@ -155,7 +155,7 @@ private[fxprof] case class PageArgs(
   favicon: Option[Option[String]],
 )
 private[fxprof] object PageArgs {
-  given ConfiguredJsonValueCodec[PageArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[PageArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

@@ -46,13 +46,13 @@ object DOMEventMarkerPayload {
       eventType = eventType,
       innerWindowID = None,
     ))
-  given JsonValueCodec[DOMEventMarkerPayload] = 
+  implicit val codec: JsonValueCodec[DOMEventMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: DOMEventMarkerPayload) = 
         new DOMEventMarkerPayload(summon[JsonValueCodec[DOMEventMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: DOMEventMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[DOMEventMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[DOMEventMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: DOMEventMarkerPayload = null
     }
@@ -65,7 +65,7 @@ private[fxprof] case class DOMEventMarkerPayloadArgs(
   innerWindowID: Option[Double],
 )
 private[fxprof] object DOMEventMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[DOMEventMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[DOMEventMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

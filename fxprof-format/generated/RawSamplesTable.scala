@@ -149,13 +149,13 @@ object RawSamplesTable {
       threadId = None,
       length = length,
     ))
-  given JsonValueCodec[RawSamplesTable] = 
+  implicit val codec: JsonValueCodec[RawSamplesTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: RawSamplesTable) = 
         new RawSamplesTable(summon[JsonValueCodec[RawSamplesTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: RawSamplesTable, out: JsonWriter) = 
-        summon[JsonValueCodec[RawSamplesTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[RawSamplesTableArgs]].encodeValue(x.args, out)
       
       def nullValue: RawSamplesTable = null
     }
@@ -174,7 +174,7 @@ private[fxprof] case class RawSamplesTableArgs(
   length: Double,
 )
 private[fxprof] object RawSamplesTableArgs {
-  given ConfiguredJsonValueCodec[RawSamplesTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[RawSamplesTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

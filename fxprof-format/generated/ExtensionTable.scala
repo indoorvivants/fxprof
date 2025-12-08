@@ -44,13 +44,13 @@ object ExtensionTable {
       name = Vector.empty,
       length = length,
     ))
-  given JsonValueCodec[ExtensionTable] = 
+  implicit val codec: JsonValueCodec[ExtensionTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: ExtensionTable) = 
         new ExtensionTable(summon[JsonValueCodec[ExtensionTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ExtensionTable, out: JsonWriter) = 
-        summon[JsonValueCodec[ExtensionTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[ExtensionTableArgs]].encodeValue(x.args, out)
       
       def nullValue: ExtensionTable = null
     }
@@ -63,7 +63,7 @@ private[fxprof] case class ExtensionTableArgs(
   length: Double,
 )
 private[fxprof] object ExtensionTableArgs {
-  given ConfiguredJsonValueCodec[ExtensionTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[ExtensionTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

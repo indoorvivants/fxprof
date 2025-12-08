@@ -34,13 +34,13 @@ object LongTaskMarkerPayload {
       `type` = `type`,
       category = category,
     ))
-  given JsonValueCodec[LongTaskMarkerPayload] = 
+  implicit val codec: JsonValueCodec[LongTaskMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: LongTaskMarkerPayload) = 
         new LongTaskMarkerPayload(summon[JsonValueCodec[LongTaskMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: LongTaskMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[LongTaskMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[LongTaskMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: LongTaskMarkerPayload = null
     }
@@ -51,7 +51,7 @@ private[fxprof] case class LongTaskMarkerPayloadArgs(
   category: LongTaskMarkerPayload_Category.type,
 )
 private[fxprof] object LongTaskMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[LongTaskMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[LongTaskMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

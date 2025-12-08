@@ -50,13 +50,13 @@ object CauseBacktrace {
       time = None,
       stack = None,
     ))
-  given JsonValueCodec[CauseBacktrace] = 
+  implicit val codec: JsonValueCodec[CauseBacktrace] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: CauseBacktrace) = 
         new CauseBacktrace(summon[JsonValueCodec[CauseBacktraceArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: CauseBacktrace, out: JsonWriter) = 
-        summon[JsonValueCodec[CauseBacktraceArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[CauseBacktraceArgs]].encodeValue(x.args, out)
       
       def nullValue: CauseBacktrace = null
     }
@@ -68,7 +68,7 @@ private[fxprof] case class CauseBacktraceArgs(
   stack: Option[IndexIntoStackTable],
 )
 private[fxprof] object CauseBacktraceArgs {
-  given ConfiguredJsonValueCodec[CauseBacktraceArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[CauseBacktraceArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

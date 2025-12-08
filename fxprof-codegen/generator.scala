@@ -405,7 +405,7 @@ def render(struct: Record, params: List[(Field, Type)]) =
                     s"${sanitiseFieldName(name)} = ${value},"
                   )
 
-      block(s"given JsonValueCodec[$structName] = ", ""):
+      block(s"implicit val codec: JsonValueCodec[$structName] = ", ""):
         block("new JsonValueCodec {", "}"):
           block(
             s"def decodeValue(in: JsonReader, default: $structName) = ",
@@ -420,7 +420,7 @@ def render(struct: Record, params: List[(Field, Type)]) =
             ""
           ):
             line(
-              s"summon[JsonValueCodec[${structArgsName}]].encodeValue(x.args, out)"
+              s"implicitly[JsonValueCodec[${structArgsName}]].encodeValue(x.args, out)"
             )
 
           line(s"def nullValue: $structName = null")
@@ -431,7 +431,10 @@ def render(struct: Record, params: List[(Field, Type)]) =
           line(s"${sanitiseFieldName(name)}: ${types(name)},")
 
     block(s"private[fxprof] object ${structArgsName} {", "}"):
-      block(s"given ConfiguredJsonValueCodec[${structArgsName}] = ", ""):
+      block(
+        s"implicit val codec: ConfiguredJsonValueCodec[${structArgsName}] = ",
+        ""
+      ):
         line(
           "ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))"
         )

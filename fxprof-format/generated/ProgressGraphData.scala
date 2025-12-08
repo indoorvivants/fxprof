@@ -50,13 +50,13 @@ object ProgressGraphData {
       percent = percent,
       timestamp = None,
     ))
-  given JsonValueCodec[ProgressGraphData] = 
+  implicit val codec: JsonValueCodec[ProgressGraphData] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: ProgressGraphData) = 
         new ProgressGraphData(summon[JsonValueCodec[ProgressGraphDataArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProgressGraphData, out: JsonWriter) = 
-        summon[JsonValueCodec[ProgressGraphDataArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[ProgressGraphDataArgs]].encodeValue(x.args, out)
       
       def nullValue: ProgressGraphData = null
     }
@@ -67,7 +67,7 @@ private[fxprof] case class ProgressGraphDataArgs(
   timestamp: Option[Milliseconds],
 )
 private[fxprof] object ProgressGraphDataArgs {
-  given ConfiguredJsonValueCodec[ProgressGraphDataArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[ProgressGraphDataArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

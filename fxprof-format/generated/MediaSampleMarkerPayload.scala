@@ -42,13 +42,13 @@ object MediaSampleMarkerPayload {
       sampleStartTimeUs = sampleStartTimeUs,
       sampleEndTimeUs = sampleEndTimeUs,
     ))
-  given JsonValueCodec[MediaSampleMarkerPayload] = 
+  implicit val codec: JsonValueCodec[MediaSampleMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: MediaSampleMarkerPayload) = 
         new MediaSampleMarkerPayload(summon[JsonValueCodec[MediaSampleMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: MediaSampleMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[MediaSampleMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[MediaSampleMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: MediaSampleMarkerPayload = null
     }
@@ -60,7 +60,7 @@ private[fxprof] case class MediaSampleMarkerPayloadArgs(
   sampleEndTimeUs: Microseconds,
 )
 private[fxprof] object MediaSampleMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[MediaSampleMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[MediaSampleMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

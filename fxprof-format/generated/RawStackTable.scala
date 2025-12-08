@@ -57,13 +57,13 @@ object RawStackTable {
       prefix = Vector.empty,
       length = length,
     ))
-  given JsonValueCodec[RawStackTable] = 
+  implicit val codec: JsonValueCodec[RawStackTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: RawStackTable) = 
         new RawStackTable(summon[JsonValueCodec[RawStackTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: RawStackTable, out: JsonWriter) = 
-        summon[JsonValueCodec[RawStackTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[RawStackTableArgs]].encodeValue(x.args, out)
       
       def nullValue: RawStackTable = null
     }
@@ -75,7 +75,7 @@ private[fxprof] case class RawStackTableArgs(
   length: Double,
 )
 private[fxprof] object RawStackTableArgs {
-  given ConfiguredJsonValueCodec[RawStackTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[RawStackTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

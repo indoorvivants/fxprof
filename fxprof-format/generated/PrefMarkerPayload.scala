@@ -66,13 +66,13 @@ object PrefMarkerPayload {
       prefType = prefType,
       prefValue = prefValue,
     ))
-  given JsonValueCodec[PrefMarkerPayload] = 
+  implicit val codec: JsonValueCodec[PrefMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: PrefMarkerPayload) = 
         new PrefMarkerPayload(summon[JsonValueCodec[PrefMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: PrefMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[PrefMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[PrefMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: PrefMarkerPayload = null
     }
@@ -87,7 +87,7 @@ private[fxprof] case class PrefMarkerPayloadArgs(
   prefValue: String,
 )
 private[fxprof] object PrefMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[PrefMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[PrefMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

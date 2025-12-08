@@ -63,13 +63,13 @@ object ProfilerOverheadSamplesTable {
       time = Vector.empty,
       length = length,
     ))
-  given JsonValueCodec[ProfilerOverheadSamplesTable] = 
+  implicit val codec: JsonValueCodec[ProfilerOverheadSamplesTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: ProfilerOverheadSamplesTable) = 
         new ProfilerOverheadSamplesTable(summon[JsonValueCodec[ProfilerOverheadSamplesTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: ProfilerOverheadSamplesTable, out: JsonWriter) = 
-        summon[JsonValueCodec[ProfilerOverheadSamplesTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[ProfilerOverheadSamplesTableArgs]].encodeValue(x.args, out)
       
       def nullValue: ProfilerOverheadSamplesTable = null
     }
@@ -84,7 +84,7 @@ private[fxprof] case class ProfilerOverheadSamplesTableArgs(
   length: Double,
 )
 private[fxprof] object ProfilerOverheadSamplesTableArgs {
-  given ConfiguredJsonValueCodec[ProfilerOverheadSamplesTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[ProfilerOverheadSamplesTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

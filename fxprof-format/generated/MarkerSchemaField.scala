@@ -79,13 +79,13 @@ object MarkerSchemaField {
       format = format,
       hidden = None,
     ))
-  given JsonValueCodec[MarkerSchemaField] = 
+  implicit val codec: JsonValueCodec[MarkerSchemaField] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: MarkerSchemaField) = 
         new MarkerSchemaField(summon[JsonValueCodec[MarkerSchemaFieldArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: MarkerSchemaField, out: JsonWriter) = 
-        summon[JsonValueCodec[MarkerSchemaFieldArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[MarkerSchemaFieldArgs]].encodeValue(x.args, out)
       
       def nullValue: MarkerSchemaField = null
     }
@@ -98,7 +98,7 @@ private[fxprof] case class MarkerSchemaFieldArgs(
   hidden: Option[Boolean],
 )
 private[fxprof] object MarkerSchemaFieldArgs {
-  given ConfiguredJsonValueCodec[MarkerSchemaFieldArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[MarkerSchemaFieldArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

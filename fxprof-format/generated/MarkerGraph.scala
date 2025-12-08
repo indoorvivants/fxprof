@@ -40,13 +40,13 @@ object MarkerGraph {
       `type` = `type`,
       color = None,
     ))
-  given JsonValueCodec[MarkerGraph] = 
+  implicit val codec: JsonValueCodec[MarkerGraph] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: MarkerGraph) = 
         new MarkerGraph(summon[JsonValueCodec[MarkerGraphArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: MarkerGraph, out: JsonWriter) = 
-        summon[JsonValueCodec[MarkerGraphArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[MarkerGraphArgs]].encodeValue(x.args, out)
       
       def nullValue: MarkerGraph = null
     }
@@ -58,7 +58,7 @@ private[fxprof] case class MarkerGraphArgs(
   color: Option[GraphColor],
 )
 private[fxprof] object MarkerGraphArgs {
-  given ConfiguredJsonValueCodec[MarkerGraphArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[MarkerGraphArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

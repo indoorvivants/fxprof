@@ -182,13 +182,13 @@ object IPCMarkerPayload {
       recvTid = None,
       niceDirection = None,
     ))
-  given JsonValueCodec[IPCMarkerPayload] = 
+  implicit val codec: JsonValueCodec[IPCMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: IPCMarkerPayload) = 
         new IPCMarkerPayload(summon[JsonValueCodec[IPCMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: IPCMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[IPCMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[IPCMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: IPCMarkerPayload = null
     }
@@ -214,7 +214,7 @@ private[fxprof] case class IPCMarkerPayloadArgs(
   niceDirection: Option[String],
 )
 private[fxprof] object IPCMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[IPCMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[IPCMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

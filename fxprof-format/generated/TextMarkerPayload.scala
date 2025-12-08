@@ -46,13 +46,13 @@ object TextMarkerPayload {
       cause = None,
       innerWindowID = None,
     ))
-  given JsonValueCodec[TextMarkerPayload] = 
+  implicit val codec: JsonValueCodec[TextMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: TextMarkerPayload) = 
         new TextMarkerPayload(summon[JsonValueCodec[TextMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: TextMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[TextMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[TextMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: TextMarkerPayload = null
     }
@@ -65,7 +65,7 @@ private[fxprof] case class TextMarkerPayloadArgs(
   innerWindowID: Option[Double],
 )
 private[fxprof] object TextMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[TextMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[TextMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

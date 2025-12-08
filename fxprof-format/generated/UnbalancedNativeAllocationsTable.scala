@@ -64,13 +64,13 @@ object UnbalancedNativeAllocationsTable {
       stack = Vector.empty,
       length = length,
     ))
-  given JsonValueCodec[UnbalancedNativeAllocationsTable] = 
+  implicit val codec: JsonValueCodec[UnbalancedNativeAllocationsTable] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: UnbalancedNativeAllocationsTable) = 
         new UnbalancedNativeAllocationsTable(summon[JsonValueCodec[UnbalancedNativeAllocationsTableArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: UnbalancedNativeAllocationsTable, out: JsonWriter) = 
-        summon[JsonValueCodec[UnbalancedNativeAllocationsTableArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[UnbalancedNativeAllocationsTableArgs]].encodeValue(x.args, out)
       
       def nullValue: UnbalancedNativeAllocationsTable = null
     }
@@ -84,7 +84,7 @@ private[fxprof] case class UnbalancedNativeAllocationsTableArgs(
   length: Double,
 )
 private[fxprof] object UnbalancedNativeAllocationsTableArgs {
-  given ConfiguredJsonValueCodec[UnbalancedNativeAllocationsTableArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[UnbalancedNativeAllocationsTableArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

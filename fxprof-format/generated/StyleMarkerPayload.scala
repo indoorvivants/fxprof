@@ -86,13 +86,13 @@ object StyleMarkerPayload {
       stylesShared = stylesShared,
       stylesReused = stylesReused,
     ))
-  given JsonValueCodec[StyleMarkerPayload] = 
+  implicit val codec: JsonValueCodec[StyleMarkerPayload] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: StyleMarkerPayload) = 
         new StyleMarkerPayload(summon[JsonValueCodec[StyleMarkerPayloadArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: StyleMarkerPayload, out: JsonWriter) = 
-        summon[JsonValueCodec[StyleMarkerPayloadArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[StyleMarkerPayloadArgs]].encodeValue(x.args, out)
       
       def nullValue: StyleMarkerPayload = null
     }
@@ -109,7 +109,7 @@ private[fxprof] case class StyleMarkerPayloadArgs(
   stylesReused: Double,
 )
 private[fxprof] object StyleMarkerPayloadArgs {
-  given ConfiguredJsonValueCodec[StyleMarkerPayloadArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[StyleMarkerPayloadArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }

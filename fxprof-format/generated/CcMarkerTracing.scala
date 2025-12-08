@@ -52,13 +52,13 @@ object CcMarkerTracing {
       desc = None,
       second = None,
     ))
-  given JsonValueCodec[CcMarkerTracing] = 
+  implicit val codec: JsonValueCodec[CcMarkerTracing] = 
     new JsonValueCodec {
       def decodeValue(in: JsonReader, default: CcMarkerTracing) = 
         new CcMarkerTracing(summon[JsonValueCodec[CcMarkerTracingArgs]].decodeValue(in, default.args))
       
       def encodeValue(x: CcMarkerTracing, out: JsonWriter) = 
-        summon[JsonValueCodec[CcMarkerTracingArgs]].encodeValue(x.args, out)
+        implicitly[JsonValueCodec[CcMarkerTracingArgs]].encodeValue(x.args, out)
       
       def nullValue: CcMarkerTracing = null
     }
@@ -72,7 +72,7 @@ private[fxprof] case class CcMarkerTracingArgs(
   second: Option[String],
 )
 private[fxprof] object CcMarkerTracingArgs {
-  given ConfiguredJsonValueCodec[CcMarkerTracingArgs] = 
+  implicit val codec: ConfiguredJsonValueCodec[CcMarkerTracingArgs] = 
     ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))
   
 }
