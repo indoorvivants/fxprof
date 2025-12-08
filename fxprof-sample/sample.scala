@@ -144,7 +144,7 @@ class Tracer private (meta: ProfileMeta) {
   case class Frame(stackID: Option[Int], functionID: Int, categoryID: Int)
   val frames = new Interner[Frame]
 
-  case class Sample(stackID: StackID, duration: Long)
+  case class Sample(stackID: StackID, start: Double)
   val samples = new Interner[Sample]
 
   case class Stack(frameID: Int, prefix: Option[StackID])
@@ -157,6 +157,11 @@ class Tracer private (meta: ProfileMeta) {
 
   private val currentStackPrefix =
     ThreadLocal.withInitial[Option[StackID]](() => None)
+
+  val processStartupTime = Instant.now().toEpochMilli()
+
+  private val threadStartupTime =
+    ThreadLocal.withInitial[Long](() => Instant.now().toEpochMilli())
 
   def build() = this.synchronized {
     val sources = SourceTable(0)
@@ -180,6 +185,7 @@ class Tracer private (meta: ProfileMeta) {
         .withInnerWindowID(Vector.fill(categories.length)(None))
         .withLine(Vector.fill(categories.length)(None))
         .withColumn(Vector.fill(categories.length)(None))
+        .withAddress(Vector.fill(categories.length)(FrameTable_Address.None))
     }
 
     val functionsTable = {
@@ -202,22 +208,28 @@ class Tracer private (meta: ProfileMeta) {
     }
 
     val samplesTable = {
-      val sampl = samples.all
+      val sampl = samples.all.sortBy(_.start)
       RawSamplesTable(WeightType.Samples, sampl.length)
         .withStack(sampl.map(s => Some(s.stackID.toDouble)).toVector)
-        .withTime(Some(sampl.map(_.duration.toDouble).toVector))
-        .withWeight(Vector.fill(sampl.length)(Some(1)))
+        .withTime(Some(sampl.map(_.start.toDouble).toVector))
+        .withWeight(Vector.fill(sampl.length)(Some(1.0)))
     }
 
     Profile(
-      meta = this.meta.withCategories(Some(cats)),
+      meta = this.meta.withCategories(
+        Some(
+          cats :+ Category("default", CategoryColor.Grey).withSubcategories(
+            Vector("Other")
+          )
+        )
+      ),
       shared = RawProfileSharedData(sources).withStringArray(stringArray)
     ).withThreads(
       Vector(
         fxprof
           .RawThread(
             processType = ProcessType.Default,
-            processStartupTime = 185,
+            processStartupTime = threadStartupTime.get() - processStartupTime,
             registerTime = 0,
             name = "thread-1",
             isMainThread = true,
@@ -225,7 +237,7 @@ class Tracer private (meta: ProfileMeta) {
             tid = Tid.Str("thread-1"),
             samples = samplesTable,
             markers = RawMarkerTable(1)
-              .withStartTime(Vector(Some(Instant.now().toEpochMilli() - 400)))
+              .withStartTime(Vector(Some(threadStartupTime.get())))
               .withEndTime(Vector(Some(Instant.now().toEpochMilli())))
               .withPhase(Vector(MarkerPhase.Instant))
               .withCategory(Vector(0))
@@ -250,12 +262,15 @@ class Tracer private (meta: ProfileMeta) {
               ResourceTable(1).withtype(Vector(1)).withName(Vector(1)),
             nativeSymbols = NativeSymbolTable(1).withName(Vector(2))
           )
-          .withProcessShutdownTime(Some(450))
+          .withProcessShutdownTime(
+            Some(Instant.now().toEpochMilli() - processStartupTime)
+          )
       )
-    )
+    ).withLibs(Vector.empty)
   }
 
   def span[A](name: String, category: String)(f: => A) = {
+    val ts = threadStartupTime.get()
     val functionNameID = strings.id(name)
     val func = Function(functionNameID)
     val funcID = functions.id(func)
@@ -266,12 +281,13 @@ class Tracer private (meta: ProfileMeta) {
     val stackID = stacks.id(Stack(frameID, prefix))
     println(s"$name -- $frame, $prefix – creating new stackID $stackID")
     currentStackPrefix.set(Some(stackID))
-    val start = System.nanoTime() / 1000
+    val start =
+      Instant.now().toEpochMilli() // System.nanoTime().toDouble / 1_000_000
     val result = f
-    val duration = System.nanoTime() / 1000 - start
+    // val duration = System.nanoTime().toDouble / 1_000_000 - start
     currentStackPrefix.set(prefix)
 
-    val sampleID = samples.id(Sample(stackID = stackID, duration = duration))
+    val sampleID = samples.id(Sample(stackID = stackID, start = start - ts))
 
   }
 
@@ -285,20 +301,28 @@ object Tracer {
   val t = Tracer(profile.meta)
   t.span("lowering: bla ", "bla") {
     t.span("lowering: bla.constants", "what") {
-      Thread.sleep(200)
-      // t.span("optimising: bla ", "bla") {
-
-      //   Thread.sleep(200)
-      // }
+      Thread.sleep(100)
+      t.span("optimising: bla ", "bla") {
+        Thread.sleep(200)
+      }
 
     }
   }
 
+  t.span("emitting: bla", "what") {
+    Thread.sleep(400)
+  }
+
   val prof = t.build()
-  println(prof.shared.stringArray)
+
+  println(prof.shared.stringArray.zipWithIndex)
+  println("\nFunc table:")
   println(writeToString(prof.threads(0).funcTable))
+  println("\nFrame table:")
   println(writeToString(prof.threads(0).frameTable))
+  println("\nStack table:")
   println(writeToString(prof.threads(0).stackTable))
+  println("\nSamples table:")
   println(writeToString(prof.threads(0).samples))
 
   val config = CommandApplication.parseOrExit[Config](args)

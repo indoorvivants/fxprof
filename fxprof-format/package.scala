@@ -268,12 +268,14 @@ package object fxprof {
   //   case class Other(value: String) extends ProfileMeta_Toolkit(value)
   // }
 
-  sealed abstract class FrameTable_Address(value: Double)
+  sealed abstract class FrameTable_Address(val value: Double)
       extends Product
       with Serializable
   object FrameTable_Address {
     case object None extends FrameTable_Address(-1)
     case class Addr(address: Address) extends FrameTable_Address(address)
+
+    given JsonValueCodec[FrameTable_Address] = intLiteralCodec(_.value.toInt)
   }
 
   sealed abstract class FuncTable_Resource(value: Double)
@@ -353,6 +355,15 @@ package object fxprof {
         out.writeVal(x.value)
       override def nullValue: T = ???
     }
+
+  def intLiteralCodec[T](v: T => Int) =
+    new JsonValueCodec[T] {
+      override def decodeValue(in: JsonReader, default: T): T = ???
+      override def encodeValue(x: T, out: JsonWriter): Unit =
+        out.writeVal(v(x))
+      override def nullValue: T = ???
+    }
+
 
   sealed abstract class MarkerDisplayLocation(value: String)
       extends StringLiteral(value)
