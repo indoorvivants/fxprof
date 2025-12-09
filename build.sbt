@@ -111,7 +111,7 @@ Global / buildSample := Def.inputTaskDyn {
           )
       },
       Def.task {
-        sLog.value.info("Sample built successfully in $out")
+        sLog.value.info(s"Sample built successfully in $out")
       }
     )
 }.evaluated
