@@ -1,50 +1,33 @@
 import fxprof.*, tracer.Tracer
-import com.github.plokhotnyuk.jsoniter_scala.core._
 import decline_derive.CommandApplication
-import java.util.concurrent.atomic.AtomicInteger
-import scala.reflect.ClassTag
-import java.util.concurrent.atomic.AtomicBoolean
-
-val meta = ProfileMeta(
-  interval = 1.0,
-  startTime = java.time.Instant.now().toEpochMilli,
-  processType = 1.0,
-  product = ProfileMeta_Product.Other("scala-native"),
-  stackwalk = ProfileMeta_Stackwalk.False,
-  version = 1.0,
-  preprocessedProfileVersion = 58
-).withInitialVisibleThreads(Some(Vector(0)))
-  .withMarkerSchema(
-    Vector(
-      MarkerSchema("test-marker").withDisplay(
-        Vector(MarkerDisplayLocation.MarkerChart)
-      )
-    )
-  )
-  .withCategories(
-    Some(
-      Vector(
-        Category("interflow", CategoryColor.Blue),
-        Category("lower", CategoryColor.Green),
-        Category("emitLLVM", CategoryColor.Red)
-      )
-    )
-  )
 
 case class Config(out: String) derives CommandApplication
 
 @main def sampleGenerate(args: String*) =
-  val t = Tracer(
-    meta.withCategories(
+  // Setup the metadata for the profile
+  val meta = ProfileMeta(
+    interval = 1.0,
+    startTime = System.currentTimeMillis(),
+    processType = 1.0,
+    product = ProfileMeta_Product.Other("scala-native-2"),
+    stackwalk = ProfileMeta_Stackwalk.False,
+    version = 1.0,
+    preprocessedProfileVersion = 58
+  )
+    // Categories defined below can be used to start spans
+    // if a span is started with a category that is not defined here, "default" will be used
+    // "default" is added implicitly to the profile when it's serialised
+    .withCategories(
       Some(
         Vector(
-          Category("lowering", CategoryColor.Yellow),
-          Category("optimising", CategoryColor.Blue),
-          Category("emitting", CategoryColor.Green)
+          Category("lowering", CategoryColor.Blue),
+          Category("emitting", CategoryColor.Green),
+          Category("optimising", CategoryColor.Red)
         )
       )
     )
-  )
+
+  val t = Tracer(meta)
 
   t.span("bla ", "lowering") {
     t.span("bla.constants", "lowering") {
@@ -72,6 +55,7 @@ case class Config(out: String) derives CommandApplication
 
   val prof = t.build()
 
+  import com.github.plokhotnyuk.jsoniter_scala.core._
   println(prof.shared.stringArray.zipWithIndex)
   println("\nFunc table:")
   println(writeToString(prof.threads(0).funcTable))
