@@ -1,7 +1,3 @@
-//> using toolkit default
-//> using scala 3.7
-//> using dep com.indoorvivants::rendition::0.0.4
-
 import rendition.RenderingContext
 
 enum ExtraDef:
@@ -443,7 +439,8 @@ def render(struct: Record, params: List[(Field, Type)]) =
         s"implicit val codec: JsonValueCodec[${structArgsName}] = ",
         ""
       ):
-        line("JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))")
+        // line("JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))")
+        line("JsonCodecMaker.makeWithRequiredCollectionFields")
         // line(
         //   "ConfiguredJsonValueCodec.derived(using CodecMakerConfig.withTransientEmpty(true))"
         // )
