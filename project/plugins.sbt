@@ -17,3 +17,5 @@ addSbtPlugin("org.scalameta" % "sbt-mdoc" % "2.6.1")
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % "1.20.1")
 
 addSbtPlugin("org.scala-native" % "sbt-scala-native" % "0.5.9")
+
+addSbtPlugin("com.indoorvivants.snapshots" % "sbt-snapshots" % "0.0.11")

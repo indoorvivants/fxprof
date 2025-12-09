@@ -8,6 +8,7 @@ val Versions = new {
   val DeclineDerive = "0.3.3"
   val Rendition = "0.0.4"
   val OsLib = "0.11.6"
+  val MUnit = "1.2.1"
 
 }
 lazy val root = project
@@ -35,11 +36,18 @@ lazy val fxprofTracer = projectMatrix
   .dependsOn(fxprofFormat)
   .jvmPlatform(Versions.allScala)
   .nativePlatform(Versions.allScala)
-  .jsPlatform(Versions.allScala)
+  // .jsPlatform(Versions.allScala)
   .settings(
     name := "fxprof-tracer",
     scalacOptions += "-Xsource:3"
   )
+  .settings(
+    snapshotsPackageName := "fxprof_snapshots",
+    snapshotsIntegrations += SnapshotIntegration.MUnit, // if using MUnit
+    snapshotsForceOverwrite := !sys.env.contains("CI"),
+    libraryDependencies += "org.scalameta" %%% "munit" % Versions.MUnit % Test
+  )
+  .enablePlugins(SnapshotsPlugin)
 
 lazy val fxprofCodegen = project
   .in(file("mod/fxprof-codegen"))
@@ -56,7 +64,7 @@ lazy val fxprofCodegen = project
 
 val codegen = inputKey[Unit]("")
 Global / codegen := Def.inputTaskDyn {
-  // val task = InputKey[Unit]("scalafmtOnly")
+  val task = InputKey[Unit]("scalafmtAll")
   val out =
     (fxprofFormat.jvm(
       Versions.Scala3
@@ -71,17 +79,19 @@ Global / codegen := Def.inputTaskDyn {
   // Def.sequential(
 
   Def
-    .sequential(Def.taskDyn {
-      (fxprofCodegen / Compile / run)
-        .toTask(
-          s" --out $out --firefoxProfiler $in"
-        )
-    })
+    .sequential(
+      Def.taskDyn {
+        (fxprofCodegen / Compile / run)
+          .toTask(
+            s" --out $out --firefoxProfiler $in"
+          )
+      }
+      // Def.taskDyn {
+      //   // val files = IO.readLines(generatedFiles)
+      //   (fxCompile / task).toTask(s" ${files.mkString(" ")}")
+      // }
+    )
 
-  // Def.taskDyn {
-  //   val files = IO.readLines(generatedFiles)
-  //   (Compile / task).toTask(s" ${files.mkString(" ")}")
-  // }
   // )
 
 }.evaluated

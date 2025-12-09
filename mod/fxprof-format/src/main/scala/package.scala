@@ -505,8 +505,8 @@ package object fxprof {
     // case class Jank(payload: JankPayload) extends MarkerPayload
     case class Browsertime(payload: BrowsertimeMarkerPayload)
         extends MarkerPayload
-    case class NoPayloadUserData(payload: NoPayloadUserData)
-        extends MarkerPayload
+    // case class NoPayloadUserData(payload: NoPayloadUserData)
+    //     extends MarkerPayload
     case class Url(payload: UrlMarkerPayload) extends MarkerPayload
     case class HostResolver(payload: HostResolverPayload) extends MarkerPayload
 
@@ -518,9 +518,6 @@ package object fxprof {
             // TODO: add all cases
             case UserTiming(payload) =>
               implicitly[JsonValueCodec[UserTimingMarkerPayload]]
-                .encodeValue(payload, out)
-            case NoPayloadUserData(payload) =>
-              implicitly[JsonValueCodec[NoPayloadUserData]]
                 .encodeValue(payload, out)
             case Url(payload) =>
               implicitly[JsonValueCodec[UrlMarkerPayload]]

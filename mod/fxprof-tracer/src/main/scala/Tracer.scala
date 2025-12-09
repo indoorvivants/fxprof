@@ -192,12 +192,10 @@ class Tracer private (meta: ProfileMeta) {
     val frame = Frame(prefix, funcID, categoryID)
     val frameID = frames.id(frame)
     val stackID = stacks.id(Stack(frameID, prefix))
-    println(s"$name -- $frame, $prefix – creating new stackID $stackID")
     currentStackPrefix.set(Some(stackID))
     val start =
-      System.currentTimeMillis() // System.nanoTime().toDouble / 1_000_000
+      System.currentTimeMillis()
     val result = f
-    // val duration = System.nanoTime().toDouble / 1_000_000 - start
     currentStackPrefix.set(prefix)
 
     val sampleID = samples.id(Sample(stackID = stackID, start = start - ts))

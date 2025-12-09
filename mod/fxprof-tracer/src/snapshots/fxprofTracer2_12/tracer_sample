@@ -1,0 +1,346 @@
+{
+   "meta": {
+      "interval": 1.0,
+      "startTime": 1.765274413067E12,
+      "processType": 1.0,
+      "categories": [
+         {
+            "name": "lowering",
+            "color": "yellow",
+            "subcategories": [
+               "Other"
+            ]
+         },
+         {
+            "name": "optimising",
+            "color": "blue",
+            "subcategories": [
+               "Other"
+            ]
+         },
+         {
+            "name": "emitting",
+            "color": "green",
+            "subcategories": [
+               "Other"
+            ]
+         },
+         {
+            "name": "default",
+            "color": "grey",
+            "subcategories": [
+               "Other"
+            ]
+         }
+      ],
+      "product": "scala-native",
+      "stackwalk": 0,
+      "version": 1.0,
+      "preprocessedProfileVersion": 58.0,
+      "markerSchema": [
+         {
+            "name": "test-marker",
+            "display": [
+               "marker-chart"
+            ],
+            "fields": [
+               
+            ]
+         }
+      ],
+      "initialVisibleThreads": [
+         0.0
+      ]
+   },
+   "libs": [
+      
+   ],
+   "shared": {
+      "stringArray": [
+         "bla ",
+         "bla.constants",
+         "object bla",
+         "bla$lzymap",
+         "bla.apply(..)",
+         "hello"
+      ],
+      "sources": {
+         "length": 0.0,
+         "uuid": [
+            
+         ],
+         "filename": [
+            
+         ]
+      }
+   },
+   "threads": [
+      {
+         "processType": "default",
+         "processStartupTime": 0.0,
+         "processShutdownTime": 381.0,
+         "registerTime": 0.0,
+         "pausedRanges": [
+            
+         ],
+         "name": "thread-1",
+         "isMainThread": true,
+         "pid": "1",
+         "tid": "thread-1",
+         "samples": {
+            "stack": [
+               1.0,
+               0.0,
+               2.0,
+               4.0,
+               3.0,
+               5.0,
+               6.0
+            ],
+            "time": [
+               3.0,
+               3.0,
+               59.0,
+               84.0,
+               84.0,
+               186.0,
+               339.0
+            ],
+            "weight": [
+               1.0,
+               1.0,
+               1.0,
+               1.0,
+               1.0,
+               1.0,
+               1.0
+            ],
+            "weightType": "samples",
+            "length": 7.0
+         },
+         "markers": {
+            "data": [
+               {
+                  "type": {
+                     
+                  },
+                  "name": "hello",
+                  "entryType": {
+                     "type": "MEASURE"
+                  }
+               }
+            ],
+            "name": [
+               0.0
+            ],
+            "startTime": [
+               1.76527441311E12
+            ],
+            "endTime": [
+               1.765274413482E12
+            ],
+            "phase": [
+               0
+            ],
+            "category": [
+               0.0
+            ],
+            "length": 1.0
+         },
+         "stackTable": {
+            "frame": [
+               0.0,
+               1.0,
+               2.0,
+               3.0,
+               4.0,
+               5.0,
+               6.0
+            ],
+            "prefix": [
+               null,
+               0.0,
+               1.0,
+               null,
+               3.0,
+               3.0,
+               null
+            ],
+            "length": 7.0
+         },
+         "frameTable": {
+            "address": [
+               -1,
+               -1,
+               -1,
+               -1,
+               -1,
+               -1,
+               -1
+            ],
+            "inlineDepth": [
+               0.0,
+               0.0,
+               0.0,
+               0.0,
+               0.0,
+               0.0,
+               0.0
+            ],
+            "category": [
+               0.0,
+               0.0,
+               1.0,
+               2.0,
+               2.0,
+               2.0,
+               3.0
+            ],
+            "subcategory": [
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null
+            ],
+            "func": [
+               0.0,
+               1.0,
+               0.0,
+               2.0,
+               3.0,
+               4.0,
+               5.0
+            ],
+            "nativeSymbol": [
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null
+            ],
+            "innerWindowID": [
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null
+            ],
+            "line": [
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null
+            ],
+            "column": [
+               null,
+               null,
+               null,
+               null,
+               null,
+               null,
+               null
+            ],
+            "length": 7.0
+         },
+         "funcTable": {
+            "name": [
+               0.0,
+               1.0,
+               2.0,
+               3.0,
+               4.0,
+               5.0
+            ],
+            "isJS": [
+               false,
+               false,
+               false,
+               false,
+               false,
+               false
+            ],
+            "relevantForJS": [
+               false,
+               false,
+               false,
+               false,
+               false,
+               false
+            ],
+            "resource": [
+               -1,
+               -1,
+               -1,
+               -1,
+               -1,
+               -1
+            ],
+            "source": [
+               null,
+               null,
+               null,
+               null,
+               null,
+               null
+            ],
+            "lineNumber": [
+               null,
+               null,
+               null,
+               null,
+               null,
+               null
+            ],
+            "columnNumber": [
+               null,
+               null,
+               null,
+               null,
+               null,
+               null
+            ],
+            "length": 6.0
+         },
+         "resourceTable": {
+            "length": 1.0,
+            "lib": [
+               
+            ],
+            "name": [
+               1.0
+            ],
+            "host": [
+               
+            ],
+            "type": [
+               1.0
+            ]
+         },
+         "nativeSymbols": {
+            "libIndex": [
+               
+            ],
+            "address": [
+               
+            ],
+            "name": [
+               2.0
+            ],
+            "functionSize": [
+               
+            ],
+            "length": 1.0
+         }
+      }
+   ]
+}
