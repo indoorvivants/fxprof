@@ -187,9 +187,8 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
             stackTable = stacksTable,
             frameTable = framesTable,
             funcTable = functionsTable,
-            resourceTable =
-              ResourceTable(1).withtype(Vector(1)).withName(Vector(1)),
-            nativeSymbols = NativeSymbolTable(1).withName(Vector(2))
+            resourceTable = ResourceTable(0),
+            nativeSymbols = NativeSymbolTable(0)
           )
           .withProcessShutdownTime(
             Some(clock.threadShutdownTime("thread-1") - processStartupTime)

@@ -73,11 +73,6 @@ Global / codegen := Def.inputTaskDyn {
   val in =
     (ThisBuild / baseDirectory).value / "firefox-profiler"
 
-  sLog.value.info(out.toString())
-  sLog.value.info(in.toString())
-
-  // Def.sequential(
-
   Def
     .sequential(
       Def.taskDyn {
@@ -86,14 +81,7 @@ Global / codegen := Def.inputTaskDyn {
             s" --out $out --firefoxProfiler $in"
           )
       }
-      // Def.taskDyn {
-      //   // val files = IO.readLines(generatedFiles)
-      //   (fxCompile / task).toTask(s" ${files.mkString(" ")}")
-      // }
     )
-
-  // )
-
 }.evaluated
 
 lazy val fxprofSample = projectMatrix
@@ -107,6 +95,25 @@ lazy val fxprofSample = projectMatrix
       "com.lihaoyi" %%% "os-lib" % Versions.OsLib
     )
   )
+
+val buildSample = inputKey[Unit]("")
+Global / buildSample := Def.inputTaskDyn {
+  val out =
+    (ThisBuild / baseDirectory).value / "sample-profile.json"
+
+  Def
+    .sequential(
+      Def.taskDyn {
+        (fxprofSample.jvm(Versions.Scala3) / Compile / run)
+          .toTask(
+            s" --out $out"
+          )
+      },
+      Def.task {
+        sLog.value.info("Sample built successfully in $out")
+      }
+    )
+}.evaluated
 
 inThisBuild(
   Seq(
