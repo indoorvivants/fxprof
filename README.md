@@ -4,7 +4,7 @@ This project implements the JSON format used by Firefox Profiler, and
 uses that format to provide a simple `Tracer`, allowing to record nested spans in 
 a format that can be visualised on https://profiler.firefox.com
 
-See [/mod/fxprof-sample/src/main/scala/sample.scala](sample) for usage:
+See [sample](/mod/fxprof-sample/src/main/scala/sample.scala) for usage:
   1. Run `buildSample` in SBT shell
   2. Load the `sample-profile.json` (will be created at the root of the project) into Firefox Profiler
   3. My development workflow usually involves running some live reload server (with CORS), and using "Load from URL" in Firefox Profiler – this allows me to continuously rebuild the profile file and I only need to reload the Profiler tab to see the changes
