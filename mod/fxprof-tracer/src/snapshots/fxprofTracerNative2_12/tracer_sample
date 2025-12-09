@@ -304,18 +304,18 @@
             "length": 6.0
          },
          "resourceTable": {
-            "length": 1.0,
+            "length": 0.0,
             "lib": [
                
             ],
             "name": [
-               1.0
+               
             ],
             "host": [
                
             ],
             "type": [
-               1.0
+               
             ]
          },
          "nativeSymbols": {
@@ -326,12 +326,12 @@
                
             ],
             "name": [
-               2.0
+               
             ],
             "functionSize": [
                
             ],
-            "length": 1.0
+            "length": 0.0
          }
       }
    ]
