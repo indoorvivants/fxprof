@@ -5,14 +5,46 @@ import scala.reflect.ClassTag
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
-class Tracer private (meta: ProfileMeta) {
+trait ClockSample {
+  def processStartupTime(): Long
+  def processShutdownTime(): Long
+  def threadStartupTime(name: String): Long
+  def threadShutdownTime(name: String): Long
+  def beforeMillis(marker: String, labels: String): Long
+  def afterMillis(marker: String, labels: String): Long
+}
+
+object ClockSample {
+  object Default extends ClockSample {
+    override def processStartupTime(): Long =
+      System.currentTimeMillis()
+    override def processShutdownTime(): Long =
+      System.currentTimeMillis()
+    override def threadStartupTime(name: String): Long =
+      System.currentTimeMillis()
+    override def threadShutdownTime(name: String): Long =
+      System.currentTimeMillis()
+    override def beforeMillis(marker: String, labels: String): Long =
+      System.currentTimeMillis()
+    override def afterMillis(marker: String, labels: String): Long =
+      System.currentTimeMillis()
+  }
+}
+
+class Tracer private (meta: ProfileMeta, clock: ClockSample) {
   type ThreadID = Int
   type StringID = Int
   type FunctionId = Int
   type StackID = Int
   type FunctionNameID = Int
 
-  class Interner[K] {
+  def withClock(clock: ClockSample): Tracer =
+    new Tracer(meta, clock)
+
+  def withMeta(meta: ProfileMeta): Tracer =
+    new Tracer(meta, clock)
+
+  private class Interner[K] {
     private val values = new java.util.concurrent.ConcurrentHashMap[K, Int]
     private val count = new AtomicInteger(0)
 
@@ -36,22 +68,26 @@ class Tracer private (meta: ProfileMeta) {
     .toMap
     .updated("default", defaultCategory)
 
-  val strings = new Interner[String]
+  private val strings = new Interner[String]
 
-  case class Function(nameID: FunctionNameID)
-  val functions = new Interner[Function]
+  private case class Function(nameID: FunctionNameID)
+  private val functions = new Interner[Function]
 
-  val threadIds = new Interner[String]
-  val categories = new Interner[String]
+  private val threadIds = new Interner[String]
+  private val categories = new Interner[String]
 
-  case class Frame(stackID: Option[Int], functionID: Int, categoryID: Int)
-  val frames = new Interner[Frame]
+  private case class Frame(
+      stackID: Option[Int],
+      functionID: Int,
+      categoryID: Int
+  )
+  private val frames = new Interner[Frame]
 
-  case class Sample(stackID: StackID, start: Double)
-  val samples = new Interner[Sample]
+  private case class Sample(stackID: StackID, start: Double)
+  private val samples = new Interner[Sample]
 
-  case class Stack(frameID: Int, prefix: Option[StackID])
-  val stacks = new Interner[Stack]
+  private case class Stack(frameID: Int, prefix: Option[StackID])
+  private val stacks = new Interner[Stack]
 
   private val currentThread =
     ThreadLocal.withInitial[ThreadID](() =>
@@ -61,10 +97,12 @@ class Tracer private (meta: ProfileMeta) {
   private val currentStackPrefix =
     ThreadLocal.withInitial[Option[StackID]](() => None)
 
-  val processStartupTime = System.currentTimeMillis()
+  private val processStartupTime = clock.processStartupTime()
 
   private val threadStartupTime =
-    ThreadLocal.withInitial[Long](() => System.currentTimeMillis())
+    ThreadLocal.withInitial[Long](() =>
+      clock.threadStartupTime(Thread.currentThread().getName())
+    )
 
   private val isClosed = new AtomicBoolean()
 
@@ -145,25 +183,7 @@ class Tracer private (meta: ProfileMeta) {
             pid = "1",
             tid = Tid.Str("thread-1"),
             samples = samplesTable,
-            markers = RawMarkerTable(1)
-              .withStartTime(Vector(Some(threadStartupTime.get())))
-              .withEndTime(Vector(Some(System.currentTimeMillis())))
-              .withPhase(Vector(MarkerPhase.Instant))
-              .withCategory(Vector(0))
-              .withData(
-                Vector(
-                  Some(
-                    MarkerPayload.UserTiming(
-                      UserTimingMarkerPayload(
-                        `type` = UserTimingMarkerPayload_Type,
-                        "hello",
-                        entryType = UserTimingMarkerPayload_EntryType.MEASURE
-                      )
-                    )
-                  )
-                )
-              )
-              .withName(Vector(0)),
+            markers = RawMarkerTable(0),
             stackTable = stacksTable,
             frameTable = framesTable,
             funcTable = functionsTable,
@@ -172,7 +192,7 @@ class Tracer private (meta: ProfileMeta) {
             nativeSymbols = NativeSymbolTable(1).withName(Vector(2))
           )
           .withProcessShutdownTime(
-            Some(System.currentTimeMillis() - processStartupTime)
+            Some(clock.threadShutdownTime("thread-1") - processStartupTime)
           )
       )
     ).withLibs(Vector.empty)
@@ -194,7 +214,7 @@ class Tracer private (meta: ProfileMeta) {
     val stackID = stacks.id(Stack(frameID, prefix))
     currentStackPrefix.set(Some(stackID))
     val start =
-      System.currentTimeMillis()
+      clock.beforeMillis(name, category)
     val result = f
     currentStackPrefix.set(prefix)
 
@@ -206,5 +226,5 @@ class Tracer private (meta: ProfileMeta) {
 }
 
 object Tracer {
-  def apply(meta: ProfileMeta) = new Tracer(meta)
+  def apply(meta: ProfileMeta) = new Tracer(meta, ClockSample.Default)
 }

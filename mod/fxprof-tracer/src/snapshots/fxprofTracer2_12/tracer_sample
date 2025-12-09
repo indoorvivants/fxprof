@@ -1,7 +1,7 @@
 {
    "meta": {
       "interval": 1.0,
-      "startTime": 1.765274413067E12,
+      "startTime": 1.7356896E12,
       "processType": 1.0,
       "categories": [
          {
@@ -57,7 +57,7 @@
    ],
    "shared": {
       "stringArray": [
-         "bla ",
+         "bla",
          "bla.constants",
          "object bla",
          "bla$lzymap",
@@ -77,8 +77,8 @@
    "threads": [
       {
          "processType": "default",
-         "processStartupTime": 0.0,
-         "processShutdownTime": 381.0,
+         "processStartupTime": 220.0,
+         "processShutdownTime": 400.0,
          "registerTime": 0.0,
          "pausedRanges": [
             
@@ -89,22 +89,22 @@
          "tid": "thread-1",
          "samples": {
             "stack": [
-               1.0,
                0.0,
+               1.0,
                2.0,
-               4.0,
                3.0,
+               4.0,
                5.0,
                6.0
             ],
             "time": [
-               3.0,
-               3.0,
-               59.0,
-               84.0,
-               84.0,
-               186.0,
-               339.0
+               20.0,
+               25.0,
+               30.0,
+               100.0,
+               120.0,
+               150.0,
+               170.0
             ],
             "weight": [
                1.0,
@@ -120,32 +120,24 @@
          },
          "markers": {
             "data": [
-               {
-                  "type": {
-                     
-                  },
-                  "name": "hello",
-                  "entryType": {
-                     "type": "MEASURE"
-                  }
-               }
+               
             ],
             "name": [
-               0.0
+               
             ],
             "startTime": [
-               1.76527441311E12
+               
             ],
             "endTime": [
-               1.765274413482E12
+               
             ],
             "phase": [
-               0
+               
             ],
             "category": [
-               0.0
+               
             ],
-            "length": 1.0
+            "length": 0.0
          },
          "stackTable": {
             "frame": [

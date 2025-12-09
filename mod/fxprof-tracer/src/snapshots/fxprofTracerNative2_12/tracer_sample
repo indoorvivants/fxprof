@@ -1,7 +1,7 @@
 {
    "meta": {
       "interval": 1.0,
-      "startTime": 1.765274453616E12,
+      "startTime": 1.765274494493E12,
       "processType": 1.0,
       "categories": [
          {
@@ -78,7 +78,7 @@
       {
          "processType": "default",
          "processStartupTime": 0.0,
-         "processShutdownTime": 324.0,
+         "processShutdownTime": 325.0,
          "registerTime": 0.0,
          "pausedRanges": [
             
@@ -100,10 +100,10 @@
             "time": [
                0.0,
                0.0,
-               50.0,
-               71.0,
-               71.0,
-               172.0,
+               52.0,
+               72.0,
+               72.0,
+               173.0,
                324.0
             ],
             "weight": [
@@ -134,10 +134,10 @@
                0.0
             ],
             "startTime": [
-               1.765274453616E12
+               1.765274494493E12
             ],
             "endTime": [
-               1.76527445394E12
+               1.765274494818E12
             ],
             "phase": [
                0
