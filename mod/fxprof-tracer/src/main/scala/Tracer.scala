@@ -89,20 +89,21 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
   private case class Stack(frameID: Int, prefix: Option[StackID])
   private val stacks = new Interner[Stack]
 
-  private val currentThread =
-    ThreadLocal.withInitial[ThreadID](() =>
-      threadIds.id(Thread.currentThread().getName())
-    )
+  // private val currentThread =
+  //   ThreadLocal.withInitial[ThreadID](() =>
+  //     threadIds.id(Thread.currentThread().getName())
+  //   )
 
   private val currentStackPrefix =
-    ThreadLocal.withInitial[Option[StackID]](() => None)
+    new ThreadLocal[Option[StackID]]
+  // ThreadLocal.withInitial[Option[StackID]](() => None)
 
   private val processStartupTime = clock.processStartupTime()
 
-  private val threadStartupTime =
-    ThreadLocal.withInitial[Long](() =>
-      clock.threadStartupTime(Thread.currentThread().getName())
-    )
+  private val threadStartupTime = new ThreadLocal[Long]
+  // ThreadLocal.withInitial[Long](() =>
+  //   clock.threadStartupTime(Thread.currentThread().getName())
+  // )
 
   private val isClosed = new AtomicBoolean()
 
@@ -111,7 +112,7 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
   }
 
   def close() = {
-    isClosed.setRelease(true)
+    isClosed.set(true)
   }
 
   def build() = this.synchronized {
@@ -166,7 +167,7 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
         .withWeight(Vector.fill(sampl.length)(Some(1.0)))
     }
 
-    isClosed.setRelease(true)
+    isClosed.set(true)
 
     Profile(
       meta = this.meta.withCategories(Some(cats)),
@@ -199,15 +200,34 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
 
   def span[A](name: String)(f: => A): A = span(name, "default")(f)
 
+  // Scala.js does not have ThreadLocal.withInitial
+  private val tlInits = collection.mutable.Set.empty[ThreadLocal[?]]
+  private def getOrElse[A](tl: ThreadLocal[A], value: => A): A = {
+    val v = tl.get()
+    if (v == null) {
+      if (tlInits.contains(tl))
+        v
+      else {
+        tl.set(value)
+        tlInits += tl
+        value
+
+      }
+    } else v
+  }
+
   def span[A](name: String, category: String)(f: => A): A = {
     checkOpen()
     val catName = categoryMap.getOrElse(category, categoryMap("default")).name
-    val ts = threadStartupTime.get()
+    val ts = getOrElse(
+      threadStartupTime,
+      clock.threadStartupTime(Thread.currentThread().getName())
+    )
     val functionNameID = strings.id(name)
     val func = Function(functionNameID)
     val funcID = functions.id(func)
     val categoryID = categories.id(catName)
-    val prefix = currentStackPrefix.get()
+    val prefix = getOrElse(currentStackPrefix, None)
     val frame = Frame(prefix, funcID, categoryID)
     val frameID = frames.id(frame)
     val stackID = stacks.id(Stack(frameID, prefix))

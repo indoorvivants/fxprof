@@ -36,7 +36,7 @@ lazy val fxprofTracer = projectMatrix
   .dependsOn(fxprofFormat)
   .jvmPlatform(Versions.allScala)
   .nativePlatform(Versions.allScala)
-  // .jsPlatform(Versions.allScala)
+  .jsPlatform(Versions.allScala)
   .settings(
     name := "fxprof-tracer",
     scalacOptions += "-Xsource:3"
@@ -45,7 +45,8 @@ lazy val fxprofTracer = projectMatrix
     snapshotsPackageName := "fxprof_snapshots",
     snapshotsIntegrations += SnapshotIntegration.MUnit, // if using MUnit
     snapshotsForceOverwrite := !sys.env.contains("CI"),
-    libraryDependencies += "org.scalameta" %%% "munit" % Versions.MUnit % Test
+    libraryDependencies += "org.scalameta" %%% "munit" % Versions.MUnit % Test,
+    Test / scalaJSLinkerConfig ~= (_.withModuleKind(ModuleKind.CommonJSModule))
   )
   .enablePlugins(SnapshotsPlugin)
 
