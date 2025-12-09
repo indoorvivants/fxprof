@@ -440,6 +440,6 @@ private[fxprof] case class NetworkPayloadArgs(
 )
 private[fxprof] object NetworkPayloadArgs {
   implicit val codec: JsonValueCodec[NetworkPayloadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

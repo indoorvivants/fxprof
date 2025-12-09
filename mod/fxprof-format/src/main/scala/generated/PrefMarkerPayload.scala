@@ -91,6 +91,6 @@ private[fxprof] case class PrefMarkerPayloadArgs(
 )
 private[fxprof] object PrefMarkerPayloadArgs {
   implicit val codec: JsonValueCodec[PrefMarkerPayloadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

@@ -81,6 +81,6 @@ private[fxprof] case class JsTracerTableArgs(
 )
 private[fxprof] object JsTracerTableArgs {
   implicit val codec: JsonValueCodec[JsTracerTableArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

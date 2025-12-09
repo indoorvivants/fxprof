@@ -69,6 +69,6 @@ private[fxprof] case class DOMEventMarkerPayloadArgs(
 )
 private[fxprof] object DOMEventMarkerPayloadArgs {
   implicit val codec: JsonValueCodec[DOMEventMarkerPayloadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

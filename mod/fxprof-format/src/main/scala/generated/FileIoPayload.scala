@@ -103,6 +103,6 @@ private[fxprof] case class FileIoPayloadArgs(
 )
 private[fxprof] object FileIoPayloadArgs {
   implicit val codec: JsonValueCodec[FileIoPayloadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

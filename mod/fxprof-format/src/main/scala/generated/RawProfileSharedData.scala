@@ -70,6 +70,6 @@ private[fxprof] case class RawProfileSharedDataArgs(
 )
 private[fxprof] object RawProfileSharedDataArgs {
   implicit val codec: JsonValueCodec[RawProfileSharedDataArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

@@ -201,6 +201,6 @@ private[fxprof] case class MarkerSchemaArgs(
 )
 private[fxprof] object MarkerSchemaArgs {
   implicit val codec: JsonValueCodec[MarkerSchemaArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

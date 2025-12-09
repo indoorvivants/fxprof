@@ -108,6 +108,6 @@ private[fxprof] case class NativeSymbolTableArgs(
 )
 private[fxprof] object NativeSymbolTableArgs {
   implicit val codec: JsonValueCodec[NativeSymbolTableArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

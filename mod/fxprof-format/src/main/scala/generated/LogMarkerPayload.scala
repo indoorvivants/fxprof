@@ -68,6 +68,6 @@ private[fxprof] case class LogMarkerPayloadArgs(
 )
 private[fxprof] object LogMarkerPayloadArgs {
   implicit val codec: JsonValueCodec[LogMarkerPayloadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

@@ -171,6 +171,6 @@ private[fxprof] case class VisualMetricsArgs(
 )
 private[fxprof] object VisualMetricsArgs {
   implicit val codec: JsonValueCodec[VisualMetricsArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

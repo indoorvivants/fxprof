@@ -130,6 +130,6 @@ private[fxprof] case class LibArgs(
 )
 private[fxprof] object LibArgs {
   implicit val codec: JsonValueCodec[LibArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

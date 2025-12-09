@@ -178,6 +178,6 @@ private[fxprof] case class RawSamplesTableArgs(
 )
 private[fxprof] object RawSamplesTableArgs {
   implicit val codec: JsonValueCodec[RawSamplesTableArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

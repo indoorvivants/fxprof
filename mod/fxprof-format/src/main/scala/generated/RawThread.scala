@@ -290,6 +290,6 @@ private[fxprof] case class RawThreadArgs(
 )
 private[fxprof] object RawThreadArgs {
   implicit val codec: JsonValueCodec[RawThreadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

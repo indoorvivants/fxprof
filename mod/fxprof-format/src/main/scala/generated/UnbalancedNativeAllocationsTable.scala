@@ -88,6 +88,6 @@ private[fxprof] case class UnbalancedNativeAllocationsTableArgs(
 )
 private[fxprof] object UnbalancedNativeAllocationsTableArgs {
   implicit val codec: JsonValueCodec[UnbalancedNativeAllocationsTableArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

@@ -72,6 +72,6 @@ private[fxprof] case class CauseBacktraceArgs(
 )
 private[fxprof] object CauseBacktraceArgs {
   implicit val codec: JsonValueCodec[CauseBacktraceArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

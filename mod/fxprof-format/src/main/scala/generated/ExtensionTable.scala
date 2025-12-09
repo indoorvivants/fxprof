@@ -67,6 +67,6 @@ private[fxprof] case class ExtensionTableArgs(
 )
 private[fxprof] object ExtensionTableArgs {
   implicit val codec: JsonValueCodec[ExtensionTableArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

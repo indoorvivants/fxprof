@@ -519,6 +519,24 @@ package object fxprof {
             case UserTiming(payload) =>
               implicitly[JsonValueCodec[UserTimingMarkerPayload]]
                 .encodeValue(payload, out)
+            case NoPayloadUserData(payload) =>
+              implicitly[JsonValueCodec[NoPayloadUserData]]
+                .encodeValue(payload, out)
+            case Url(payload) =>
+              implicitly[JsonValueCodec[UrlMarkerPayload]]
+                .encodeValue(payload, out)
+            case HostResolver(payload) =>
+              implicitly[JsonValueCodec[HostResolverPayload]]
+                .encodeValue(payload, out)
+
+            case Navigation(payload) =>
+              implicitly[JsonValueCodec[NavigationMarkerPayload]]
+                .encodeValue(payload, out)
+
+            case Browsertime(payload) =>
+              implicitly[JsonValueCodec[BrowsertimeMarkerPayload]]
+                .encodeValue(payload, out)
+
           }
 
         override def decodeValue(

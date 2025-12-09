@@ -159,6 +159,6 @@ private[fxprof] case class PageArgs(
 )
 private[fxprof] object PageArgs {
   implicit val codec: JsonValueCodec[PageArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

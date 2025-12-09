@@ -76,6 +76,6 @@ private[fxprof] case class CcMarkerTracingArgs(
 )
 private[fxprof] object CcMarkerTracingArgs {
   implicit val codec: JsonValueCodec[CcMarkerTracingArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

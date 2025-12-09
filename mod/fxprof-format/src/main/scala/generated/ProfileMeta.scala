@@ -672,6 +672,6 @@ private[fxprof] case class ProfileMetaArgs(
 )
 private[fxprof] object ProfileMetaArgs {
   implicit val codec: JsonValueCodec[ProfileMetaArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

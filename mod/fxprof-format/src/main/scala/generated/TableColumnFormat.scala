@@ -63,6 +63,6 @@ private[fxprof] case class TableColumnFormatArgs(
 )
 private[fxprof] object TableColumnFormatArgs {
   implicit val codec: JsonValueCodec[TableColumnFormatArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

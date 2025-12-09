@@ -77,6 +77,6 @@ private[fxprof] case class PausedRangeArgs(
 )
 private[fxprof] object PausedRangeArgs {
   implicit val codec: JsonValueCodec[PausedRangeArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

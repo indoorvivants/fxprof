@@ -85,6 +85,6 @@ private[fxprof] case class CategoryArgs(
 )
 private[fxprof] object CategoryArgs {
   implicit val codec: JsonValueCodec[CategoryArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

@@ -53,6 +53,6 @@ private[fxprof] case class NoPayloadUserDataArgs(
 )
 private[fxprof] object NoPayloadUserDataArgs {
   implicit val codec: JsonValueCodec[NoPayloadUserDataArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

@@ -98,6 +98,6 @@ private[fxprof] case class RawCounterArgs(
 )
 private[fxprof] object RawCounterArgs {
   implicit val codec: JsonValueCodec[RawCounterArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

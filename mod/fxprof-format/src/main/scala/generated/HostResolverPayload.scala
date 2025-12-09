@@ -73,6 +73,6 @@ private[fxprof] case class HostResolverPayloadArgs(
 )
 private[fxprof] object HostResolverPayloadArgs {
   implicit val codec: JsonValueCodec[HostResolverPayloadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

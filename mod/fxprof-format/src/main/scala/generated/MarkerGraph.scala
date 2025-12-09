@@ -62,6 +62,6 @@ private[fxprof] case class MarkerGraphArgs(
 )
 private[fxprof] object MarkerGraphArgs {
   implicit val codec: JsonValueCodec[MarkerGraphArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

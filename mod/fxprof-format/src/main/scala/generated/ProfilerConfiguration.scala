@@ -93,6 +93,6 @@ private[fxprof] case class ProfilerConfigurationArgs(
 )
 private[fxprof] object ProfilerConfigurationArgs {
   implicit val codec: JsonValueCodec[ProfilerConfigurationArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

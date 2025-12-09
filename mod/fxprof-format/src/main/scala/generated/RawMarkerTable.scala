@@ -115,6 +115,6 @@ private[fxprof] case class RawMarkerTableArgs(
 )
 private[fxprof] object RawMarkerTableArgs {
   implicit val codec: JsonValueCodec[RawMarkerTableArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

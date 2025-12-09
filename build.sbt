@@ -50,32 +50,41 @@ lazy val fxprofCodegen = project
       "com.indoorvivants" %%% "rendition" % Versions.Rendition,
       "com.lihaoyi" %%% "os-lib" % Versions.OsLib
     ),
-    noPublish,
-    codegen := {
-    val task = InputKey[Unit]("scalafmtOnly")
-    val out =
-      (fxprofFormat.jvm(Versions.Scala3) / Compile / sourceDirectory).value / "scala" / "generated"
-
-    Def.sequential(
-      Def
-        .taskDyn {
-          (fxprofCodegen / Compile / run)
-            .toTask(
-              s" --out $out"
-            )
-        },
-      Def.taskDyn {
-        val files = IO.readLines(generatedFiles)
-        (Compile / task).toTask(s" ${files.mkString(" ")}")
-      }
-    )
-
-  }.evaluated
-    }
+    run / fork := true,
+    noPublish
   )
 
-val codegen = taskKey[Unit]("")
+val codegen = inputKey[Unit]("")
+Global / codegen := Def.inputTaskDyn {
+  // val task = InputKey[Unit]("scalafmtOnly")
+  val out =
+    (fxprofFormat.jvm(
+      Versions.Scala3
+    ) / Compile / sourceDirectory).value / "scala" / "generated"
 
+  val in =
+    (ThisBuild / baseDirectory).value / "firefox-profiler"
+
+  sLog.value.info(out.toString())
+  sLog.value.info(in.toString())
+
+  // Def.sequential(
+
+  Def
+    .sequential(Def.taskDyn {
+      (fxprofCodegen / Compile / run)
+        .toTask(
+          s" --out $out --firefoxProfiler $in"
+        )
+    })
+
+  // Def.taskDyn {
+  //   val files = IO.readLines(generatedFiles)
+  //   (Compile / task).toTask(s" ${files.mkString(" ")}")
+  // }
+  // )
+
+}.evaluated
 
 lazy val fxprofSample = projectMatrix
   .in(file("mod/fxprof-sample"))

@@ -85,6 +85,6 @@ private[fxprof] case class GPUMarkerPayloadArgs(
 )
 private[fxprof] object GPUMarkerPayloadArgs {
   implicit val codec: JsonValueCodec[GPUMarkerPayloadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

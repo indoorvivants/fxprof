@@ -116,6 +116,6 @@ private[fxprof] case class JsAllocationsTableArgs(
 )
 private[fxprof] object JsAllocationsTableArgs {
   implicit val codec: JsonValueCodec[JsAllocationsTableArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

@@ -1,4 +1,5 @@
 import rendition.RenderingContext
+import decline_derive.CommandApplication
 
 enum ExtraDef:
   case LiteralStr(name: String, value: String)
@@ -100,10 +101,16 @@ def parseType(str: String, name: String): Type =
     case s"$something<$tpe>"                                   =>
       Type.GenericRef(something, tpe)
 
-@main def run(out: String) =
-  val outDir = os.Path(out, os.pwd)
+case class Config(out: String, firefoxProfiler: String)
+    derives CommandApplication
+
+@main def run(args: String*) =
+  val config = CommandApplication.parseOrExit[Config](args)
+
+  val outDir = os.Path(config.out, os.pwd)
+  val profilerDir = os.Path(config.firefoxProfiler, os.pwd)
   val allowed = Map(
-    "firefox-profiler/src/types/markers.ts" ->
+    "src/types/markers.ts" ->
       List(
         "FileIoPayload",
         "CauseBacktrace",
@@ -137,7 +144,7 @@ def parseType(str: String, name: String): Type =
         "MarkerSchemaField",
         "TableColumnFormat"
       ),
-    "firefox-profiler/src/types/profile.ts" ->
+    "src/types/profile.ts" ->
       List(
         "RawCounter",
         "RawCounterSamplesTable",
@@ -183,7 +190,7 @@ def parseType(str: String, name: String): Type =
   allowed.foreach:
     (prof, list) =>
       println(s"Processing $prof")
-      val lines = os.read.lines(os.pwd / os.RelPath(prof)).toArray
+      val lines = os.read.lines(profilerDir / os.RelPath(prof)).toArray
 
       enum State:
         case Start, CollectingFields

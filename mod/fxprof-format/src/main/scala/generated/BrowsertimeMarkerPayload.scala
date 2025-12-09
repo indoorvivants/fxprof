@@ -55,6 +55,6 @@ private[fxprof] case class BrowsertimeMarkerPayloadArgs(
 )
 private[fxprof] object BrowsertimeMarkerPayloadArgs {
   implicit val codec: JsonValueCodec[BrowsertimeMarkerPayloadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

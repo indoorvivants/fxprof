@@ -218,6 +218,6 @@ private[fxprof] case class IPCMarkerPayloadArgs(
 )
 private[fxprof] object IPCMarkerPayloadArgs {
   implicit val codec: JsonValueCodec[IPCMarkerPayloadArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

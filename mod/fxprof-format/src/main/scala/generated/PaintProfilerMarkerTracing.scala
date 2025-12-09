@@ -62,6 +62,6 @@ private[fxprof] case class PaintProfilerMarkerTracingArgs(
 )
 private[fxprof] object PaintProfilerMarkerTracingArgs {
   implicit val codec: JsonValueCodec[PaintProfilerMarkerTracingArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

@@ -71,6 +71,6 @@ private[fxprof] case class ProgressGraphDataArgs(
 )
 private[fxprof] object ProgressGraphDataArgs {
   implicit val codec: JsonValueCodec[ProgressGraphDataArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }

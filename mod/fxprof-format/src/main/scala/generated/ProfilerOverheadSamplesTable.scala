@@ -88,6 +88,6 @@ private[fxprof] case class ProfilerOverheadSamplesTableArgs(
 )
 private[fxprof] object ProfilerOverheadSamplesTableArgs {
   implicit val codec: JsonValueCodec[ProfilerOverheadSamplesTableArgs] = 
-    JsonCodecMaker.make(CodecMakerConfig.withTransientEmpty(true))
+    JsonCodecMaker.makeWithRequiredCollectionFields
   
 }
