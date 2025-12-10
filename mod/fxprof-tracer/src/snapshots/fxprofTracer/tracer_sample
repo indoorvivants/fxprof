@@ -5,13 +5,6 @@
       "processType": 1.0,
       "categories": [
          {
-            "name": "default",
-            "color": "grey",
-            "subcategories": [
-               "Other"
-            ]
-         },
-         {
             "name": "lowering",
             "color": "yellow",
             "subcategories": [
@@ -28,6 +21,13 @@
          {
             "name": "emitting",
             "color": "green",
+            "subcategories": [
+               "Other"
+            ]
+         },
+         {
+            "name": "default",
+            "color": "grey",
             "subcategories": [
                "Other"
             ]
@@ -57,12 +57,12 @@
    ],
    "shared": {
       "stringArray": [
-         "hello",
          "bla",
          "bla.constants",
          "object bla",
          "bla$lzymap",
-         "bla.apply(..)"
+         "bla.apply(..)",
+         "hello"
       ],
       "sources": {
          "length": 0.0,
@@ -75,6 +75,145 @@
       }
    },
    "threads": [
+      {
+         "processType": "default",
+         "processStartupTime": 100.0,
+         "registerTime": 0.0,
+         "pausedRanges": [
+            
+         ],
+         "name": "tracer-t-2",
+         "isMainThread": false,
+         "pid": "1",
+         "tid": "tracer-t-2",
+         "samples": {
+            "stack": [
+               0.0
+            ],
+            "time": [
+               290.0
+            ],
+            "weight": [
+               1.0
+            ],
+            "weightType": "samples",
+            "length": 1.0
+         },
+         "markers": {
+            "data": [
+               
+            ],
+            "name": [
+               
+            ],
+            "startTime": [
+               
+            ],
+            "endTime": [
+               
+            ],
+            "phase": [
+               
+            ],
+            "category": [
+               
+            ],
+            "length": 0.0
+         },
+         "stackTable": {
+            "frame": [
+               0.0
+            ],
+            "prefix": [
+               null
+            ],
+            "length": 1.0
+         },
+         "frameTable": {
+            "address": [
+               -1
+            ],
+            "inlineDepth": [
+               0.0
+            ],
+            "category": [
+               3.0
+            ],
+            "subcategory": [
+               null
+            ],
+            "func": [
+               0.0
+            ],
+            "nativeSymbol": [
+               null
+            ],
+            "innerWindowID": [
+               null
+            ],
+            "line": [
+               null
+            ],
+            "column": [
+               null
+            ],
+            "length": 1.0
+         },
+         "funcTable": {
+            "name": [
+               5.0
+            ],
+            "isJS": [
+               false
+            ],
+            "relevantForJS": [
+               false
+            ],
+            "resource": [
+               -1
+            ],
+            "source": [
+               null
+            ],
+            "lineNumber": [
+               null
+            ],
+            "columnNumber": [
+               null
+            ],
+            "length": 1.0
+         },
+         "resourceTable": {
+            "length": 0.0,
+            "lib": [
+               
+            ],
+            "name": [
+               
+            ],
+            "host": [
+               
+            ],
+            "type": [
+               
+            ]
+         },
+         "nativeSymbols": {
+            "libIndex": [
+               
+            ],
+            "address": [
+               
+            ],
+            "name": [
+               
+            ],
+            "functionSize": [
+               
+            ],
+            "length": 0.0
+         }
+      },
       {
          "processType": "default",
          "processStartupTime": 220.0,
@@ -172,12 +311,12 @@
                0.0
             ],
             "category": [
-               1.0,
+               0.0,
+               0.0,
                1.0,
                2.0,
-               3.0,
-               3.0,
-               3.0
+               2.0,
+               2.0
             ],
             "subcategory": [
                null,
@@ -231,11 +370,11 @@
          },
          "funcTable": {
             "name": [
+               0.0,
                1.0,
                2.0,
                3.0,
-               4.0,
-               5.0
+               4.0
             ],
             "isJS": [
                false,
@@ -280,145 +419,6 @@
                null
             ],
             "length": 5.0
-         },
-         "resourceTable": {
-            "length": 0.0,
-            "lib": [
-               
-            ],
-            "name": [
-               
-            ],
-            "host": [
-               
-            ],
-            "type": [
-               
-            ]
-         },
-         "nativeSymbols": {
-            "libIndex": [
-               
-            ],
-            "address": [
-               
-            ],
-            "name": [
-               
-            ],
-            "functionSize": [
-               
-            ],
-            "length": 0.0
-         }
-      },
-      {
-         "processType": "default",
-         "processStartupTime": 100.0,
-         "registerTime": 0.0,
-         "pausedRanges": [
-            
-         ],
-         "name": "tracer-t-2",
-         "isMainThread": false,
-         "pid": "1",
-         "tid": "tracer-t-2",
-         "samples": {
-            "stack": [
-               0.0
-            ],
-            "time": [
-               290.0
-            ],
-            "weight": [
-               1.0
-            ],
-            "weightType": "samples",
-            "length": 1.0
-         },
-         "markers": {
-            "data": [
-               
-            ],
-            "name": [
-               
-            ],
-            "startTime": [
-               
-            ],
-            "endTime": [
-               
-            ],
-            "phase": [
-               
-            ],
-            "category": [
-               
-            ],
-            "length": 0.0
-         },
-         "stackTable": {
-            "frame": [
-               0.0
-            ],
-            "prefix": [
-               null
-            ],
-            "length": 1.0
-         },
-         "frameTable": {
-            "address": [
-               -1
-            ],
-            "inlineDepth": [
-               0.0
-            ],
-            "category": [
-               0.0
-            ],
-            "subcategory": [
-               null
-            ],
-            "func": [
-               0.0
-            ],
-            "nativeSymbol": [
-               null
-            ],
-            "innerWindowID": [
-               null
-            ],
-            "line": [
-               null
-            ],
-            "column": [
-               null
-            ],
-            "length": 1.0
-         },
-         "funcTable": {
-            "name": [
-               0.0
-            ],
-            "isJS": [
-               false
-            ],
-            "relevantForJS": [
-               false
-            ],
-            "resource": [
-               -1
-            ],
-            "source": [
-               null
-            ],
-            "lineNumber": [
-               null
-            ],
-            "columnNumber": [
-               null
-            ],
-            "length": 1.0
          },
          "resourceTable": {
             "length": 0.0,

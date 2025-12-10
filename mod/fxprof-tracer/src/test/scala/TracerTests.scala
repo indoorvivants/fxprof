@@ -120,10 +120,13 @@ class TracerTests extends FunSuite with MunitSnapshotsIntegration {
       }
     }
 
+    // Note that we are launching the threads in deterministic order
+    // This is only done to make sure our tests are reproducible,
+    // as thread interleaving can produce different orders in shared structures, such as strings array
     t1.start()
-    t2.start()
-
     t1.join()
+
+    t2.start()
     t2.join()
 
     tracer.close()

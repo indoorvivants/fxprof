@@ -5,13 +5,6 @@
       "processType": 1.0,
       "categories": [
          {
-            "name": "default",
-            "color": "grey",
-            "subcategories": [
-               "Other"
-            ]
-         },
-         {
             "name": "lowering",
             "color": "yellow",
             "subcategories": [
@@ -28,6 +21,13 @@
          {
             "name": "emitting",
             "color": "green",
+            "subcategories": [
+               "Other"
+            ]
+         },
+         {
+            "name": "default",
+            "color": "grey",
             "subcategories": [
                "Other"
             ]
@@ -57,12 +57,12 @@
    ],
    "shared": {
       "stringArray": [
-         "hello",
          "bla",
          "bla.constants",
          "object bla",
          "bla$lzymap",
-         "bla.apply(..)"
+         "bla.apply(..)",
+         "hello"
       ],
       "sources": {
          "length": 0.0,
@@ -172,12 +172,12 @@
                0.0
             ],
             "category": [
-               1.0,
+               0.0,
+               0.0,
                1.0,
                2.0,
-               3.0,
-               3.0,
-               3.0
+               2.0,
+               2.0
             ],
             "subcategory": [
                null,
@@ -231,11 +231,11 @@
          },
          "funcTable": {
             "name": [
+               0.0,
                1.0,
                2.0,
                3.0,
-               4.0,
-               5.0
+               4.0
             ],
             "isJS": [
                false,
@@ -374,7 +374,7 @@
                0.0
             ],
             "category": [
-               0.0
+               3.0
             ],
             "subcategory": [
                null
@@ -398,7 +398,7 @@
          },
          "funcTable": {
             "name": [
-               0.0
+               5.0
             ],
             "isJS": [
                false
