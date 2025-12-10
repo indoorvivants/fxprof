@@ -27,33 +27,41 @@ case class Config(out: String) derives CommandApplication
       )
     )
 
-  val t = Tracer(meta)
+  val tracer = Tracer(meta)
 
-  t.span("bla ", "lowering") {
-    t.span("bla.constants", "lowering") {
-      Thread.sleep(100)
-      t.span("bla ", "optimising") {
-        Thread.sleep(200)
+  val t1 = new Thread("tracer-t-1") {
+    override def run(): Unit = {
+      tracer.span("bla", "lowering") {
+        tracer.span("bla.constants", "lowering") {
+          tracer.span("bla", "optimising") {}
+        }
+      }
+
+      tracer.span("object bla", "emitting") {
+        tracer.span("bla$lzymap", "emitting") {}
+        tracer.span("bla.apply(..)", "emitting") {}
+      }
+
+    }
+  }
+
+  val t2 = new Thread("tracer-t-2") {
+    override def run(): Unit = {
+      tracer.span("hello") {
+        println("yes")
       }
     }
   }
 
-  t.span("object bla", "emitting") {
-    t.span("bla$lzymap", "emitting") {
-      Thread.sleep(400)
-    }
-    t.span("bla.apply(..)", "emitting") {
-      Thread.sleep(100)
-    }
-  }
+  t1.start()
+  t2.start()
 
-  t.span("hello") {
-    println("yes")
-  }
+  t1.join()
+  t2.join()
 
-  t.close()
+  tracer.close()
 
-  val prof = t.build()
+  val prof = tracer.build()
 
   import com.github.plokhotnyuk.jsoniter_scala.core._
   println(prof.shared.stringArray.zipWithIndex)

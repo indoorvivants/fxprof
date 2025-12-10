@@ -45,10 +45,20 @@ class TracerTests extends FunSuite with MunitSnapshotsIntegration {
       override def processShutdownTime(): Long = fixedTime.toEpochMilli() + 500
 
       override def threadStartupTime(name: String): Long =
-        fixedTime.toEpochMilli() + 220
+        name match {
+          case "tracer-t-1" =>
+            fixedTime.toEpochMilli() + 220
+          case "tracer-t-2" =>
+            fixedTime.toEpochMilli() + 100
+        }
 
       override def threadShutdownTime(name: String): Long =
-        fixedTime.toEpochMilli() + 400
+        name match {
+          case "tracer-t-1" =>
+            fixedTime.toEpochMilli() + 400
+          case "tracer-t-2" =>
+            fixedTime.toEpochMilli() + 150
+        }
 
       override def beforeMillis(marker: String, labels: String): Long = {
         var t = fixedTime.toEpochMilli() + 220
@@ -74,7 +84,7 @@ class TracerTests extends FunSuite with MunitSnapshotsIntegration {
 
     }
 
-    val t = Tracer(
+    val tracer = Tracer(
       meta.withCategories(
         Some(
           Vector(
@@ -86,24 +96,39 @@ class TracerTests extends FunSuite with MunitSnapshotsIntegration {
       )
     ).withClock(clock)
 
-    t.span("bla", "lowering") {
-      t.span("bla.constants", "lowering") {
-        t.span("bla", "optimising") {}
+    val t1 = new Thread("tracer-t-1") {
+      override def run(): Unit = {
+        tracer.span("bla", "lowering") {
+          tracer.span("bla.constants", "lowering") {
+            tracer.span("bla", "optimising") {}
+          }
+        }
+
+        tracer.span("object bla", "emitting") {
+          tracer.span("bla$lzymap", "emitting") {}
+          tracer.span("bla.apply(..)", "emitting") {}
+        }
+
       }
     }
 
-    t.span("object bla", "emitting") {
-      t.span("bla$lzymap", "emitting") {}
-      t.span("bla.apply(..)", "emitting") {}
+    val t2 = new Thread("tracer-t-2") {
+      override def run(): Unit = {
+        tracer.span("hello") {
+          println("yes")
+        }
+      }
     }
 
-    t.span("hello") {
-      println("yes")
-    }
+    t1.start()
+    t2.start()
 
-    t.close()
+    t1.join()
+    t2.join()
 
-    val prof = t.build()
+    tracer.close()
+
+    val prof = tracer.build()
 
     assertSnapshot(
       "tracer sample",

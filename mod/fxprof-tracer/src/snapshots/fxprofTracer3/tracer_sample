@@ -5,6 +5,13 @@
       "processType": 1.0,
       "categories": [
          {
+            "name": "default",
+            "color": "grey",
+            "subcategories": [
+               "Other"
+            ]
+         },
+         {
             "name": "lowering",
             "color": "yellow",
             "subcategories": [
@@ -21,13 +28,6 @@
          {
             "name": "emitting",
             "color": "green",
-            "subcategories": [
-               "Other"
-            ]
-         },
-         {
-            "name": "default",
-            "color": "grey",
             "subcategories": [
                "Other"
             ]
@@ -58,11 +58,11 @@
    "shared": {
       "stringArray": [
          "bla",
+         "hello",
          "bla.constants",
          "object bla",
          "bla$lzymap",
-         "bla.apply(..)",
-         "hello"
+         "bla.apply(..)"
       ],
       "sources": {
          "length": 0.0,
@@ -78,15 +78,14 @@
       {
          "processType": "default",
          "processStartupTime": 220.0,
-         "processShutdownTime": 400.0,
          "registerTime": 0.0,
          "pausedRanges": [
             
          ],
-         "name": "thread-1",
-         "isMainThread": true,
+         "name": "tracer-t-1",
+         "isMainThread": false,
          "pid": "1",
-         "tid": "thread-1",
+         "tid": "tracer-t-1",
          "samples": {
             "stack": [
                0.0,
@@ -94,8 +93,7 @@
                2.0,
                3.0,
                4.0,
-               5.0,
-               6.0
+               5.0
             ],
             "time": [
                20.0,
@@ -103,11 +101,9 @@
                30.0,
                100.0,
                120.0,
-               150.0,
-               170.0
+               150.0
             ],
             "weight": [
-               1.0,
                1.0,
                1.0,
                1.0,
@@ -116,7 +112,7 @@
                1.0
             ],
             "weightType": "samples",
-            "length": 7.0
+            "length": 6.0
          },
          "markers": {
             "data": [
@@ -146,8 +142,7 @@
                2.0,
                3.0,
                4.0,
-               5.0,
-               6.0
+               5.0
             ],
             "prefix": [
                null,
@@ -155,14 +150,12 @@
                1.0,
                null,
                3.0,
-               3.0,
-               null
+               3.0
             ],
-            "length": 7.0
+            "length": 6.0
          },
          "frameTable": {
             "address": [
-               -1,
                -1,
                -1,
                -1,
@@ -176,20 +169,17 @@
                0.0,
                0.0,
                0.0,
-               0.0,
                0.0
             ],
             "category": [
-               0.0,
-               0.0,
+               1.0,
                1.0,
                2.0,
-               2.0,
-               2.0,
+               3.0,
+               3.0,
                3.0
             ],
             "subcategory": [
-               null,
                null,
                null,
                null,
@@ -203,11 +193,9 @@
                0.0,
                2.0,
                3.0,
-               4.0,
-               5.0
+               4.0
             ],
             "nativeSymbol": [
-               null,
                null,
                null,
                null,
@@ -221,11 +209,9 @@
                null,
                null,
                null,
-               null,
                null
             ],
             "line": [
-               null,
                null,
                null,
                null,
@@ -239,22 +225,19 @@
                null,
                null,
                null,
-               null,
                null
             ],
-            "length": 7.0
+            "length": 6.0
          },
          "funcTable": {
             "name": [
                0.0,
-               1.0,
                2.0,
                3.0,
                4.0,
                5.0
             ],
             "isJS": [
-               false,
                false,
                false,
                false,
@@ -266,11 +249,9 @@
                false,
                false,
                false,
-               false,
                false
             ],
             "resource": [
-               -1,
                -1,
                -1,
                -1,
@@ -282,11 +263,9 @@
                null,
                null,
                null,
-               null,
                null
             ],
             "lineNumber": [
-               null,
                null,
                null,
                null,
@@ -298,10 +277,148 @@
                null,
                null,
                null,
-               null,
                null
             ],
-            "length": 6.0
+            "length": 5.0
+         },
+         "resourceTable": {
+            "length": 0.0,
+            "lib": [
+               
+            ],
+            "name": [
+               
+            ],
+            "host": [
+               
+            ],
+            "type": [
+               
+            ]
+         },
+         "nativeSymbols": {
+            "libIndex": [
+               
+            ],
+            "address": [
+               
+            ],
+            "name": [
+               
+            ],
+            "functionSize": [
+               
+            ],
+            "length": 0.0
+         }
+      },
+      {
+         "processType": "default",
+         "processStartupTime": 100.0,
+         "registerTime": 0.0,
+         "pausedRanges": [
+            
+         ],
+         "name": "tracer-t-2",
+         "isMainThread": false,
+         "pid": "1",
+         "tid": "tracer-t-2",
+         "samples": {
+            "stack": [
+               0.0
+            ],
+            "time": [
+               290.0
+            ],
+            "weight": [
+               1.0
+            ],
+            "weightType": "samples",
+            "length": 1.0
+         },
+         "markers": {
+            "data": [
+               
+            ],
+            "name": [
+               
+            ],
+            "startTime": [
+               
+            ],
+            "endTime": [
+               
+            ],
+            "phase": [
+               
+            ],
+            "category": [
+               
+            ],
+            "length": 0.0
+         },
+         "stackTable": {
+            "frame": [
+               0.0
+            ],
+            "prefix": [
+               null
+            ],
+            "length": 1.0
+         },
+         "frameTable": {
+            "address": [
+               -1
+            ],
+            "inlineDepth": [
+               0.0
+            ],
+            "category": [
+               0.0
+            ],
+            "subcategory": [
+               null
+            ],
+            "func": [
+               0.0
+            ],
+            "nativeSymbol": [
+               null
+            ],
+            "innerWindowID": [
+               null
+            ],
+            "line": [
+               null
+            ],
+            "column": [
+               null
+            ],
+            "length": 1.0
+         },
+         "funcTable": {
+            "name": [
+               1.0
+            ],
+            "isJS": [
+               false
+            ],
+            "relevantForJS": [
+               false
+            ],
+            "resource": [
+               -1
+            ],
+            "source": [
+               null
+            ],
+            "lineNumber": [
+               null
+            ],
+            "columnNumber": [
+               null
+            ],
+            "length": 1.0
          },
          "resourceTable": {
             "length": 0.0,

@@ -36,7 +36,8 @@ lazy val fxprofTracer = projectMatrix
   .dependsOn(fxprofFormat)
   .jvmPlatform(Versions.allScala)
   .nativePlatform(Versions.allScala)
-  .jsPlatform(Versions.allScala)
+  // TODO: re-enable when TracerTests.scala is adjusted to be runnable on Scala.js (Thread#join is a problem)
+  // .jsPlatform(Versions.allScala)
   .settings(
     name := "fxprof-tracer",
     scalacOptions += "-Xsource:3"

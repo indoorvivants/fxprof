@@ -19,7 +19,7 @@ libraryDependencies += "com.indoorvivants" %% "fxprof-tracer" % "VERSION"
 All modules are 
 
 Caveats:
-  1. Current tracer is single threaded
+  1. ~~Current tracer is single threaded~~
   2. The output looks right-ish, but not as rich as something like what [samply](https://github.com/mstange/samply) can produce
   3. At the moment profiles can only be written, not read
   

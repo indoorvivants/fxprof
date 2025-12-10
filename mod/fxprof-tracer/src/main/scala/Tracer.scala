@@ -4,6 +4,7 @@ import fxprof.*
 import scala.reflect.ClassTag
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.ConcurrentHashMap
 
 trait ClockSample {
   def processStartupTime(): Long
@@ -71,9 +72,7 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
   private val strings = new Interner[String]
 
   private case class Function(nameID: FunctionNameID)
-  private val functions = new Interner[Function]
 
-  private val threadIds = new Interner[String]
   private val categories = new Interner[String]
 
   private case class Frame(
@@ -81,31 +80,22 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
       functionID: Int,
       categoryID: Int
   )
-  private val frames = new Interner[Frame]
 
   private case class Sample(stackID: StackID, start: Double)
-  private val samples = new Interner[Sample]
-
   private case class Stack(frameID: Int, prefix: Option[StackID])
-  private val stacks = new Interner[Stack]
 
-  // private val currentThread =
-  //   ThreadLocal.withInitial[ThreadID](() =>
-  //     threadIds.id(Thread.currentThread().getName())
-  //   )
-
-  private val currentStackPrefix =
-    new ThreadLocal[Option[StackID]]
-  // ThreadLocal.withInitial[Option[StackID]](() => None)
-
+  private val stackPrefixes = new ConcurrentHashMap[Thread, Option[StackID]]()
   private val processStartupTime = clock.processStartupTime()
-
-  private val threadStartupTime = new ThreadLocal[Long]
-  // ThreadLocal.withInitial[Long](() =>
-  //   clock.threadStartupTime(Thread.currentThread().getName())
-  // )
-
+  private val threadStartupTime = new ConcurrentHashMap[Thread, Long]()
   private val isClosed = new AtomicBoolean()
+
+  private class ThreadSummary {
+    val samples = new Interner[Sample]
+    val stacks = new Interner[Stack]
+    val frames = new Interner[Frame]
+    val functions = new Interner[Function]
+  }
+  private val threads = new ConcurrentHashMap[Thread, ThreadSummary]()
 
   def checkOpen() = {
     if (isClosed.get()) throw new IllegalStateException("Profile is closed")
@@ -122,49 +112,75 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
       .flatMap(categoryMap.get)
       .map(_.withSubcategories(Vector("Other")))
 
-    val framesTable = {
-      val (categories, functions) =
-        frames.all.toVector
-          .map(f => (f.categoryID.toDouble, f.functionID.toDouble))
-          .unzip
+    val rawThreads = Vector.newBuilder[RawThread]
 
-      FrameTable(categories.length)
-        .withCategory(categories.map(Some(_)))
-        .withSubcategory(Vector.fill(categories.length)(None))
-        .withFunc(functions)
-        .withNativeSymbol(Vector.fill(categories.length)(None))
-        .withInlineDepth(Vector.fill(categories.length)(0))
-        .withInnerWindowID(Vector.fill(categories.length)(None))
-        .withLine(Vector.fill(categories.length)(None))
-        .withColumn(Vector.fill(categories.length)(None))
-        .withAddress(Vector.fill(categories.length)(FrameTable_Address.None))
-    }
+    threads.forEach { (thread, summary) =>
+      import summary.*
 
-    val functionsTable = {
-      val funcs = functions.all
-      FuncTable(funcs.length)
-        .withName(funcs.toVector.map(_.nameID.toDouble))
-        .withIsJS(Vector.fill(funcs.length)(false))
-        .withRelevantForJS(Vector.fill(funcs.length)(false))
-        .withResource(Vector.fill(funcs.length)(FuncTable_Resource.None))
-        .withSource(Vector.fill(funcs.length)(None))
-        .withLineNumber(Vector.fill(funcs.length)(None))
-        .withColumnNumber(Vector.fill(funcs.length)(None))
-    }
+      val framesTable = {
+        val (categories, functions) =
+          frames.all.toVector
+            .map(f => (f.categoryID.toDouble, f.functionID.toDouble))
+            .unzip
 
-    val stacksTable = {
-      val stack = stacks.all
-      RawStackTable(stack.length)
-        .withFrame(stack.map(_.frameID.toDouble).toVector)
-        .withPrefix(stack.map(_.prefix.map(_.toDouble)).toVector)
-    }
+        FrameTable(categories.length)
+          .withCategory(categories.map(Some(_)))
+          .withSubcategory(Vector.fill(categories.length)(None))
+          .withFunc(functions)
+          .withNativeSymbol(Vector.fill(categories.length)(None))
+          .withInlineDepth(Vector.fill(categories.length)(0))
+          .withInnerWindowID(Vector.fill(categories.length)(None))
+          .withLine(Vector.fill(categories.length)(None))
+          .withColumn(Vector.fill(categories.length)(None))
+          .withAddress(Vector.fill(categories.length)(FrameTable_Address.None))
+      }
 
-    val samplesTable = {
-      val sampl = samples.all.sortBy(_.start)
-      RawSamplesTable(WeightType.Samples, sampl.length)
-        .withStack(sampl.map(s => Some(s.stackID.toDouble)).toVector)
-        .withTime(Some(sampl.map(_.start.toDouble).toVector))
-        .withWeight(Vector.fill(sampl.length)(Some(1.0)))
+      val functionsTable = {
+        val funcs = functions.all
+        FuncTable(funcs.length)
+          .withName(funcs.toVector.map(_.nameID.toDouble))
+          .withIsJS(Vector.fill(funcs.length)(false))
+          .withRelevantForJS(Vector.fill(funcs.length)(false))
+          .withResource(Vector.fill(funcs.length)(FuncTable_Resource.None))
+          .withSource(Vector.fill(funcs.length)(None))
+          .withLineNumber(Vector.fill(funcs.length)(None))
+          .withColumnNumber(Vector.fill(funcs.length)(None))
+      }
+
+      val stacksTable = {
+        val stack = stacks.all
+        RawStackTable(stack.length)
+          .withFrame(stack.map(_.frameID.toDouble).toVector)
+          .withPrefix(stack.map(_.prefix.map(_.toDouble)).toVector)
+      }
+
+      val samplesTable = {
+        val sampl = samples.all.sortBy(_.start)
+        RawSamplesTable(WeightType.Samples, sampl.length)
+          .withStack(sampl.map(s => Some(s.stackID.toDouble)).toVector)
+          .withTime(Some(sampl.map(_.start.toDouble).toVector))
+          .withWeight(Vector.fill(sampl.length)(Some(1.0)))
+      }
+
+      rawThreads += RawThread(
+        processType = ProcessType.Default,
+        processStartupTime = threadStartupTime.get(thread) - processStartupTime,
+        registerTime = 0,
+        name = thread.getName(),
+        isMainThread = false,
+        pid = "1",
+        tid = Tid.Str(thread.getName()),
+        samples = samplesTable,
+        markers = RawMarkerTable(0),
+        stackTable = stacksTable,
+        frameTable = framesTable,
+        funcTable = functionsTable,
+        resourceTable = ResourceTable(0),
+        nativeSymbols = NativeSymbolTable(0)
+      )
+      // .withProcessShutdownTime(
+      //   //Some(clock.threadShutdownTime(thread.getName()) - processStartupTime)
+      // )
     }
 
     isClosed.set(true)
@@ -173,69 +189,37 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
       meta = this.meta.withCategories(Some(cats)),
       shared = RawProfileSharedData(sources).withStringArray(stringArray)
     ).withThreads(
-      Vector(
-        fxprof
-          .RawThread(
-            processType = ProcessType.Default,
-            processStartupTime = threadStartupTime.get() - processStartupTime,
-            registerTime = 0,
-            name = "thread-1",
-            isMainThread = true,
-            pid = "1",
-            tid = Tid.Str("thread-1"),
-            samples = samplesTable,
-            markers = RawMarkerTable(0),
-            stackTable = stacksTable,
-            frameTable = framesTable,
-            funcTable = functionsTable,
-            resourceTable = ResourceTable(0),
-            nativeSymbols = NativeSymbolTable(0)
-          )
-          .withProcessShutdownTime(
-            Some(clock.threadShutdownTime("thread-1") - processStartupTime)
-          )
-      )
-    ).withLibs(Vector.empty)
+      rawThreads.result()
+    )
   }
 
   def span[A](name: String)(f: => A): A = span(name, "default")(f)
 
-  // Scala.js does not have ThreadLocal.withInitial
-  private val tlInits = collection.mutable.Set.empty[ThreadLocal[?]]
-  private def getOrElse[A](tl: ThreadLocal[A], value: => A): A = {
-    val v = tl.get()
-    if (v == null) {
-      if (tlInits.contains(tl))
-        v
-      else {
-        tl.set(value)
-        tlInits += tl
-        value
-
-      }
-    } else v
-  }
-
   def span[A](name: String, category: String)(f: => A): A = {
     checkOpen()
     val catName = categoryMap.getOrElse(category, categoryMap("default")).name
-    val ts = getOrElse(
-      threadStartupTime,
-      clock.threadStartupTime(Thread.currentThread().getName())
-    )
+    val ts =
+      threadStartupTime.computeIfAbsent(
+        Thread.currentThread(),
+        _ => clock.threadStartupTime(Thread.currentThread().getName())
+      )
+    val summary =
+      threads.computeIfAbsent(Thread.currentThread(), _ => new ThreadSummary)
+    import summary._
     val functionNameID = strings.id(name)
     val func = Function(functionNameID)
     val funcID = functions.id(func)
     val categoryID = categories.id(catName)
-    val prefix = getOrElse(currentStackPrefix, None)
+    val prefix =
+      stackPrefixes.computeIfAbsent(Thread.currentThread(), _ => None)
     val frame = Frame(prefix, funcID, categoryID)
     val frameID = frames.id(frame)
     val stackID = stacks.id(Stack(frameID, prefix))
-    currentStackPrefix.set(Some(stackID))
+    stackPrefixes.put(Thread.currentThread(), Some(stackID))
     val start =
       clock.beforeMillis(name, category)
     val result = f
-    currentStackPrefix.set(prefix)
+    stackPrefixes.put(Thread.currentThread(), prefix)
 
     val sampleID = samples.id(Sample(stackID = stackID, start = start - ts))
 
