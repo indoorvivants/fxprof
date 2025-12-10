@@ -32,18 +32,37 @@ object ClockSample {
   }
 }
 
-class Tracer private (meta: ProfileMeta, clock: ClockSample) {
+trait Tracer {
+  def span[A](name: String)(f: => A): A
+  def span[A](name: String, category: String)(f: => A): A
+  def close(): Unit
+}
+
+object Tracer {
+  def apply(meta: ProfileMeta) =
+    new RealTracer(meta, ClockSample.Default)
+
+  val noop = new Tracer {
+    override def span[A](name: String)(f: => A): A = f
+    override def span[A](name: String, category: String)(f: => A): A = f
+    override def close(): Unit = ()
+  }
+
+}
+
+class RealTracer private[tracer] (meta: ProfileMeta, clock: ClockSample)
+    extends Tracer {
   type ThreadID = Int
   type StringID = Int
   type FunctionId = Int
   type StackID = Int
   type FunctionNameID = Int
 
-  def withClock(clock: ClockSample): Tracer =
-    new Tracer(meta, clock)
+  def withClock(clock: ClockSample): RealTracer =
+    new RealTracer(meta, clock)
 
-  def withMeta(meta: ProfileMeta): Tracer =
-    new Tracer(meta, clock)
+  def withMeta(meta: ProfileMeta): RealTracer =
+    new RealTracer(meta, clock)
 
   private class Interner[K] {
     private val values = new java.util.concurrent.ConcurrentHashMap[K, Int]
@@ -226,8 +245,4 @@ class Tracer private (meta: ProfileMeta, clock: ClockSample) {
     result
   }
 
-}
-
-object Tracer {
-  def apply(meta: ProfileMeta) = new Tracer(meta, ClockSample.Default)
 }
