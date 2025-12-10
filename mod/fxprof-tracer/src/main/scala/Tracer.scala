@@ -144,7 +144,7 @@ class RealTracer private[tracer] (meta: ProfileMeta, clock: ClockSample)
 
         FrameTable(categories.length)
           .withCategory(categories.map(Some(_)))
-          .withSubcategory(Vector.fill(categories.length)(None))
+          .withSubcategory(Vector.fill(categories.length)(Some(0)))
           .withFunc(functions)
           .withNativeSymbol(Vector.fill(categories.length)(None))
           .withInlineDepth(Vector.fill(categories.length)(0))
