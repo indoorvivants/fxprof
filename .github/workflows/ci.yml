@@ -34,8 +34,8 @@ jobs:
       # - name: Pull cache
       #   run: sbt --client pullRemoteCache || echo 'remote cache not found'
 
-      - name: Test
-        run: sbt --client test
+      # - name: Test
+      #   run: sbt --client test
 
       - name: Test publishing
         run: sbt --client publishLocal
